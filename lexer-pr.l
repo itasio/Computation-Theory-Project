@@ -20,13 +20,15 @@ DIGIT					[0-9]
 IDENTIFIER		[a-zA-Z][a-zA-Z0-9_]*
 CONST_INT		[0{DIGIT}+]
 CONST_FLOAT	{CONST_INT}"."({DIGIT}+)([eE][+-]?CONST_INT)?
-CONST_BOOL		??????
+CONST_BOOL		["True""False"]
 CONST_STR		"\"" [a-zA-Z0-9-+*/:_$%!#@&~^()., \n\t\r\\\"]+ "\""
 		
 
 
 %%
 "integer"|"False"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"not"|"main"|"boolean"|"else"|"while"|"and"|return"|"True"|"endif"|"endwhile"|"or"|comp"			{ printf("Line %d token KEYWORD: ", lineNum); return TK_KEYWORD;}
+"True"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
+"False"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 {IDENTIFIER}			{printf("token IDENTIFIER: "); return TK_IDENT;}
 {CONST_INT}			{printf("token CONST_INT: "); return TK_INTCONST;}
 {CONST_FLOAT}			{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}		
@@ -51,7 +53,7 @@ int main ()
    char* nline = "\n";
 	while ( (token = yylex()) != EOF ){
 		if(token == TK_NEWLINE){
-			str = "";			//have to truncate string
+			str[0] = "";			//have to truncate string
 		}else{
 			strcat(str, yytext);
 		}

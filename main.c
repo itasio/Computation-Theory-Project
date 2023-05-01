@@ -16,7 +16,7 @@ int main ()
    char* nline = "\n";
 	while ( (token = yylex()) != EOF ){
 		if(token == TK_NEWLINE){
-			str = "";			//have to truncate string
+			str[0] = "\0";			//have to truncate string
 		}else{
 			strcat(str, yytext);
 		}
