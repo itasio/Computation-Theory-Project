@@ -35,6 +35,7 @@ CONST_STR		"\"" [a-zA-Z0-9-+*/:_$%!#@&~^()., \n\t\r\\\"]+ "\""
 "-"							{printf("token MINUS_OP: "); return TK_MINUS;}
 "="							{printf("token ASSIGN_OP: "); return TK_ASSIGN;}
 
+
 [ \r\t]+		/* eat whitespace */
 "--"[^\n]*  	/* eat line comments */
 \n 					 {++lineNum; return TK_NEWLINE;}
@@ -48,17 +49,14 @@ int main ()
 {
    int token, i;
    int counter = 0;
-   char str[500];
+   char str[500];						//keep here the input to show whole text of line where an error has occured
    str[0]='\0';
 	while ( (token = yylex()) != EOF ){
-		if(token == TK_NEWLINE){
-			for(i=strlen(str);i>=0;i--){
-				//printf("%c", str[i]);
+		if(token == TK_NEWLINE){		
+			for(i=strlen(str);i>=0;i--){	//<<erasing>> the former line, to be ready for the next one
 				str[i] = '\0';
 			}
-			//printf("there\n");
 		}else{
-			//printf("here\n");
 			strcat(str, yytext);
 		}
 		if(token != TK_ERROR){
@@ -66,6 +64,7 @@ int main ()
 		}
 		else{
 			printf("%s\n", str);
+			return -1;
 		}
 	}
 }
