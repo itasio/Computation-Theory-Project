@@ -1,4 +1,5 @@
 %{
+	//-1 is for EOF
 	#define TK_ERROR -3
 	#define TK_NEWLINE -2
 	#define TK_IDENT 258
@@ -19,7 +20,7 @@
 DIGIT					[0-9]
 IDENTIFIER		[a-zA-Z][a-zA-Z0-9_]*
 CONST_INT		0|([1-9]{DIGIT}*)
-CONST_FLOAT	{CONST_INT}"."({DIGIT}+)([eE][+-]?CONST_INT)?
+CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 CONST_STR		"\"" [a-zA-Z0-9-+*/:_$%!#@&~^()., \n\t\r\\\"]+ "\""
 		
 
@@ -28,9 +29,9 @@ CONST_STR		"\"" [a-zA-Z0-9-+*/:_$%!#@&~^()., \n\t\r\\\"]+ "\""
 "integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"not"|"main"|"boolean"|"else"|"while"|"and"|return"|"endif"|"endwhile"|"or"|comp"			{ printf("Line %d token KEYWORD: ", lineNum); return TK_KEYWORD;}
 "True"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 "False"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
-{IDENTIFIER}				{printf("token IDENTIFIER: "); return TK_IDENT;}
 {CONST_INT}					{printf("token CONST_INT: "); return TK_CONSTINT;}
-{CONST_FLOAT}				{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}		
+{CONST_FLOAT}				{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}
+{IDENTIFIER}				{printf("token IDENTIFIER: "); return TK_IDENT;}		
 "+"							{printf("token PLUS_OP: "); return TK_PLUS;}
 "-"							{printf("token MINUS_OP: "); return TK_MINUS;}
 "="							{printf("token ASSIGN_OP: "); return TK_ASSIGN;}
