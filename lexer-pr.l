@@ -28,9 +28,9 @@ CONST_STR		"\"" [a-zA-Z0-9-+*/:_$%!#@&~^()., \n\t\r\\\"]+ "\""
 "integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"not"|"main"|"boolean"|"else"|"while"|"and"|return"|"endif"|"endwhile"|"or"|comp"			{ printf("Line %d token KEYWORD: ", lineNum); return TK_KEYWORD;}
 "True"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 "False"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
-{IDENTIFIER}			{printf("token IDENTIFIER: "); return TK_IDENT;}
-{CONST_INT}			{printf("token CONST_INT: "); return TK_CONSTINT;}
-{CONST_FLOAT}	{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}		
+{IDENTIFIER}				{printf("token IDENTIFIER: "); return TK_IDENT;}
+{CONST_INT}					{printf("token CONST_INT: "); return TK_CONSTINT;}
+{CONST_FLOAT}				{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}		
 "+"							{printf("token PLUS_OP: "); return TK_PLUS;}
 "-"							{printf("token MINUS_OP: "); return TK_MINUS;}
 "="							{printf("token ASSIGN_OP: "); return TK_ASSIGN;}
@@ -38,7 +38,7 @@ CONST_STR		"\"" [a-zA-Z0-9-+*/:_$%!#@&~^()., \n\t\r\\\"]+ "\""
 
 [ \r\t]+		/* eat whitespace */
 "--"[^\n]*  	/* eat line comments */
-\n 					 {++lineNum; return TK_NEWLINE;}
+\n 				{++lineNum; return TK_NEWLINE;}
 
 <<EOF>> 	return EOF;
 .           { printf("Unrecognized token %s in line: %d ", yytext, lineNum); return TK_ERROR;}
@@ -60,7 +60,8 @@ int main ()
 			strcat(str, yytext);
 		}
 		if(token != TK_ERROR){
-			printf("%s\n", yytext);
+			if(token != TK_NEWLINE)		//do not print new line
+				printf("%s\n", yytext);
 		}
 		else{
 			printf("%s\n", str);

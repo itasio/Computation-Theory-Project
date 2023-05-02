@@ -865,32 +865,32 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 38 "lexer-pr.l"
+#line 39 "lexer-pr.l"
 /* eat whitespace */
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 39 "lexer-pr.l"
+#line 40 "lexer-pr.l"
 /* eat line comments */
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 40 "lexer-pr.l"
+#line 41 "lexer-pr.l"
 {++lineNum; return TK_NEWLINE;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 42 "lexer-pr.l"
+#line 43 "lexer-pr.l"
 return EOF;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 43 "lexer-pr.l"
+#line 44 "lexer-pr.l"
 { printf("Unrecognized token %s in line: %d ", yytext, lineNum); return TK_ERROR;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 46 "lexer-pr.l"
+#line 47 "lexer-pr.l"
 ECHO;
 	YY_BREAK
 #line 897 "lex.yy.c"
@@ -1896,30 +1896,29 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 46 "lexer-pr.l"
+#line 47 "lexer-pr.l"
 
 int main ()
 {
    int token, i;
    int counter = 0;
-   char str[500];
+   char str[500];						//keep here the input to show whole text of line where an error has occured
    str[0]='\0';
 	while ( (token = yylex()) != EOF ){
-		if(token == TK_NEWLINE){
-			for(i=strlen(str);i>=0;i--){
-				//printf("%c", str[i]);
+		if(token == TK_NEWLINE){		
+			for(i=strlen(str);i>=0;i--){	//<<erasing>> the former line, to be ready for the next one
 				str[i] = '\0';
 			}
-			//printf("there\n");
 		}else{
-			//printf("here\n");
 			strcat(str, yytext);
 		}
 		if(token != TK_ERROR){
-			printf("%s\n", yytext);
+			if(token != TK_NEWLINE)		//do not print new line
+				printf("%s\n", yytext);
 		}
 		else{
 			printf("%s\n", str);
+			return -1;
 		}
 	}
 }
