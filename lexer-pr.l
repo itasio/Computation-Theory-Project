@@ -17,11 +17,11 @@
 	int lineNum = 1;
 %}
 
-DIGIT					[0-9]
+DIGIT			[0-9]
 IDENTIFIER		[a-zA-Z][a-zA-Z0-9_]*
 CONST_INT		0|([1-9]{DIGIT}*)
 CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
-CONST_STR		"\"" [a-zA-Z0-9-+*/:_$%!#@&~^()., \n\t\r\\\"]+ "\""
+CONST_STR		"\""([a-zA-Z0-9+-/*:_$%!#@&~^()., \n\t\r\\]+)"\""
 		
 
 
@@ -31,6 +31,7 @@ CONST_STR		"\"" [a-zA-Z0-9-+*/:_$%!#@&~^()., \n\t\r\\\"]+ "\""
 "False"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 {CONST_INT}					{printf("token CONST_INT: "); return TK_CONSTINT;}
 {CONST_FLOAT}				{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}
+{CONST_STR}					{printf("token CONST_STRING: "); return TK_CONSTSTR;}
 {IDENTIFIER}				{printf("token IDENTIFIER: "); return TK_IDENT;}		
 "+"							{printf("token PLUS_OP: "); return TK_PLUS;}
 "-"							{printf("token MINUS_OP: "); return TK_MINUS;}
