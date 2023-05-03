@@ -15,23 +15,34 @@
 	#include <stdio.h>
 	#include <string.h>
 	int lineNum = 1;
+	int MAX_STR_CONST = 500;
 %}
 
 DIGIT			[0-9]
 IDENTIFIER		[a-zA-Z][a-zA-Z0-9_]*
 CONST_INT		0|([1-9]{DIGIT}*)
 CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
-CONST_STR		"\""([a-zA-Z0-9+-/*:_$%!#@&~^()., \n\t\r\\]+)"\""
-		
+/*CONST_STR		"\""([a-zA-Z0-9+-/*:_$%!#@&~^()., \n\t\r\\]+)"\"" */
+
+%x string
 
 
 %%
+						char string_buf[MAX_STR_CONST];
+						char *string_buf_ptr;
+
+\"						BEGIN(string);
+<string>\\+\"			/*append in string_buf*/
+<string>[a-zA-Z0-9+-/*:_$%!#@&~^()., \n\t\r\\] /*append in string_buf*/
+<string>\"				{BEGIN(INITIAL); 
+						/*print it now that it's over*/
+						return TK_CONSTSTR;}
+						
 "integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"not"|"main"|"boolean"|"else"|"while"|"and"|return"|"endif"|"endwhile"|"or"|comp"			{ printf("Line %d token KEYWORD: ", lineNum); return TK_KEYWORD;}
 "True"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 "False"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 {CONST_INT}					{printf("token CONST_INT: "); return TK_CONSTINT;}
 {CONST_FLOAT}				{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}
-{CONST_STR}					{printf("token CONST_STRING: "); return TK_CONSTSTR;}
 {IDENTIFIER}				{printf("token IDENTIFIER: "); return TK_IDENT;}		
 "+"							{printf("token PLUS_OP: "); return TK_PLUS;}
 "-"							{printf("token MINUS_OP: "); return TK_MINUS;}
@@ -51,7 +62,7 @@ int main ()
 {
    int token, i;
    int counter = 0;
-   char str[500];						//keep here the input to show whole text of line where an error has occured
+   char str[MAX_STR_CONST];						//keep here the input to show whole text of line where an error has occured
    str[0]='\0';
 	while ( (token = yylex()) != EOF ){
 		if(token == TK_NEWLINE){		
@@ -62,7 +73,7 @@ int main ()
 			strcat(str, yytext);
 		}
 		if(token != TK_ERROR){
-			if(token != TK_NEWLINE)		//do not print new line
+			if(token != TK_NEWLINE && token != TK_CONSTSTR)		//do not print new line or string literal(has already been printed)
 				printf("%s\n", yytext);
 		}
 		else{
