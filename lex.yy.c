@@ -851,7 +851,7 @@ case 4:
 YY_RULE_SETUP
 #line 38 "lexer-pr.l"
 {BEGIN(INITIAL);
-													j=strlen(string_buf);
+													j=strlen(string_buf);			/*Placing " in the end of string*/
 													string_buf[j]='"';
 													j++;
 													string_buf[j]='\0';
@@ -864,7 +864,7 @@ YY_RULE_SETUP
 case 5:
 YY_RULE_SETUP
 #line 49 "lexer-pr.l"
-{ printf("Line %d token KEYWORD: ", lineNum); return TK_KEYWORD;}
+{ printf("token KEYWORD: "); return TK_KEYWORD;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP

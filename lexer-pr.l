@@ -45,15 +45,15 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 													}
 													return TK_CONSTSTR;}
 						
-"integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"not"|"main"|"boolean"|"else"|"while"|"and"|return"|"endif"|"endwhile"|"or"|comp"			{ printf("Line %d token KEYWORD: ", lineNum); return TK_KEYWORD;}
-"True"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
-"False"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
-{CONST_INT}					{printf("token CONST_INT: "); return TK_CONSTINT;}
-{CONST_FLOAT}				{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}
-{IDENTIFIER}				{printf("token IDENTIFIER: "); return TK_IDENT;}		
-"+"							{printf("token PLUS_OP: "); return TK_PLUS;}
-"-"							{printf("token MINUS_OP: "); return TK_MINUS;}
-"="							{printf("token ASSIGN_OP: "); return TK_ASSIGN;}
+"integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"not"|"main"|"boolean"|"else"|"while"|"and"|return"|"endif"|"endwhile"|"or"|comp"			{ printf("token KEYWORD: "); return TK_KEYWORD;}
+"True"										{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
+"False"										{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
+{CONST_INT}									{printf("token CONST_INT: "); return TK_CONSTINT;}
+{CONST_FLOAT}								{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}
+{IDENTIFIER}								{printf("token IDENTIFIER: "); return TK_IDENT;}		
+"+"											{printf("token PLUS_OP: "); return TK_PLUS;}
+"-"											{printf("token MINUS_OP: "); return TK_MINUS;}
+"="|"+="|"-="|"*="|"/="|"%="				{printf("token ASSIGN_OP: "); return TK_ASSIGN;}
 
 
 [ \r\t]+		/* eat whitespace */
