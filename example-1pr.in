@@ -22,3 +22,6 @@ integer
 Integer
 for
 enddef
+=
+"="
+%=
