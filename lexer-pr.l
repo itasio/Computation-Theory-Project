@@ -15,6 +15,7 @@
 	#include <stdio.h>
 	#include <string.h>
 	int lineNum = 1;
+	int j;
 	int MAX_STR_CONST = 500;
 %}
 
@@ -28,15 +29,21 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 
 
 %%
-						char string_buf[MAX_STR_CONST];
-						char *string_buf_ptr;
+													char string_buf[MAX_STR_CONST];
 
-\"						BEGIN(string);
-<string>\\+\"			/*append in string_buf*/
-<string>[a-zA-Z0-9+-/*:_$%!#@&~^()., \n\t\r\\] /*append in string_buf*/
-<string>\"				{BEGIN(INITIAL); 
-						/*print it now that it's over*/
-						return TK_CONSTSTR;}
+\"													{BEGIN(string); string_buf[0]='"'; string_buf[1]='\0';}
+<string>\\+\"										strcat(string_buf, yytext);
+<string>[a-zA-Z0-9+-/*:_$%!#@&~^()., \n\t\r\\] 		strcat(string_buf, yytext);
+<string>\"											{BEGIN(INITIAL);
+													j=strlen(string_buf);			/*Placing " in the end of string*/
+													string_buf[j]='"';
+													j++;
+													string_buf[j]='\0';
+													printf("token CONST_STRING: %s\n", string_buf);
+													for(;j>=0;j--){
+														string_buf[j] = '\0';
+													}
+													return TK_CONSTSTR;}
 						
 "integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"not"|"main"|"boolean"|"else"|"while"|"and"|return"|"endif"|"endwhile"|"or"|comp"			{ printf("Line %d token KEYWORD: ", lineNum); return TK_KEYWORD;}
 "True"						{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}

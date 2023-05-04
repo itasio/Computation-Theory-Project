@@ -546,11 +546,12 @@ char *yytext;
 	#include <stdio.h>
 	#include <string.h>
 	int lineNum = 1;
+	int j;
 	int MAX_STR_CONST = 500;
-#line 551 "lex.yy.c"
+#line 552 "lex.yy.c"
 /*CONST_STR		"\""([a-zA-Z0-9+-/*:_$%!#@&~^()., \n\t\r\\]+)"\"" */
 
-#line 554 "lex.yy.c"
+#line 555 "lex.yy.c"
 
 #define INITIAL 0
 #define string 1
@@ -768,11 +769,10 @@ YY_DECL
 		}
 
 	{
-#line 30 "lexer-pr.l"
+#line 31 "lexer-pr.l"
 
-#line 32 "lexer-pr.l"
-						char string_buf[MAX_STR_CONST];
-						char *string_buf_ptr;
+#line 33 "lexer-pr.l"
+													char string_buf[MAX_STR_CONST];
 
 #line 778 "lex.yy.c"
 
@@ -834,103 +834,110 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 YY_RULE_SETUP
 #line 35 "lexer-pr.l"
-BEGIN(string);
+{BEGIN(string); string_buf[0]='"'; string_buf[1]='\0';}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 36 "lexer-pr.l"
-/*append in string_buf*/
+strcat(string_buf, yytext);
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
 #line 37 "lexer-pr.l"
-/*append in string_buf*/
+strcat(string_buf, yytext);
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 38 "lexer-pr.l"
-{BEGIN(INITIAL); 
-						/*print it now that it's over*/
-						return TK_CONSTSTR;}
+{BEGIN(INITIAL);
+													j=strlen(string_buf);
+													string_buf[j]='"';
+													j++;
+													string_buf[j]='\0';
+													printf("token CONST_STRING: %s\n", string_buf);
+													for(;j>=0;j--){
+														string_buf[j] = '\0';
+													}
+													return TK_CONSTSTR;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 42 "lexer-pr.l"
+#line 49 "lexer-pr.l"
 { printf("Line %d token KEYWORD: ", lineNum); return TK_KEYWORD;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 43 "lexer-pr.l"
+#line 50 "lexer-pr.l"
 {printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 44 "lexer-pr.l"
+#line 51 "lexer-pr.l"
 {printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 45 "lexer-pr.l"
+#line 52 "lexer-pr.l"
 {printf("token CONST_INT: "); return TK_CONSTINT;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 46 "lexer-pr.l"
+#line 53 "lexer-pr.l"
 {printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 47 "lexer-pr.l"
+#line 54 "lexer-pr.l"
 {printf("token IDENTIFIER: "); return TK_IDENT;}		
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 48 "lexer-pr.l"
+#line 55 "lexer-pr.l"
 {printf("token PLUS_OP: "); return TK_PLUS;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 49 "lexer-pr.l"
+#line 56 "lexer-pr.l"
 {printf("token MINUS_OP: "); return TK_MINUS;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 50 "lexer-pr.l"
+#line 57 "lexer-pr.l"
 {printf("token ASSIGN_OP: "); return TK_ASSIGN;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 53 "lexer-pr.l"
+#line 60 "lexer-pr.l"
 /* eat whitespace */
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 54 "lexer-pr.l"
+#line 61 "lexer-pr.l"
 /* eat line comments */
 	YY_BREAK
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 55 "lexer-pr.l"
+#line 62 "lexer-pr.l"
 {++lineNum; return TK_NEWLINE;}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(string):
-#line 57 "lexer-pr.l"
+#line 64 "lexer-pr.l"
 return EOF;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 58 "lexer-pr.l"
+#line 65 "lexer-pr.l"
 { printf("Unrecognized token %s in line: %d ", yytext, lineNum); return TK_ERROR;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 61 "lexer-pr.l"
+#line 68 "lexer-pr.l"
 ECHO;
 	YY_BREAK
-#line 934 "lex.yy.c"
+#line 941 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1933,7 +1940,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 61 "lexer-pr.l"
+#line 68 "lexer-pr.l"
 
 int main ()
 {
