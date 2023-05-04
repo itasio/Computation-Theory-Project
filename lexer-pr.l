@@ -33,7 +33,7 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 
 \"													{BEGIN(string); string_buf[0]='"'; string_buf[1]='\0';}
 <string>\\+\"										strcat(string_buf, yytext);
-<string>[a-zA-Z0-9+-/*:_$%!#@&~^()., \n\t\r\\] 		strcat(string_buf, yytext);
+<string>[a-zA-Z0-9+-/*=:_$%!#@&~^()., \n\t\r\\] 		strcat(string_buf, yytext);
 <string>\"											{BEGIN(INITIAL);
 													j=strlen(string_buf);			/*Placing " in the end of string*/
 													string_buf[j]='"';
@@ -54,6 +54,7 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 "+"											{printf("token PLUS_OP: "); return TK_PLUS;}
 "-"											{printf("token MINUS_OP: "); return TK_MINUS;}
 "="|"+="|"-="|"*="|"/="|"%="				{printf("token ASSIGN_OP: "); return TK_ASSIGN;}
+"and"|"or"|"not"							{printf("token LOGICAL_OP: "); return TK_ASSIGN;}
 
 
 [ \r\t]+		/* eat whitespace */
