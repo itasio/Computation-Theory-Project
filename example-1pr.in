@@ -9,6 +9,7 @@ jphnm
 42000.0e-3
 True
 true
+"True"
 "fae"
 "vds\new"
 "fs\"dv"
@@ -21,7 +22,14 @@ def
 integer
 Integer
 for
-enddef
+  enddef
 =
 "="
 %=
+and
+for(i=0; i<10;i+1)[
+    y = i + 1;
+]
+for(i=0; i<10;i^2)[
+    y = i + 1;
+]

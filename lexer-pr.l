@@ -4,13 +4,16 @@
 	#define TK_NEWLINE -2
 	#define TK_IDENT 258
 	#define TK_ASSIGN 259
-	#define TK_PLUS 260
-	#define TK_MINUS 261
-	#define TK_KEYWORD 262
-	#define TK_CONSTINT 263
-	#define TK_CONSTFLOAT 264
-	#define TK_CONSTSTR 265
-	#define TK_CONSTBOOL 266
+	#define TK_ARITHMETIC 260
+	#define TK_KEYWORD 261
+	#define TK_CONSTINT 262
+	#define TK_CONSTFLOAT 263
+	#define TK_CONSTSTR 264
+	#define TK_CONSTBOOL 265
+	#define TK_LOGICAL 266
+	#define TK_RELATIONAL 267
+	#define TK_DELIMITER 268
+
 	#include <math.h>
 	#include <stdio.h>
 	#include <string.h>
@@ -23,7 +26,7 @@ DIGIT			[0-9]
 IDENTIFIER		[a-zA-Z][a-zA-Z0-9_]*
 CONST_INT		0|([1-9]{DIGIT}*)
 CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
-/*CONST_STR		"\""([a-zA-Z0-9+-/*:_$%!#@&~^()., \n\t\r\\]+)"\"" */
+
 
 %x string
 
@@ -44,18 +47,18 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 														string_buf[j] = '\0';
 													}
 													return TK_CONSTSTR;}
-						
-"integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"not"|"main"|"boolean"|"else"|"while"|"and"|return"|"endif"|"endwhile"|"or"|comp"			{ printf("token KEYWORD: "); return TK_KEYWORD;}
+													
+"and"|"or"|"not"							{printf("token LOGICAL_OP: "); return TK_LOGICAL;}																		
+"integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"main"|"boolean"|"else"|"while"|return"|"endif"|"endwhile"|comp"			{ printf("token KEYWORD: "); return TK_KEYWORD;}
 "True"										{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 "False"										{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
 {CONST_INT}									{printf("token CONST_INT: "); return TK_CONSTINT;}
 {CONST_FLOAT}								{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}
-{IDENTIFIER}								{printf("token IDENTIFIER: "); return TK_IDENT;}		
-"+"											{printf("token PLUS_OP: "); return TK_PLUS;}
-"-"											{printf("token MINUS_OP: "); return TK_MINUS;}
+{IDENTIFIER}								{printf("token IDENTIFIER: "); return TK_IDENT;}
+"+"|"-"|"*"|"/"|"%"|"**"					{printf("token ARITHMETIC_OP: "); return TK_ARITHMETIC;}
 "="|"+="|"-="|"*="|"/="|"%="				{printf("token ASSIGN_OP: "); return TK_ASSIGN;}
-"and"|"or"|"not"							{printf("token LOGICAL_OP: "); return TK_ASSIGN;}
-
+"=="|"!="|"<"|"<="|">"|">="					{printf("token RELATIONAL_OP: "); return TK_RELATIONAL;}
+";"|"("|")"|","|"["|"]"|":"|"."				{printf("token DELIMITER: "); return TK_DELIMITER;}
 
 [ \r\t]+		/* eat whitespace */
 "--"[^\n]*  	/* eat line comments */
