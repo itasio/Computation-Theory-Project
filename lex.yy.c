@@ -1969,7 +1969,7 @@ void yyfree (void * ptr )
 
 int main ()
 {
-   int token, i;
+   int token, i, llll;
    int counter = 0;
    char str[MAX_STR_CONST];						//keep here the input to show whole text of line where an error has occured
    str[0]='\0';
