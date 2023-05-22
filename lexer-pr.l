@@ -1,19 +1,7 @@
 %{
-	//-1 is for EOF
-	#define TK_ERROR -3
-	#define TK_NEWLINE -2
-	#define TK_IDENT 258
-	#define TK_ASSIGN 259
-	#define TK_ARITHMETIC 260
-	#define TK_KEYWORD 261
-	#define TK_CONSTINT 262
-	#define TK_CONSTFLOAT 263
-	#define TK_CONSTSTR 264
-	#define TK_CONSTBOOL 265
-	#define TK_LOGICAL 266
-	#define TK_RELATIONAL 267
-	#define TK_DELIMITER 268
 
+	#include "myparser.tab.h"
+	#include "cgen.h"	
 	#include <math.h>
 	#include <stdio.h>
 	#include <string.h>
@@ -69,27 +57,3 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 
 
 %%
-int main ()
-{
-   int token, i;
-   int counter = 0;
-   char str[MAX_STR_CONST];						//keep here the input to show whole text of line where an error has occured
-   str[0]='\0';
-	while ( (token = yylex()) != EOF ){
-		if(token == TK_NEWLINE){		
-			for(i=strlen(str);i>=0;i--){	//<<erasing>> the former line, to be ready for the next one
-				str[i] = '\0';
-			}
-		}else{
-			strcat(str, yytext);
-		}
-		if(token != TK_ERROR){
-			if(token != TK_NEWLINE && token != TK_CONSTSTR)		//do not print new line or string literal(has already been printed)
-				printf("%s\n", yytext);
-		}
-		else{
-			printf("%s\n", str);
-			return -1;
-		}
-	}
-}
