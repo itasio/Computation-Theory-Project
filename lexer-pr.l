@@ -61,8 +61,8 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 "endif"		return KW_ENDIF;
 "endwhile"	return KW_ENDWHILE;
 "comp"		return KW_COMP;
-"True"		return KW_CONSTBOOL;
-"False"		return KW_CONSTBOOL;
+"True"		return KW_TRUE;
+"False"		return KW_FALSE;
 {CONST_INT}								{yylval.str = strdup(yytext); return TK_CONSTINT;}
 {CONST_FLOAT}							{yylval.str = strdup(yytext); return TK_CONSTFLOAT;}
 {IDENTIFIER}							{yylval.str = strdup(yytext); return TK_IDENT;}
@@ -77,11 +77,11 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 "+="									return TK_PLUEQ;
 "-="									return TK_MINEQ;
 "*="									return TK_MULEQ;
-"/="									return TK_DIVEQ
+"/="									return TK_DIVEQ;
 "%="									return TK_ASSIGN;
 "=="									return TK_EQEQ;
 "!="									return TK_NOTEQ;
-">="									return TK_GREEQ;}
+">="									return TK_GREEQ;
 "<="									return TK_LESEQ;
 "<"			return '<';
 ">"			return '>';
@@ -99,7 +99,7 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 \n 				{++lineNum; return TK_NEWLINE;}
 
 <<EOF>> 	return EOF;
-.           { printf("Unrecognized token %s in line: %d ", yytext, lineNum); return TK_ERROR;}
+.           { yyerror("lexical error: unrecognized literal '%s'\n", yytext);}
 
 
 %%

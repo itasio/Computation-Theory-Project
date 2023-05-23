@@ -10,11 +10,48 @@
 }
 
 %token <str> TK_IDENT 
-%token <str> TK_INT 
-%token <str> TK_REAL 
-%token TK_ASSGN 
-%token KW_IF   
-%token KW_ELSE 
+%token <str> TK_CONSTINT 
+%token <str> TK_CONSTFLOAT 
+
+
+%token TK_POW
+%token TK_PLUEQ
+%token TK_MINEQ
+%token TK_MULEQ
+%token TK_DIVEQ
+%token TK_ASSIGN
+%token TK_EQEQ
+%token TK_NOTEQ
+%token TK_GREEQ
+%token TK_LESEQ
+
+%token KW_AND
+%token KW_OR
+%token KW_NOT														
+%token KW_INTEGER
+%token KW_FOR
+%token KW_BREAK
+%token KW_DEF
+%token KW_ENDCOMP
+%token KW_SCALAR
+%token KW_CONST
+%token KW_IN
+%token KW_CONTINUE
+%token KW_ENDDEF
+%token KW_OF
+%token KW_STR
+%token KW_IF
+%token KW_ENDFOR
+%token KW_MAIN
+%token KW_BOOLEAN
+%token KW_ELSE
+%token KW_WHILE
+%token KW_RETURN
+%token KW_ENDIF
+%token KW_ENDWHILE
+%token KW_COMP
+%token KW_TRUE
+%token KW_FALSE
 
 %start input
 
@@ -61,19 +98,3 @@ int main ()
 	else
 		printf("Rejected!\n");
 }
-
-
-
-	#define TK_ERROR -3
-	#define TK_NEWLINE -2
-	#define TK_IDENT 258
-	#define TK_ASSIGN 259
-	#define TK_ARITHMETIC 260
-	#define TK_KEYWORD 261
-	#define TK_CONSTINT 262
-	#define TK_CONSTFLOAT 263
-	#define TK_CONSTSTR 264
-	#define TK_CONSTBOOL 265
-	#define TK_LOGICAL 266
-	#define TK_RELATIONAL 267
-	#define TK_DELIMITER 268
