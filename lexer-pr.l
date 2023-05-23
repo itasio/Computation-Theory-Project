@@ -36,17 +36,63 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 													}
 													return TK_CONSTSTR;}
 													
-"and"|"or"|"not"							{printf("token LOGICAL_OP: "); return TK_LOGICAL;}																		
-"integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"main"|"boolean"|"else"|"while"|return"|"endif"|"endwhile"|comp"			{ printf("token KEYWORD: "); return TK_KEYWORD;}
-"True"										{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
-"False"										{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
-{CONST_INT}									{printf("token CONST_INT: "); return TK_CONSTINT;}
-{CONST_FLOAT}								{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}
-{IDENTIFIER}								{printf("token IDENTIFIER: "); return TK_IDENT;}
-"+"|"-"|"*"|"/"|"%"|"**"					{printf("token ARITHMETIC_OP: "); return TK_ARITHMETIC;}
-"="|"+="|"-="|"*="|"/="|"%="				{printf("token ASSIGN_OP: "); return TK_ASSIGN;}
-"=="|"!="|"<"|"<="|">"|">="					{printf("token RELATIONAL_OP: "); return TK_RELATIONAL;}
-";"|"("|")"|","|"["|"]"|":"|"."				{printf("token DELIMITER: "); return TK_DELIMITER;}
+"and"		return KW_AND;
+"or"		return KW_OR;
+"not"		return KW_NOT;														
+"integer"	return KW_INTEGER;
+"for"		return KW_FOR;
+"break"		return KW_BREAK;
+"def"		return KW_DEF;
+"endcomp"	return KW_ENDCOMP;
+"scalar"	return KW_SCALAR;
+"const"		return KW_CONST;
+"in"		return KW_IN;
+"continue"	return KW_CONTINUE;
+"enddef"	return KW_ENDDEF;
+"of"		return KW_OF;
+"str"		return KW_STR;
+"if"		return KW_IF;
+"endfor"	return KW_ENDFOR;
+"main"		return KW_MAIN;
+"boolean"	return KW_BOOLEAN;
+"else"		return KW_ELSE;
+"while"		return KW_WHILE;
+"return"	return KW_RETURN;
+"endif"		return KW_ENDIF;
+"endwhile"	return KW_ENDWHILE;
+"comp"		return KW_COMP;
+"True"		return KW_CONSTBOOL;
+"False"		return KW_CONSTBOOL;
+{CONST_INT}								{yylval.str = strdup(yytext); return TK_CONSTINT;}
+{CONST_FLOAT}							{yylval.str = strdup(yytext); return TK_CONSTFLOAT;}
+{IDENTIFIER}							{yylval.str = strdup(yytext); return TK_IDENT;}
+
+"+"			return '+';
+"-"			return '-';
+"*"			return '*';
+"/"			return '/';
+"%"			return '%';
+"**"									return TK_POW;
+"="
+"+="									return TK_PLUEQ;
+"-="									return TK_MINEQ;
+"*="									return TK_MULEQ;
+"/="									return TK_DIVEQ
+"%="									return TK_ASSIGN;
+"=="									return TK_EQEQ;
+"!="									return TK_NOTEQ;
+">="									return TK_GREEQ;}
+"<="									return TK_LESEQ;
+"<"			return '<';
+">"			return '>';
+";"			return ';';
+"("			return '(';
+")"			return ')';
+","			return ',';
+"["			return '[';
+"]"			return ']';
+":"			return ':';
+"."			return '.';
 
 [ \r\t]+		/* eat whitespace */
 "--"[^\n]*  	/* eat line comments */
