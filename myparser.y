@@ -12,7 +12,7 @@
 %token <str> TK_IDENT 
 %token <str> TK_CONSTINT 
 %token <str> TK_CONSTFLOAT 
-
+%token <str> TK_CONSTSTR
 
 %token TK_POW
 %token TK_PLUEQ
@@ -53,7 +53,7 @@
 %token KW_TRUE
 %token KW_FALSE
 
-%start input
+%start program
 
 %type <str> listOfExprs expr
 
@@ -62,27 +62,28 @@
 
 %%
 
-input: 
+program: 
 	listOfExprs  
 	{
 		if (yyerror_count == 0) {
 			//puts(c_prologue);
 			printf("here\n");
 			printf("%s\n", $1);
-			printf("there\n");	
+			//printf("there\n");	
 		}
 	}
 	;
 
 listOfExprs: 
 	expr 
-	| listOfExprs ',' expr { $$ = template("%s\n%s", $1, $3);}
+	| listOfExprs ';' expr { $$ = template("%s\n%s", $1, $3);}
 	;
 	
 expr:
-	TK_INT
-	| TK_REAL 
+	TK_CONSTINT
+	| TK_CONSTFLOAT 
 	| TK_IDENT
+	| TK_CONSTSTR
 	| expr '+' expr { $$ = template("%s %s +", $1, $3); }
 	| expr '-' expr { $$ = template("%s %s -", $1, $3); }
 	| expr '*' expr { $$ = template("%s %s *", $1, $3); }

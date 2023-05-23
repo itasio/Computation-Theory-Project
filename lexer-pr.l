@@ -5,7 +5,7 @@
 	#include <math.h>
 	#include <stdio.h>
 	#include <string.h>
-	int lineNum = 1;
+	int line_num = 1;
 	int j;
 	int MAX_STR_CONST = 500;
 %}
@@ -30,11 +30,13 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 													string_buf[j]='"';
 													j++;
 													string_buf[j]='\0';
-													printf("token CONST_STRING: %s\n", string_buf);
+													//printf("token CONST_STRING: %s\n", string_buf);
+													yylval.str = strdup(string_buf);
 													for(;j>=0;j--){
 														string_buf[j] = '\0';
 													}
-													return TK_CONSTSTR;}
+													return TK_CONSTSTR;
+													}
 													
 "and"		return KW_AND;
 "or"		return KW_OR;
@@ -96,7 +98,7 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 
 [ \r\t]+		/* eat whitespace */
 "--"[^\n]*  	/* eat line comments */
-\n 				{++lineNum; return TK_NEWLINE;}
+\n 				++line_num;
 
 <<EOF>> 	return EOF;
 .           { yyerror("lexical error: unrecognized literal '%s'\n", yytext);}
