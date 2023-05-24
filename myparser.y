@@ -79,14 +79,12 @@ function_block:
 	;
 	
 listOfExprs:
-	expr ';'
-	| listOfExprs ';' expr{ printf("t"); $$ = template("%s\n%s", $1, $3); }
+	expr ';' {$$ = template("%s;", $1);}
+	| listOfExprs expr ';' { printf("t"); $$ = template("%s \n%s;", $1, $2); }
 	;
 
 expr:
-	//TK_IDENT{ printf("y");$$ = template("%s",$1);}
 	TK_IDENT '=' TK_CONSTINT { printf("y");$$ = template("%s=%s",$1, $3);}
-	//| KW_CONST TK_IDENT '=' TK_CONSTINT {$$ = template("",);}
 	;
 
 %%

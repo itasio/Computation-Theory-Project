@@ -55,7 +55,7 @@ Grammar
     6               | KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_RETURN ';' KW_ENDDEF ';'
 
     7 listOfExprs: expr ';'
-    8            | listOfExprs ';' expr
+    8            | listOfExprs expr ';'
 
     9 expr: TK_IDENT '=' TK_CONSTINT
 
@@ -247,7 +247,7 @@ State 12
     3 main_block: KW_DEF KW_MAIN '(' ')' ':' . KW_ENDDEF ';'
     4           | KW_DEF KW_MAIN '(' ')' ':' . listOfExprs KW_ENDDEF ';'
     7 listOfExprs: . expr ';'
-    8            | . listOfExprs ';' expr
+    8            | . listOfExprs expr ';'
     9 expr: . TK_IDENT '=' TK_CONSTINT
 
     TK_IDENT   shift, and go to state 14
@@ -282,10 +282,13 @@ State 15
 State 16
 
     4 main_block: KW_DEF KW_MAIN '(' ')' ':' listOfExprs . KW_ENDDEF ';'
-    8 listOfExprs: listOfExprs . ';' expr
+    8 listOfExprs: listOfExprs . expr ';'
+    9 expr: . TK_IDENT '=' TK_CONSTINT
 
+    TK_IDENT   shift, and go to state 14
     KW_ENDDEF  shift, and go to state 21
-    ';'        shift, and go to state 22
+
+    expr  go to state 22
 
 
 State 17
@@ -300,7 +303,7 @@ State 18
     5 function_block: KW_DEF TK_IDENT '(' ')' ':' . listOfExprs KW_ENDDEF ';'
     6               | KW_DEF TK_IDENT '(' ')' ':' . listOfExprs KW_RETURN ';' KW_ENDDEF ';'
     7 listOfExprs: . expr ';'
-    8            | . listOfExprs ';' expr
+    8            | . listOfExprs expr ';'
     9 expr: . TK_IDENT '=' TK_CONSTINT
 
     TK_IDENT  shift, and go to state 14
@@ -332,12 +335,9 @@ State 21
 
 State 22
 
-    8 listOfExprs: listOfExprs ';' . expr
-    9 expr: . TK_IDENT '=' TK_CONSTINT
+    8 listOfExprs: listOfExprs expr . ';'
 
-    TK_IDENT  shift, and go to state 14
-
-    expr  go to state 27
+    ';'  shift, and go to state 27
 
 
 State 23
@@ -351,11 +351,14 @@ State 24
 
     5 function_block: KW_DEF TK_IDENT '(' ')' ':' listOfExprs . KW_ENDDEF ';'
     6               | KW_DEF TK_IDENT '(' ')' ':' listOfExprs . KW_RETURN ';' KW_ENDDEF ';'
-    8 listOfExprs: listOfExprs . ';' expr
+    8 listOfExprs: listOfExprs . expr ';'
+    9 expr: . TK_IDENT '=' TK_CONSTINT
 
+    TK_IDENT   shift, and go to state 14
     KW_ENDDEF  shift, and go to state 28
     KW_RETURN  shift, and go to state 29
-    ';'        shift, and go to state 22
+
+    expr  go to state 22
 
 
 State 25
@@ -374,7 +377,7 @@ State 26
 
 State 27
 
-    8 listOfExprs: listOfExprs ';' expr .
+    8 listOfExprs: listOfExprs expr ';' .
 
     $default  reduce using rule 8 (listOfExprs)
 
