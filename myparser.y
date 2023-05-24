@@ -55,42 +55,38 @@
 
 %start program
 
-%type <str> listOfExprs expr
+%type <str> listOfExprs expr main_block function_block
 
 %left '+' '-' 
 %left '*' '/'
 
 %%
 
-program: 
-	listOfExprs  
-	{
-		if (yyerror_count == 0) {
-			//puts(c_prologue);
-			printf("here\n");
-			printf("%s\n", $1);
-			//printf("there\n");	
-		}
-	}
+program:
+	main_block {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s\n", $1);}
+	| main_block function_block {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s\n%s", $1, $2);}
 	;
 
-listOfExprs: 
-	expr 
-	| listOfExprs ';' expr { $$ = template("%s\n%s", $1, $3);}
+main_block:
+	KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF ';' {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s %s %s %s %s \n%s%s", $1, $2, $3, $4, $5, $6, %7);}
+	| KW_DEF KW_MAIN '(' ')' ':' listOfExprs KW_ENDDEF ';' {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s %s %s %s %s \n%s\n%s%s", $1, $2, $3, $4, $5, $6, $7, $8);}
+	;
+
+function_block:
+	KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_ENDDEF ';' {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s %s %s %s %s \n%s\n%s%s", $1, $2, $3, $4, $5, $6, $7, $8);}
+	| KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_RETURN ';' KW_ENDDEF ';' {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s %s %s %s %s \n%s\n%s%s\n%s%s", $1, $2, $3, $4, $5, $6, $7, $8, $9, $10);}
 	;
 	
+listOfExprs:
+	expr
+	| expr listOfExprs { $$ = template("%s%s", $1, $2); }
+	;
+
 expr:
-	TK_CONSTINT
-	| TK_CONSTFLOAT 
-	| TK_IDENT
-	| TK_CONSTSTR
-	| expr '+' expr { $$ = template("%s %s +", $1, $3); }
-	| expr '-' expr { $$ = template("%s %s -", $1, $3); }
-	| expr '*' expr { $$ = template("%s %s *", $1, $3); }
-	| expr '/' expr { $$ = template("%s %s /", $1, $3); }
-	| '(' expr ')' { $$ = template("%s", $2); }
+	%empty
+	| KW_CONST TK_IDENT '=' TK_CONSTINT ';' { $$ = template("%s %s %s %s %s", $1, $2, $3, $4, $5); }
 	;
-	
+
 %%
 int main ()
 {
