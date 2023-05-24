@@ -1,4 +1,3 @@
-"fds";
-"afsa";
-"Item:\t\"Laser Printer\"\nPrice:\t$142\n ";
-1+2
+def main():
+x = 3;
+enddef;

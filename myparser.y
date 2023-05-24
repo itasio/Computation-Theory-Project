@@ -8,6 +8,7 @@
 %union {
 	char* str;
 }
+%define parse.error verbose
 
 %token <str> TK_IDENT 
 %token <str> TK_CONSTINT 
@@ -63,28 +64,29 @@
 %%
 
 program:
-	main_block {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s\n", $1);}
-	| main_block function_block {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s\n%s", $1, $2);}
+	main_block {if (yyerror_count == 0) {puts(c_prologue); printf("%s\n", $1);}}
+	| main_block function_block {if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
 	;
 
 main_block:
-	KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF ';' {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s %s %s %s %s \n%s%s", $1, $2, $3, $4, $5, $6, %7);}
-	| KW_DEF KW_MAIN '(' ')' ':' listOfExprs KW_ENDDEF ';' {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s %s %s %s %s \n%s\n%s%s", $1, $2, $3, $4, $5, $6, $7, $8);}
+	KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF ';' { printf("q");$$ = template("int main(){}");}
+	| KW_DEF KW_MAIN '(' ')' ':' listOfExprs KW_ENDDEF ';' { printf("w");$$ = template("int main(){\n%s\n}",$6);}
 	;
 
 function_block:
-	KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_ENDDEF ';' {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s %s %s %s %s \n%s\n%s%s", $1, $2, $3, $4, $5, $6, $7, $8);}
-	| KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_RETURN ';' KW_ENDDEF ';' {if (yyerror_count == 0) /*puts(c_prologue);*/ printf("%s %s %s %s %s \n%s\n%s%s\n%s%s", $1, $2, $3, $4, $5, $6, $7, $8, $9, $10);}
+	KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_ENDDEF ';' { printf("e");$$ = template("void %s(){\n%s}", $2, $6);}
+	| KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_RETURN ';' KW_ENDDEF ';' { printf("r");$$ = template("void %s(){\n%s\nreturn;}", $2, $6);}
 	;
 	
 listOfExprs:
-	expr
-	| expr listOfExprs { $$ = template("%s%s", $1, $2); }
+	expr ';'
+	| listOfExprs ';' expr{ printf("t"); $$ = template("%s\n%s", $1, $3); }
 	;
 
 expr:
-	%empty
-	| KW_CONST TK_IDENT '=' TK_CONSTINT ';' { $$ = template("%s %s %s %s %s", $1, $2, $3, $4, $5); }
+	//TK_IDENT{ printf("y");$$ = template("%s",$1);}
+	TK_IDENT '=' TK_CONSTINT { printf("y");$$ = template("%s=%s",$1, $3);}
+	//| KW_CONST TK_IDENT '=' TK_CONSTINT {$$ = template("",);}
 	;
 
 %%
