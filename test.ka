@@ -1,5 +1,8 @@
 def main():
-x=3;
-y=4;
-k=7;
+z =4;
+d=4;
+enddef;
+
+def foo():
+
 enddef;

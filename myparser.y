@@ -56,7 +56,8 @@
 
 %start program
 
-%type <str> listOfExprs expr main_block function_block
+%type <str> listOfExprs expr main_block function_block var_declarations const_declarations comp_declarations
+%type <str> data_types array
 
 %left '+' '-' 
 %left '*' '/'
@@ -64,8 +65,11 @@
 %%
 
 program:
-	main_block {if (yyerror_count == 0) {puts(c_prologue); printf("%s\n", $1);}}
-	| main_block function_block {if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
+	main_block 																			{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n", $1);}}
+	| function_block main_block  														{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
+	| var_declarations function_block main_block 										{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s", $1, $2, $3);}}
+	| const_declarations var_declarations function_block main_block						{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s", $1, $2, $3, $4);}}
+	| comp_declarations const_declarations var_declarations function_block main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
 	;
 
 main_block:
@@ -74,9 +78,9 @@ main_block:
 	;
 
 function_block:
-	KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_ENDDEF ';' { printf("e");$$ = template("void %s(){\n%s}", $2, $6);}
-	| KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_RETURN ';' KW_ENDDEF ';' { printf("r");$$ = template("void %s(){\n%s\nreturn;}", $2, $6);}
-	;
+	KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_ENDDEF ';' { printf("e");$$ = template("void %s(){\n%s\n}", $2, $6);}
+	| KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_RETURN ';' KW_ENDDEF ';' { printf("r");$$ = template("void %s(){\n%s\nreturn;\n}", $2, $6);}
+	; 	????????todo
 	
 listOfExprs:
 	expr ';' {$$ = template("%s;", $1);}
@@ -86,6 +90,17 @@ listOfExprs:
 expr:
 	TK_IDENT '=' TK_CONSTINT { printf("y");$$ = template("%s=%s",$1, $3);}
 	;
+
+data_types:
+	KW_INTEGER {$$ = template("int");}
+	| KW_SCALAR {$$ = template("double");}
+	| KW_STR {$$ = template("char*");}
+	| KW_BOOLEAN  {$$ = template("int");}
+	| KW_COMP ????????????
+
+array:
+	'[' TK_CONSTINT ']' ':' data_types
+	| '[' ']' ':' data_types
 
 %%
 int main ()

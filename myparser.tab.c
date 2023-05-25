@@ -1393,13 +1393,13 @@ yyreduce:
 
   case 6:
 #line 77 "myparser.y"
-                                                              { printf("e");(yyval.str) = template("void %s(){\n%s}", (yyvsp[-6].str), (yyvsp[-2].str));}
+                                                              { printf("e");(yyval.str) = template("void %s(){\n%s\n}", (yyvsp[-6].str), (yyvsp[-2].str));}
 #line 1398 "myparser.tab.c"
     break;
 
   case 7:
 #line 78 "myparser.y"
-                                                                              { printf("r");(yyval.str) = template("void %s(){\n%s\nreturn;}", (yyvsp[-8].str), (yyvsp[-4].str));}
+                                                                              { printf("r");(yyval.str) = template("void %s(){\n%s\nreturn;\n}", (yyvsp[-8].str), (yyvsp[-4].str));}
 #line 1404 "myparser.tab.c"
     break;
 
