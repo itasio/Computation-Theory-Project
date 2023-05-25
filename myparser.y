@@ -57,7 +57,7 @@
 %start program
 
 %type <str> listOfExprs expr main_block function_block var_declarations const_declarations comp_declarations
-%type <str> data_types array
+%type <str> data_type array
 
 %left '+' '-' 
 %left '*' '/'
@@ -80,8 +80,7 @@ main_block:
 function_block:
 	KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_ENDDEF ';' { printf("e");$$ = template("void %s(){\n%s\n}", $2, $6);}
 	| KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_RETURN ';' KW_ENDDEF ';' { printf("r");$$ = template("void %s(){\n%s\nreturn;\n}", $2, $6);}
-	; 	????????todo
-	
+	; 	/*????????todo*/	
 listOfExprs:
 	expr ';' {$$ = template("%s;", $1);}
 	| listOfExprs expr ';' { printf("t"); $$ = template("%s \n%s;", $1, $2); }
@@ -91,16 +90,31 @@ expr:
 	TK_IDENT '=' TK_CONSTINT { printf("y");$$ = template("%s=%s",$1, $3);}
 	;
 
-data_types:
+const_declarations:
+	KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR {$$ = template("const double %s = %s", $2, $4);}
+	|	KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER {$$ = template("const int %s = %s", $2, $4);}
+	|	KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR {$$ = template("const char* %s = %s", $2, $4);}
+	|	KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN {$$ = template("const int %s = 1", $2);}
+	|	KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN {$$ = template("const int %s = 0", $2);}
+	;
+
+var_declarations:
+	TK_IDENT ':' data_type
+	;
+
+data_type:
 	KW_INTEGER {$$ = template("int");}
 	| KW_SCALAR {$$ = template("double");}
 	| KW_STR {$$ = template("char*");}
 	| KW_BOOLEAN  {$$ = template("int");}
-	| KW_COMP ????????????
+	/*| array		????????????
+	| KW_COMP ????????????*/
+	;
 
 array:
-	'[' TK_CONSTINT ']' ':' data_types
-	| '[' ']' ':' data_types
+	'[' TK_CONSTINT ']' ':' data_type
+	| '[' ']' ':' data_type
+	;
 
 %%
 int main ()
