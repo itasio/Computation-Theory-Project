@@ -1,5 +1,13 @@
-def foo():
+const r = 2.5 : scalar;
+const t = 4 : integer;
+const y = "sag" : str;
+const u = True : boolean;
+const i = False : boolean;
+y : integer
 
+def foo():
+d=5;
+f=5;
 enddef;
 
 def main():

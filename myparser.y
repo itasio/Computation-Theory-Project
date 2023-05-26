@@ -57,7 +57,7 @@
 %start program
 
 %type <str> listOfExprs expr main_block function_block var_declarations const_declarations /*comp_declarations*/
-%type <str> data_type array
+%type <str> data_type const_declaration //array
 
 %left '+' '-' 
 %left '*' '/'
@@ -89,8 +89,13 @@ listOfExprs:
 expr:
 	TK_IDENT '=' TK_CONSTINT { printf("y");$$ = template("%s=%s",$1, $3);}
 	;
-
+	
 const_declarations:
+	const_declaration ';' {$$ = template("%s;", $1);}
+	| const_declarations const_declaration ';' {$$ = template("%s \n%s;", $1, $2);}
+	;
+	
+const_declaration:
 	KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR {$$ = template("const double %s = %s", $2, $4);}
 	|	KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER {$$ = template("const int %s = %s", $2, $4);}
 	|	KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR {$$ = template("const char* %s = %s", $2, $4);}
@@ -99,7 +104,7 @@ const_declarations:
 	;
 
 var_declarations:
-	TK_IDENT ':' data_type
+	TK_IDENT ':' data_type {$$ = template("%s %s", $3, $1);}
 	;
 
 data_type:
