@@ -87,7 +87,9 @@ listOfExprs:
 	;
 
 expr:
-	TK_IDENT '=' TK_CONSTINT { printf("y");$$ = template("%s=%s",$1, $3);}
+	TK_CONSTINT
+	| TK_CONSTFLOAT
+	| expr '+' expr {$$ = $1 + $2;}
 	;
 	
 const_declarations:
