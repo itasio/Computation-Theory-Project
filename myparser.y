@@ -1,5 +1,6 @@
 %{
 	#include <stdio.h>
+	#include <math.h>
   	#include "cgen.h"
 	
 	extern int yylex(void);
@@ -56,34 +57,42 @@
 
 %start program
 
-%type <str> listOfExprs expr main_block function_block var_declarations const_declarations /*comp_declarations*/
-%type <str> data_type const_declaration //array
+%type <str> listofexpr listofinstructions  main_block function_blocks var_declarations const_declarations /*comp_declarations*/
+%type <str> expr instruction data_type const_declaration var_declaration function_block //array
+
 
 %left '+' '-' 
 %left '*' '/'
-
+%right TK_POW
+%left '.' '(' ')' '[' ']'
 %%
 
 program:
 	main_block 																			{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n", $1);}}
-	| function_block main_block  														{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
-	| var_declarations function_block main_block 										{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s", $1, $2, $3);}}
-	| const_declarations var_declarations function_block main_block						{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s", $1, $2, $3, $4);}}
-	/*| comp_declarations const_declarations var_declarations function_block main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
+	| function_blocks main_block  														{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
+	| var_declarations function_blocks main_block 										{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s", $1, $2, $3);}}
+	| const_declarations var_declarations function_blocks main_block						{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s", $1, $2, $3, $4);}}
+	/*| comp_declarations const_declarations var_declarations function_blocks main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
 	*/;
 
 main_block:
 	KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF ';' { printf("q");$$ = template("int main(){}");}
-	| KW_DEF KW_MAIN '(' ')' ':' listOfExprs KW_ENDDEF ';' { printf("w");$$ = template("int main(){\n%s\n}",$6);}
+	| KW_DEF KW_MAIN '(' ')' ':' listofinstructions KW_ENDDEF ';' { printf("w");$$ = template("int main(){\n%s\n}",$6);}
+	;
+
+function_blocks:
+	function_block ';' {$$ = template("%s", $1);}
+	| function_blocks function_block ';' {$$ = template("%s \n%s", $1, $2);}
 	;
 
 function_block:
-	KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_ENDDEF ';' { printf("e");$$ = template("void %s(){\n%s\n}", $2, $6);}
-	| KW_DEF TK_IDENT '(' ')' ':' listOfExprs KW_RETURN ';' KW_ENDDEF ';' { printf("r");$$ = template("void %s(){\n%s\nreturn;\n}", $2, $6);}
-	; 	/*????????todo*/	
-listOfExprs:
+	KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_ENDDEF { printf("e");$$ = template("void %s(){\n%s\n}", $2, $6);}
+	| KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF { printf("r");$$ = template("void %s(){\n%s\nreturn;\n}", $2, $6);}
+	; 	/*????????todo*/
+
+listofexpr:
 	expr ';' {$$ = template("%s;", $1);}
-	| listOfExprs expr ';' { printf("t"); $$ = template("%s \n%s;", $1, $2); }
+	| listofexpr expr ';' { printf("t"); $$ = template("%s \n%s;", $1, $2); }
 	;
 
 expr:
@@ -91,7 +100,16 @@ expr:
 	| TK_CONSTFLOAT
 	| expr '+' expr {$$ = $1 + $2;}
 	;
-	
+
+listofinstructions:
+	instruction ';' {$$ = template("%s;", $1);}
+	| listofinstructions instruction ';' { printf("t"); $$ = template("%s \n%s;", $1, $2); }
+	;
+
+instruction:
+	TK_IDENT '=' TK_CONSTINT { printf("y");$$ = template("%s=%s",$1, $3);}
+	;
+
 const_declarations:
 	const_declaration ';' {$$ = template("%s;", $1);}
 	| const_declarations const_declaration ';' {$$ = template("%s \n%s;", $1, $2);}
@@ -106,6 +124,11 @@ const_declaration:
 	;
 
 var_declarations:
+	var_declaration ';' {$$ = template("%s;", $1);}
+	| var_declarations var_declaration ';' {$$ = template("%s \n%s;", $1, $2);}
+	;
+
+var_declaration:
 	TK_IDENT ':' data_type {$$ = template("%s %s", $3, $1);}
 	;
 
