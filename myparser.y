@@ -56,7 +56,7 @@
 
 %start program
 
-%type <str> listOfExprs expr main_block function_block var_declarations const_declarations comp_declarations
+%type <str> listOfExprs expr main_block function_block var_declarations const_declarations /*comp_declarations*/
 %type <str> data_type array
 
 %left '+' '-' 
@@ -69,8 +69,8 @@ program:
 	| function_block main_block  														{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
 	| var_declarations function_block main_block 										{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s", $1, $2, $3);}}
 	| const_declarations var_declarations function_block main_block						{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s", $1, $2, $3, $4);}}
-	| comp_declarations const_declarations var_declarations function_block main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
-	;
+	/*| comp_declarations const_declarations var_declarations function_block main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
+	*/;
 
 main_block:
 	KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF ';' { printf("q");$$ = template("int main(){}");}
@@ -108,14 +108,15 @@ data_type:
 	| KW_STR {$$ = template("char*");}
 	| KW_BOOLEAN  {$$ = template("int");}
 	/*| array		????????????
-	| KW_COMP ????????????*/
+	| KW_COMP ????????????
+	*/
 	;
 
-array:
+/*array:
 	'[' TK_CONSTINT ']' ':' data_type
 	| '[' ']' ':' data_type
 	;
-
+*/
 %%
 int main ()
 {
