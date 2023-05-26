@@ -1,9 +1,13 @@
 %{
 	#include <stdio.h>
+	#include <stdlib.h>
 	#include <math.h>
   	#include "cgen.h"
 	
 	extern int yylex(void);
+	int i1, i2;
+	double d1, d2;
+
 %}
 
 %union {
@@ -91,14 +95,15 @@ function_block:
 	; 	/*????????todo*/
 
 listofexpr:
-	expr ';' {$$ = template("%s;", $1);}
-	| listofexpr expr ';' { printf("t"); $$ = template("%s \n%s;", $1, $2); }
+	expr {$$ = template("%s;", $1);}
+	| listofexpr expr {$$ = template("%s \n%s;", $1, $2); }
 	;
 
 expr:
 	TK_CONSTINT
 	| TK_CONSTFLOAT
-	| expr '+' expr {$$ = $1 + $2;}
+	| expr '+' expr {$$ = template("%s + %s", $1, $3);}
+	| expr TK_POW expr {$$ = template("pow(%s, %s)", $1, $3);}
 	;
 
 listofinstructions:
@@ -107,7 +112,8 @@ listofinstructions:
 	;
 
 instruction:
-	TK_IDENT '=' TK_CONSTINT { printf("y");$$ = template("%s=%s",$1, $3);}
+	//TK_IDENT '=' TK_CONSTINT {$$ = template("%s=%s",$1, $3);}
+	TK_IDENT '=' listofexpr {$$ = template("%s=%s",$1, $3);}
 	;
 
 const_declarations:
