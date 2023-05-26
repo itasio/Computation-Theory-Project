@@ -1472,13 +1472,13 @@ yyreduce:
 
   case 12:
 #line 98 "myparser.y"
-             {(yyval.str) = template("%s;", (yyvsp[0].str));}
+             {(yyval.str) = template("%s", (yyvsp[0].str));}
 #line 1477 "myparser.tab.c"
     break;
 
   case 13:
 #line 99 "myparser.y"
-                          {(yyval.str) = template("%s \n%s;", (yyvsp[-1].str), (yyvsp[0].str)); }
+                          {(yyval.str) = template("%s \n%s", (yyvsp[-1].str), (yyvsp[0].str)); }
 #line 1483 "myparser.tab.c"
     break;
 

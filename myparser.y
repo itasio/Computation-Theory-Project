@@ -95,8 +95,8 @@ function_block:
 	; 	/*????????todo*/
 
 listofexpr:
-	expr {$$ = template("%s;", $1);}
-	| listofexpr expr {$$ = template("%s \n%s;", $1, $2); }
+	expr {$$ = template("%s", $1);}
+	| listofexpr expr {$$ = template("%s \n%s", $1, $2); }
 	;
 
 expr:

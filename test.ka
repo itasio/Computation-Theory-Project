@@ -10,6 +10,7 @@ k : scalar;
 def foo():
 d=5;
 f=5;
+k = 3+5**4+2;
 enddef;
 
 def loo():
