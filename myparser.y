@@ -62,8 +62,8 @@
 
 %start program
 
-%type <str> listofexpr listofinstructions  main_block function_blocks var_declarations const_declarations /*comp_declarations*/
-%type <str> expr instruction data_type const_declaration var_declaration function_block //array
+%type <str> statements listofexpr listofinstructions  main_block function_blocks var_declarations const_declarations /*comp_declarations*/
+%type <str> statement expr instruction data_type const_declaration var_declaration function_block //array
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -110,13 +110,13 @@ expr:
 	TK_CONSTINT
 	| TK_CONSTFLOAT
 	| TK_IDENT
-	| TK_IDENT '=' expr {$$ = template("%s = %s",$1, $3);}
-	| TK_IDENT TK_PLUEQ expr {$$ = template("%s += %s",$1, $3);}
-	| TK_IDENT TK_MINEQ expr {$$ = template("%s -= %s",$1, $3);}
-	| TK_IDENT TK_MULEQ expr {$$ = template("%s *= %s",$1, $3);}
-	| TK_IDENT TK_DIVEQ expr {$$ = template("%s /= %s",$1, $3);}
-	| TK_IDENT TK_MODEQ expr {$$ = template("%s %= %s",$1, $3);}
-	| TK_IDENT TK_COLEQ expr {$$ = template("%s := %s",$1, $3);}
+	//| TK_IDENT '=' expr {$$ = template("%s = %s",$1, $3);}
+	//| TK_IDENT TK_PLUEQ expr {$$ = template("%s += %s",$1, $3);}
+	//| TK_IDENT TK_MINEQ expr {$$ = template("%s -= %s",$1, $3);}
+	//| TK_IDENT TK_MULEQ expr {$$ = template("%s *= %s",$1, $3);}
+	//| TK_IDENT TK_DIVEQ expr {$$ = template("%s /= %s",$1, $3);}
+	//| TK_IDENT TK_MODEQ expr {$$ = template("%s %= %s",$1, $3);}
+	//| TK_IDENT TK_COLEQ expr {$$ = template("%s := %s",$1, $3);}
 	| expr KW_OR expr {$$ = template("%s || %s", $1, $3);}
 	| expr KW_AND expr {$$ = template("%s && %s", $1, $3);}
 	| KW_NOT expr {$$ = template("!%s", $2);}
@@ -140,14 +140,33 @@ expr:
 	;
 
 listofinstructions:
+	var_declarations const_declarations statements {$$ = template("%s\n%s\n%s",$1, $2, $3);}
+	| const_declarations var_declarations statements {$$ = template("%s\n%s\n%s",$1, $2, $3);}
+	| statements {$$ = template("%s\n",$1);}
+	;
+
+/*
+listofinstructions:
 	instruction ';' {$$ = template("%s;", $1);}
 	| listofinstructions instruction ';' { printf("t"); $$ = template("%s \n%s;", $1, $2); }
 	;
-
+*/
+/*
 instruction:
 	//TK_IDENT '=' listofexpr {$$ = template("%s=%s",$1, $3);}
 	listofexpr {$$ = template("%s",$1);}
 	;
+*/
+
+statements:
+	statement ';' { $$ = template("%s;", $1);}
+	| statements statement ';' { $$ = template("%s \n%s;", $1, $2); }
+	;
+
+statement:
+	TK_IDENT '=' listofexpr {$$ = template("%s = %s",$1, $3);}
+	;
+
 
 const_declarations:
 	const_declaration ';' {$$ = template("%s;", $1);}
