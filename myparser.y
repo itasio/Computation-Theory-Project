@@ -25,11 +25,12 @@
 %token TK_MINEQ
 %token TK_MULEQ
 %token TK_DIVEQ
-%token TK_ASSIGN
+%token TK_MODEQ
 %token TK_EQEQ
 %token TK_NOTEQ
 %token TK_GREEQ
 %token TK_LESEQ
+%token TK_COLEQ
 
 %token KW_AND
 %token KW_OR
@@ -64,10 +65,15 @@
 %type <str> listofexpr listofinstructions  main_block function_blocks var_declarations const_declarations /*comp_declarations*/
 %type <str> expr instruction data_type const_declaration var_declaration function_block //array
 
-
+%right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
+%left KW_OR
+%left KW_AND
+%right KW_NOT
+%left TK_EQEQ TK_NOTEQ
+%left '<' TK_LESEQ '>' TK_GREEQ
 %left '+' '-' 
 %left '*' '/' '%'
-%left UMINUS
+%left UMINUS UPLUS
 %right TK_POW
 %left '.' '(' ')' '[' ']'
 %%
@@ -104,6 +110,15 @@ expr:
 	TK_CONSTINT
 	| TK_CONSTFLOAT
 	| TK_IDENT
+	| expr KW_OR expr {$$ = template("%s || %s", $1, $3);}
+	| expr KW_AND expr {$$ = template("%s && %s", $1, $3);}
+	| KW_NOT expr {$$ = template("!%s", $2);}
+	| expr TK_NOTEQ expr {$$ = template("%s != %s", $1, $3);}
+	| expr TK_EQEQ expr {$$ = template("%s == %s", $1, $3);}
+	| expr TK_LESEQ expr {$$ = template("%s <= %s", $1, $3);}
+	| expr TK_GREEQ expr {$$ = template("%s >= %s", $1, $3);}
+	| expr '<' expr {$$ = template("%s < %s", $1, $3);}
+	| expr '>' expr {$$ = template("%s > %s", $1, $3);}
 	| expr '+' expr {$$ = template("%s + %s", $1, $3);}
 	| expr '-' expr {$$ = template("%s - %s", $1, $3);}
 	| expr '*' expr {$$ = template("%s * %s", $1, $3);}
@@ -111,6 +126,7 @@ expr:
 	| expr '%' expr {$$ = template("%s %% %s", $1, $3);}
 	| expr TK_POW expr {$$ = template("pow(%s, %s)", $1, $3);}
 	| '-' expr %prec UMINUS {$$ = template("- %s", $2);}
+	| '+' expr %prec UPLUS {$$ = template("%s", $2);}
 	| '(' expr ')' {$$ = template("(%s)", $2);}
 	| TK_IDENT '[' expr ']' {$$ = template("%s[%s]", $1, $3);}
 	| expr '.' expr {$$ = template("%s.%s", $1, $3);}

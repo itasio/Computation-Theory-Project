@@ -80,7 +80,8 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 "-="									return TK_MINEQ;
 "*="									return TK_MULEQ;
 "/="									return TK_DIVEQ;
-"%="									return TK_ASSIGN;
+"%="									return TK_MODEQ;
+":="									return TK_COLEQ;
 "=="									return TK_EQEQ;
 "!="									return TK_NOTEQ;
 ">="									return TK_GREEQ;
