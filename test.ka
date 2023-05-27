@@ -23,21 +23,9 @@ z =-1**2;
 enddef;
 
 def loo():
-x = 3 > 2;
-x = 3 >= 2;
-x = 3 < 2;
-x = 3 <= 2;
-x = (a == b);
-x = (a != b);
-x = not b;
-x = (a and b);
-x = (a or b);
-x += 3;
-x -= 3;
-x *= 3;
-x /= 3;
-x %= 3;
-x := 3;
+l = (a <= b) and (d <= c);
+l = (c+a) != (2*d);
+l = (a+1) % cube(b+3);
 enddef;
 
 def main():
