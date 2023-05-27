@@ -89,7 +89,8 @@ extern int yydebug;
     KW_ENDWHILE = 295,
     KW_COMP = 296,
     KW_TRUE = 297,
-    KW_FALSE = 298
+    KW_FALSE = 298,
+    UMINUS = 299
   };
 #endif
 
@@ -101,7 +102,7 @@ union YYSTYPE
 
 	char* str;
 
-#line 105 "myparser.tab.h"
+#line 106 "myparser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

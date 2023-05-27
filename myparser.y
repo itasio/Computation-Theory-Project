@@ -66,7 +66,8 @@
 
 
 %left '+' '-' 
-%left '*' '/'
+%left '*' '/' '%'
+%left UMINUS
 %right TK_POW
 %left '.' '(' ')' '[' ']'
 %%
@@ -102,8 +103,17 @@ listofexpr:
 expr:
 	TK_CONSTINT
 	| TK_CONSTFLOAT
+	| TK_IDENT
 	| expr '+' expr {$$ = template("%s + %s", $1, $3);}
+	| expr '-' expr {$$ = template("%s - %s", $1, $3);}
+	| expr '*' expr {$$ = template("%s * %s", $1, $3);}
+	| expr '/' expr {$$ = template("%s / %s", $1, $3);}
+	| expr '%' expr {$$ = template("%s %% %s", $1, $3);}
 	| expr TK_POW expr {$$ = template("pow(%s, %s)", $1, $3);}
+	| '-' expr %prec UMINUS {$$ = template("- %s", $2);}
+	| '(' expr ')' {$$ = template("(%s)", $2);}
+	| TK_IDENT '[' expr ']' {$$ = template("%s[%s]", $1, $3);}
+	| expr '.' expr {$$ = template("%s.%s", $1, $3);}
 	;
 
 listofinstructions:
