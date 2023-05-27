@@ -110,6 +110,13 @@ expr:
 	TK_CONSTINT
 	| TK_CONSTFLOAT
 	| TK_IDENT
+	| TK_IDENT '=' expr {$$ = template("%s = %s",$1, $3);}
+	| TK_IDENT TK_PLUEQ expr {$$ = template("%s += %s",$1, $3);}
+	| TK_IDENT TK_MINEQ expr {$$ = template("%s -= %s",$1, $3);}
+	| TK_IDENT TK_MULEQ expr {$$ = template("%s *= %s",$1, $3);}
+	| TK_IDENT TK_DIVEQ expr {$$ = template("%s /= %s",$1, $3);}
+	| TK_IDENT TK_MODEQ expr {$$ = template("%s %= %s",$1, $3);}
+	| TK_IDENT TK_COLEQ expr {$$ = template("%s := %s",$1, $3);}
 	| expr KW_OR expr {$$ = template("%s || %s", $1, $3);}
 	| expr KW_AND expr {$$ = template("%s && %s", $1, $3);}
 	| KW_NOT expr {$$ = template("!%s", $2);}
@@ -138,8 +145,8 @@ listofinstructions:
 	;
 
 instruction:
-	//TK_IDENT '=' TK_CONSTINT {$$ = template("%s=%s",$1, $3);}
-	TK_IDENT '=' listofexpr {$$ = template("%s=%s",$1, $3);}
+	//TK_IDENT '=' listofexpr {$$ = template("%s=%s",$1, $3);}
+	listofexpr {$$ = template("%s",$1);}
 	;
 
 const_declarations:

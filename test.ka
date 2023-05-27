@@ -23,8 +23,21 @@ z =-1**2;
 enddef;
 
 def loo():
-rr=5;
-ff=5;
+x = 3 > 2;
+x = 3 >= 2;
+x = 3 < 2;
+x = 3 <= 2;
+x = (a == b);
+x = (a != b);
+x = not b;
+x = (a and b);
+x = (a or b);
+x += 3;
+x -= 3;
+x *= 3;
+x /= 3;
+x %= 3;
+x := 3;
 enddef;
 
 def main():
