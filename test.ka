@@ -25,7 +25,11 @@ enddef;
 def loo():
 l = (a <= b) and (d <= c);
 l = (c+a) != (2*d);
-l = (a+1) % cube(b+3);
+    if (x>y):
+        total = total + 5;
+    else:
+        total %= 3;    
+    endif;
 enddef;
 
 def main():

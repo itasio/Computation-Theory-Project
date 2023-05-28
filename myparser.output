@@ -1,33 +1,19 @@
-Nonterminals useless in grammar
-
-    instruction
-
-
 Terminals unused in grammar
 
-    TK_PLUEQ
-    TK_MINEQ
-    TK_MULEQ
-    TK_DIVEQ
-    TK_MODEQ
-    TK_COLEQ
     KW_FOR
     KW_BREAK
     KW_ENDCOMP
     KW_IN
     KW_CONTINUE
     KW_OF
-    KW_IF
     KW_ENDFOR
-    KW_ELSE
     KW_WHILE
-    KW_ENDIF
     KW_ENDWHILE
     KW_COMP
 
 
-State 86 conflicts: 2 shift/reduce
-State 97 conflicts: 2 shift/reduce
+State 101 conflicts: 2 shift/reduce
+State 134 conflicts: 2 shift/reduce
 
 
 Grammar
@@ -79,92 +65,102 @@ Grammar
    37                   | const_declarations var_declarations statements
    38                   | statements
 
-   39 statements: statement ';'
-   40           | statements statement ';'
+   39 statements: statement
+   40           | statements statement
 
-   41 statement: TK_IDENT '=' listofexpr
+   41 statement: TK_IDENT '=' listofexpr ';'
+   42          | TK_IDENT TK_PLUEQ expr ';'
+   43          | TK_IDENT TK_MINEQ expr ';'
+   44          | TK_IDENT TK_MULEQ expr ';'
+   45          | TK_IDENT TK_MODEQ expr ';'
+   46          | TK_IDENT TK_DIVEQ expr ';'
+   47          | TK_IDENT TK_COLEQ expr ';'
+   48          | if_statement ';'
 
-   42 const_declarations: const_declaration ';'
-   43                   | const_declarations const_declaration ';'
+   49 if_statement: KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
 
-   44 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
-   47                  | KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
+   51 const_declarations: const_declaration ';'
+   52                   | const_declarations const_declaration ';'
 
-   49 var_declarations: var_declaration ';'
-   50                 | var_declarations var_declaration ';'
+   53 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
+   56                  | KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
 
-   51 var_declaration: TK_IDENT ':' data_type
+   58 var_declarations: var_declaration ';'
+   59                 | var_declarations var_declaration ';'
 
-   52 data_type: KW_INTEGER
-   53          | KW_SCALAR
-   54          | KW_STR
-   55          | KW_BOOLEAN
+   60 var_declaration: TK_IDENT ':' data_type
+
+   61 data_type: KW_INTEGER
+   62          | KW_SCALAR
+   63          | KW_STR
+   64          | KW_BOOLEAN
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     '%' (37) 29
-    '(' (40) 5 6 9 10 33
-    ')' (41) 5 6 9 10 33
+    '(' (40) 5 6 9 10 33 49 50
+    ')' (41) 5 6 9 10 33 49 50
     '*' (42) 27
     '+' (43) 25 32
     '-' (45) 26 31
     '.' (46) 35
     '/' (47) 28
-    ':' (58) 5 6 9 10 44 45 46 47 48 51
-    ';' (59) 5 6 7 8 10 39 40 42 43 49 50
+    ':' (58) 5 6 9 10 49 50 53 54 55 56 57 60
+    ';' (59) 5 6 7 8 10 41 42 43 44 45 46 47 48 51 52 58 59
     '<' (60) 23
-    '=' (61) 41 44 45 46 47 48
+    '=' (61) 41 53 54 55 56 57
     '>' (62) 24
     '[' (91) 34
     ']' (93) 34
     error (256)
-    TK_IDENT <str> (258) 9 10 15 34 41 44 45 46 47 48 51
-    TK_CONSTINT <str> (259) 13 45
-    TK_CONSTFLOAT <str> (260) 14 44
-    TK_CONSTSTR <str> (261) 46
+    TK_IDENT <str> (258) 9 10 15 34 41 42 43 44 45 46 47 53 54 55 56 57 60
+    TK_CONSTINT <str> (259) 13 54
+    TK_CONSTFLOAT <str> (260) 14 53
+    TK_CONSTSTR <str> (261) 55
     TK_POW (262) 30
-    TK_PLUEQ (263)
-    TK_MINEQ (264)
-    TK_MULEQ (265)
-    TK_DIVEQ (266)
-    TK_MODEQ (267)
+    TK_PLUEQ (263) 42
+    TK_MINEQ (264) 43
+    TK_MULEQ (265) 44
+    TK_DIVEQ (266) 46
+    TK_MODEQ (267) 45
     TK_EQEQ (268) 20
     TK_NOTEQ (269) 19
     TK_GREEQ (270) 22
     TK_LESEQ (271) 21
-    TK_COLEQ (272)
+    TK_COLEQ (272) 47
     KW_AND (273) 17
     KW_OR (274) 16
     KW_NOT (275) 18
-    KW_INTEGER (276) 45 52
+    KW_INTEGER (276) 54 61
     KW_FOR (277)
     KW_BREAK (278)
     KW_DEF (279) 5 6 9 10
     KW_ENDCOMP (280)
-    KW_SCALAR (281) 44 53
-    KW_CONST (282) 44 45 46 47 48
+    KW_SCALAR (281) 53 62
+    KW_CONST (282) 53 54 55 56 57
     KW_IN (283)
     KW_CONTINUE (284)
     KW_ENDDEF (285) 5 6 9 10
     KW_OF (286)
-    KW_STR (287) 46 54
-    KW_IF (288)
+    KW_STR (287) 55 63
+    KW_IF (288) 49 50
     KW_ENDFOR (289)
     KW_MAIN (290) 5 6
-    KW_BOOLEAN (291) 47 48 55
-    KW_ELSE (292)
+    KW_BOOLEAN (291) 56 57 64
+    KW_ELSE (292) 50
     KW_WHILE (293)
     KW_RETURN (294) 10
-    KW_ENDIF (295)
+    KW_ENDIF (295) 49 50
     KW_ENDWHILE (296)
     KW_COMP (297)
-    KW_TRUE (298) 47
-    KW_FALSE (299) 48
+    KW_TRUE (298) 56
+    KW_FALSE (299) 57
     UMINUS (300)
     UPLUS (301)
 
@@ -187,34 +183,37 @@ Nonterminals, with rules where they appear
         on right: 7 8
     listofexpr <str> (67)
         on left: 11 12
-        on right: 12 41
+        on right: 12 41 49 50
     expr <str> (68)
         on left: 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
-        on right: 11 12 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35
+        on right: 11 12 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 42 43 44 45 46 47
     listofinstructions <str> (69)
         on left: 36 37 38
         on right: 6 9 10
     statements <str> (70)
         on left: 39 40
-        on right: 36 37 38 40
+        on right: 36 37 38 40 49 50
     statement <str> (71)
-        on left: 41
+        on left: 41 42 43 44 45 46 47 48
         on right: 39 40
-    const_declarations <str> (72)
-        on left: 42 43
-        on right: 4 36 37 43
-    const_declaration <str> (73)
-        on left: 44 45 46 47 48
-        on right: 42 43
-    var_declarations <str> (74)
+    if_statement <str> (72)
         on left: 49 50
-        on right: 3 4 36 37 50
-    var_declaration <str> (75)
-        on left: 51
-        on right: 49 50
-    data_type <str> (76)
-        on left: 52 53 54 55
-        on right: 51
+        on right: 48
+    const_declarations <str> (73)
+        on left: 51 52
+        on right: 4 36 37 52
+    const_declaration <str> (74)
+        on left: 53 54 55 56 57
+        on right: 51 52
+    var_declarations <str> (75)
+        on left: 58 59
+        on right: 3 4 36 37 59
+    var_declaration <str> (76)
+        on left: 60
+        on right: 58 59
+    data_type <str> (77)
+        on left: 61 62 63 64
+        on right: 60
 
 
 State 0
@@ -230,16 +229,16 @@ State 0
     8                | . function_blocks function_block ';'
     9 function_block: . KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_ENDDEF
    10               | . KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF
-   42 const_declarations: . const_declaration ';'
-   43                   | . const_declarations const_declaration ';'
-   44 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
-   47                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
-   49 var_declarations: . var_declaration ';'
-   50                 | . var_declarations var_declaration ';'
-   51 var_declaration: . TK_IDENT ':' data_type
+   51 const_declarations: . const_declaration ';'
+   52                   | . const_declarations const_declaration ';'
+   53 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
+   56                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
+   58 var_declarations: . var_declaration ';'
+   59                 | . var_declarations var_declaration ';'
+   60 var_declaration: . TK_IDENT ':' data_type
 
     TK_IDENT  shift, and go to state 1
     KW_DEF    shift, and go to state 2
@@ -257,7 +256,7 @@ State 0
 
 State 1
 
-   51 var_declaration: TK_IDENT . ':' data_type
+   60 var_declaration: TK_IDENT . ':' data_type
 
     ':'  shift, and go to state 12
 
@@ -275,11 +274,11 @@ State 2
 
 State 3
 
-   44 const_declaration: KW_CONST . TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | KW_CONST . TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | KW_CONST . TK_IDENT '=' TK_CONSTSTR ':' KW_STR
-   47                  | KW_CONST . TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | KW_CONST . TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
+   53 const_declaration: KW_CONST . TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | KW_CONST . TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | KW_CONST . TK_IDENT '=' TK_CONSTSTR ':' KW_STR
+   56                  | KW_CONST . TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | KW_CONST . TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
 
     TK_IDENT  shift, and go to state 15
 
@@ -323,15 +322,15 @@ State 7
 State 8
 
     4 program: const_declarations . var_declarations function_blocks main_block
-   43 const_declarations: const_declarations . const_declaration ';'
-   44 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
-   47                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
-   49 var_declarations: . var_declaration ';'
-   50                 | . var_declarations var_declaration ';'
-   51 var_declaration: . TK_IDENT ':' data_type
+   52 const_declarations: const_declarations . const_declaration ';'
+   53 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
+   56                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
+   58 var_declarations: . var_declaration ';'
+   59                 | . var_declarations var_declaration ';'
+   60 var_declaration: . TK_IDENT ':' data_type
 
     TK_IDENT  shift, and go to state 1
     KW_CONST  shift, and go to state 3
@@ -343,7 +342,7 @@ State 8
 
 State 9
 
-   42 const_declarations: const_declaration . ';'
+   51 const_declarations: const_declaration . ';'
 
     ';'  shift, and go to state 22
 
@@ -355,8 +354,8 @@ State 10
     8                | . function_blocks function_block ';'
     9 function_block: . KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_ENDDEF
    10               | . KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF
-   50 var_declarations: var_declarations . var_declaration ';'
-   51 var_declaration: . TK_IDENT ':' data_type
+   59 var_declarations: var_declarations . var_declaration ';'
+   60 var_declaration: . TK_IDENT ':' data_type
 
     TK_IDENT  shift, and go to state 1
     KW_DEF    shift, and go to state 23
@@ -368,18 +367,18 @@ State 10
 
 State 11
 
-   49 var_declarations: var_declaration . ';'
+   58 var_declarations: var_declaration . ';'
 
     ';'  shift, and go to state 26
 
 
 State 12
 
-   51 var_declaration: TK_IDENT ':' . data_type
-   52 data_type: . KW_INTEGER
-   53          | . KW_SCALAR
-   54          | . KW_STR
-   55          | . KW_BOOLEAN
+   60 var_declaration: TK_IDENT ':' . data_type
+   61 data_type: . KW_INTEGER
+   62          | . KW_SCALAR
+   63          | . KW_STR
+   64          | . KW_BOOLEAN
 
     KW_INTEGER  shift, and go to state 27
     KW_SCALAR   shift, and go to state 28
@@ -407,11 +406,11 @@ State 14
 
 State 15
 
-   44 const_declaration: KW_CONST TK_IDENT . '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | KW_CONST TK_IDENT . '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | KW_CONST TK_IDENT . '=' TK_CONSTSTR ':' KW_STR
-   47                  | KW_CONST TK_IDENT . '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | KW_CONST TK_IDENT . '=' KW_FALSE ':' KW_BOOLEAN
+   53 const_declaration: KW_CONST TK_IDENT . '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | KW_CONST TK_IDENT . '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | KW_CONST TK_IDENT . '=' TK_CONSTSTR ':' KW_STR
+   56                  | KW_CONST TK_IDENT . '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | KW_CONST TK_IDENT . '=' KW_FALSE ':' KW_BOOLEAN
 
     '='  shift, and go to state 34
 
@@ -446,7 +445,7 @@ State 19
 
 State 20
 
-   43 const_declarations: const_declarations const_declaration . ';'
+   52 const_declarations: const_declarations const_declaration . ';'
 
     ';'  shift, and go to state 36
 
@@ -458,8 +457,8 @@ State 21
     8                | . function_blocks function_block ';'
     9 function_block: . KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_ENDDEF
    10               | . KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF
-   50 var_declarations: var_declarations . var_declaration ';'
-   51 var_declaration: . TK_IDENT ':' data_type
+   59 var_declarations: var_declarations . var_declaration ';'
+   60 var_declaration: . TK_IDENT ':' data_type
 
     TK_IDENT  shift, and go to state 1
     KW_DEF    shift, and go to state 23
@@ -471,9 +470,9 @@ State 21
 
 State 22
 
-   42 const_declarations: const_declaration ';' .
+   51 const_declarations: const_declaration ';' .
 
-    $default  reduce using rule 42 (const_declarations)
+    $default  reduce using rule 51 (const_declarations)
 
 
 State 23
@@ -501,51 +500,51 @@ State 24
 
 State 25
 
-   50 var_declarations: var_declarations var_declaration . ';'
+   59 var_declarations: var_declarations var_declaration . ';'
 
     ';'  shift, and go to state 39
 
 
 State 26
 
-   49 var_declarations: var_declaration ';' .
+   58 var_declarations: var_declaration ';' .
 
-    $default  reduce using rule 49 (var_declarations)
+    $default  reduce using rule 58 (var_declarations)
 
 
 State 27
 
-   52 data_type: KW_INTEGER .
+   61 data_type: KW_INTEGER .
 
-    $default  reduce using rule 52 (data_type)
+    $default  reduce using rule 61 (data_type)
 
 
 State 28
 
-   53 data_type: KW_SCALAR .
+   62 data_type: KW_SCALAR .
 
-    $default  reduce using rule 53 (data_type)
+    $default  reduce using rule 62 (data_type)
 
 
 State 29
 
-   54 data_type: KW_STR .
+   63 data_type: KW_STR .
 
-    $default  reduce using rule 54 (data_type)
+    $default  reduce using rule 63 (data_type)
 
 
 State 30
 
-   55 data_type: KW_BOOLEAN .
+   64 data_type: KW_BOOLEAN .
 
-    $default  reduce using rule 55 (data_type)
+    $default  reduce using rule 64 (data_type)
 
 
 State 31
 
-   51 var_declaration: TK_IDENT ':' data_type .
+   60 var_declaration: TK_IDENT ':' data_type .
 
-    $default  reduce using rule 51 (var_declaration)
+    $default  reduce using rule 60 (var_declaration)
 
 
 State 32
@@ -566,11 +565,11 @@ State 33
 
 State 34
 
-   44 const_declaration: KW_CONST TK_IDENT '=' . TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | KW_CONST TK_IDENT '=' . TK_CONSTINT ':' KW_INTEGER
-   46                  | KW_CONST TK_IDENT '=' . TK_CONSTSTR ':' KW_STR
-   47                  | KW_CONST TK_IDENT '=' . KW_TRUE ':' KW_BOOLEAN
-   48                  | KW_CONST TK_IDENT '=' . KW_FALSE ':' KW_BOOLEAN
+   53 const_declaration: KW_CONST TK_IDENT '=' . TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | KW_CONST TK_IDENT '=' . TK_CONSTINT ':' KW_INTEGER
+   55                  | KW_CONST TK_IDENT '=' . TK_CONSTSTR ':' KW_STR
+   56                  | KW_CONST TK_IDENT '=' . KW_TRUE ':' KW_BOOLEAN
+   57                  | KW_CONST TK_IDENT '=' . KW_FALSE ':' KW_BOOLEAN
 
     TK_CONSTINT    shift, and go to state 42
     TK_CONSTFLOAT  shift, and go to state 43
@@ -588,9 +587,9 @@ State 35
 
 State 36
 
-   43 const_declarations: const_declarations const_declaration ';' .
+   52 const_declarations: const_declarations const_declaration ';' .
 
-    $default  reduce using rule 43 (const_declarations)
+    $default  reduce using rule 52 (const_declarations)
 
 
 State 37
@@ -617,9 +616,9 @@ State 38
 
 State 39
 
-   50 var_declarations: var_declarations var_declaration ';' .
+   59 var_declarations: var_declarations var_declaration ';' .
 
-    $default  reduce using rule 50 (var_declarations)
+    $default  reduce using rule 59 (var_declarations)
 
 
 State 40
@@ -640,35 +639,35 @@ State 41
 
 State 42
 
-   45 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTINT . ':' KW_INTEGER
+   54 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTINT . ':' KW_INTEGER
 
     ':'  shift, and go to state 50
 
 
 State 43
 
-   44 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTFLOAT . ':' KW_SCALAR
+   53 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTFLOAT . ':' KW_SCALAR
 
     ':'  shift, and go to state 51
 
 
 State 44
 
-   46 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTSTR . ':' KW_STR
+   55 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTSTR . ':' KW_STR
 
     ':'  shift, and go to state 52
 
 
 State 45
 
-   47 const_declaration: KW_CONST TK_IDENT '=' KW_TRUE . ':' KW_BOOLEAN
+   56 const_declaration: KW_CONST TK_IDENT '=' KW_TRUE . ':' KW_BOOLEAN
 
     ':'  shift, and go to state 53
 
 
 State 46
 
-   48 const_declaration: KW_CONST TK_IDENT '=' KW_FALSE . ':' KW_BOOLEAN
+   57 const_declaration: KW_CONST TK_IDENT '=' KW_FALSE . ':' KW_BOOLEAN
 
     ':'  shift, and go to state 54
 
@@ -687,29 +686,40 @@ State 48
    36 listofinstructions: . var_declarations const_declarations statements
    37                   | . const_declarations var_declarations statements
    38                   | . statements
-   39 statements: . statement ';'
-   40           | . statements statement ';'
-   41 statement: . TK_IDENT '=' listofexpr
-   42 const_declarations: . const_declaration ';'
-   43                   | . const_declarations const_declaration ';'
-   44 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
-   47                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
-   49 var_declarations: . var_declaration ';'
-   50                 | . var_declarations var_declaration ';'
-   51 var_declaration: . TK_IDENT ':' data_type
+   39 statements: . statement
+   40           | . statements statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+   51 const_declarations: . const_declaration ';'
+   52                   | . const_declarations const_declaration ';'
+   53 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
+   56                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
+   58 var_declarations: . var_declaration ';'
+   59                 | . var_declarations var_declaration ';'
+   60 var_declaration: . TK_IDENT ':' data_type
 
     TK_IDENT  shift, and go to state 55
     KW_CONST  shift, and go to state 3
+    KW_IF     shift, and go to state 56
 
-    listofinstructions  go to state 56
-    statements          go to state 57
-    statement           go to state 58
-    const_declarations  go to state 59
+    listofinstructions  go to state 57
+    statements          go to state 58
+    statement           go to state 59
+    if_statement        go to state 60
+    const_declarations  go to state 61
     const_declaration   go to state 9
-    var_declarations    go to state 60
+    var_declarations    go to state 62
     var_declaration     go to state 11
 
 
@@ -720,198 +730,475 @@ State 49
    36 listofinstructions: . var_declarations const_declarations statements
    37                   | . const_declarations var_declarations statements
    38                   | . statements
-   39 statements: . statement ';'
-   40           | . statements statement ';'
-   41 statement: . TK_IDENT '=' listofexpr
-   42 const_declarations: . const_declaration ';'
-   43                   | . const_declarations const_declaration ';'
-   44 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
-   47                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
-   49 var_declarations: . var_declaration ';'
-   50                 | . var_declarations var_declaration ';'
-   51 var_declaration: . TK_IDENT ':' data_type
+   39 statements: . statement
+   40           | . statements statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+   51 const_declarations: . const_declaration ';'
+   52                   | . const_declarations const_declaration ';'
+   53 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
+   56                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
+   58 var_declarations: . var_declaration ';'
+   59                 | . var_declarations var_declaration ';'
+   60 var_declaration: . TK_IDENT ':' data_type
 
     TK_IDENT   shift, and go to state 55
     KW_CONST   shift, and go to state 3
-    KW_ENDDEF  shift, and go to state 61
+    KW_ENDDEF  shift, and go to state 63
+    KW_IF      shift, and go to state 56
 
-    listofinstructions  go to state 62
-    statements          go to state 57
-    statement           go to state 58
-    const_declarations  go to state 59
+    listofinstructions  go to state 64
+    statements          go to state 58
+    statement           go to state 59
+    if_statement        go to state 60
+    const_declarations  go to state 61
     const_declaration   go to state 9
-    var_declarations    go to state 60
+    var_declarations    go to state 62
     var_declaration     go to state 11
 
 
 State 50
 
-   45 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTINT ':' . KW_INTEGER
+   54 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTINT ':' . KW_INTEGER
 
-    KW_INTEGER  shift, and go to state 63
+    KW_INTEGER  shift, and go to state 65
 
 
 State 51
 
-   44 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' . KW_SCALAR
+   53 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' . KW_SCALAR
 
-    KW_SCALAR  shift, and go to state 64
+    KW_SCALAR  shift, and go to state 66
 
 
 State 52
 
-   46 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTSTR ':' . KW_STR
+   55 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTSTR ':' . KW_STR
 
-    KW_STR  shift, and go to state 65
+    KW_STR  shift, and go to state 67
 
 
 State 53
 
-   47 const_declaration: KW_CONST TK_IDENT '=' KW_TRUE ':' . KW_BOOLEAN
+   56 const_declaration: KW_CONST TK_IDENT '=' KW_TRUE ':' . KW_BOOLEAN
 
-    KW_BOOLEAN  shift, and go to state 66
+    KW_BOOLEAN  shift, and go to state 68
 
 
 State 54
 
-   48 const_declaration: KW_CONST TK_IDENT '=' KW_FALSE ':' . KW_BOOLEAN
+   57 const_declaration: KW_CONST TK_IDENT '=' KW_FALSE ':' . KW_BOOLEAN
 
-    KW_BOOLEAN  shift, and go to state 67
+    KW_BOOLEAN  shift, and go to state 69
 
 
 State 55
 
-   41 statement: TK_IDENT . '=' listofexpr
-   51 var_declaration: TK_IDENT . ':' data_type
+   41 statement: TK_IDENT . '=' listofexpr ';'
+   42          | TK_IDENT . TK_PLUEQ expr ';'
+   43          | TK_IDENT . TK_MINEQ expr ';'
+   44          | TK_IDENT . TK_MULEQ expr ';'
+   45          | TK_IDENT . TK_MODEQ expr ';'
+   46          | TK_IDENT . TK_DIVEQ expr ';'
+   47          | TK_IDENT . TK_COLEQ expr ';'
+   60 var_declaration: TK_IDENT . ':' data_type
 
-    '='  shift, and go to state 68
-    ':'  shift, and go to state 12
+    TK_PLUEQ  shift, and go to state 70
+    TK_MINEQ  shift, and go to state 71
+    TK_MULEQ  shift, and go to state 72
+    TK_DIVEQ  shift, and go to state 73
+    TK_MODEQ  shift, and go to state 74
+    TK_COLEQ  shift, and go to state 75
+    '='       shift, and go to state 76
+    ':'       shift, and go to state 12
 
 
 State 56
 
-    9 function_block: KW_DEF TK_IDENT '(' ')' ':' listofinstructions . KW_ENDDEF
-   10               | KW_DEF TK_IDENT '(' ')' ':' listofinstructions . KW_RETURN ';' KW_ENDDEF
+   49 if_statement: KW_IF . '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | KW_IF . '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
 
-    KW_ENDDEF  shift, and go to state 69
-    KW_RETURN  shift, and go to state 70
+    '('  shift, and go to state 77
 
 
 State 57
 
-   38 listofinstructions: statements .  [KW_ENDDEF, KW_RETURN]
-   40 statements: statements . statement ';'
-   41 statement: . TK_IDENT '=' listofexpr
+    9 function_block: KW_DEF TK_IDENT '(' ')' ':' listofinstructions . KW_ENDDEF
+   10               | KW_DEF TK_IDENT '(' ')' ':' listofinstructions . KW_RETURN ';' KW_ENDDEF
 
-    TK_IDENT  shift, and go to state 71
-
-    $default  reduce using rule 38 (listofinstructions)
-
-    statement  go to state 72
+    KW_ENDDEF  shift, and go to state 78
+    KW_RETURN  shift, and go to state 79
 
 
 State 58
 
-   39 statements: statement . ';'
+   38 listofinstructions: statements .  [KW_ENDDEF, KW_RETURN]
+   40 statements: statements . statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
 
-    ';'  shift, and go to state 73
+    TK_IDENT  shift, and go to state 80
+    KW_IF     shift, and go to state 56
+
+    $default  reduce using rule 38 (listofinstructions)
+
+    statement     go to state 81
+    if_statement  go to state 60
 
 
 State 59
 
+   39 statements: statement .
+
+    $default  reduce using rule 39 (statements)
+
+
+State 60
+
+   48 statement: if_statement . ';'
+
+    ';'  shift, and go to state 82
+
+
+State 61
+
    37 listofinstructions: const_declarations . var_declarations statements
-   43 const_declarations: const_declarations . const_declaration ';'
-   44 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
-   47                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
-   49 var_declarations: . var_declaration ';'
-   50                 | . var_declarations var_declaration ';'
-   51 var_declaration: . TK_IDENT ':' data_type
+   52 const_declarations: const_declarations . const_declaration ';'
+   53 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
+   56                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
+   58 var_declarations: . var_declaration ';'
+   59                 | . var_declarations var_declaration ';'
+   60 var_declaration: . TK_IDENT ':' data_type
 
     TK_IDENT  shift, and go to state 1
     KW_CONST  shift, and go to state 3
 
     const_declaration  go to state 20
-    var_declarations   go to state 74
+    var_declarations   go to state 83
     var_declaration    go to state 11
-
-
-State 60
-
-   36 listofinstructions: var_declarations . const_declarations statements
-   42 const_declarations: . const_declaration ';'
-   43                   | . const_declarations const_declaration ';'
-   44 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
-   47                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
-   50 var_declarations: var_declarations . var_declaration ';'
-   51 var_declaration: . TK_IDENT ':' data_type
-
-    TK_IDENT  shift, and go to state 1
-    KW_CONST  shift, and go to state 3
-
-    const_declarations  go to state 75
-    const_declaration   go to state 9
-    var_declaration     go to state 25
-
-
-State 61
-
-    5 main_block: KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF . ';'
-
-    ';'  shift, and go to state 76
 
 
 State 62
 
-    6 main_block: KW_DEF KW_MAIN '(' ')' ':' listofinstructions . KW_ENDDEF ';'
+   36 listofinstructions: var_declarations . const_declarations statements
+   51 const_declarations: . const_declaration ';'
+   52                   | . const_declarations const_declaration ';'
+   53 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
+   56                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
+   59 var_declarations: var_declarations . var_declaration ';'
+   60 var_declaration: . TK_IDENT ':' data_type
 
-    KW_ENDDEF  shift, and go to state 77
+    TK_IDENT  shift, and go to state 1
+    KW_CONST  shift, and go to state 3
+
+    const_declarations  go to state 84
+    const_declaration   go to state 9
+    var_declaration     go to state 25
 
 
 State 63
 
-   45 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER .
+    5 main_block: KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF . ';'
 
-    $default  reduce using rule 45 (const_declaration)
+    ';'  shift, and go to state 85
 
 
 State 64
 
-   44 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR .
+    6 main_block: KW_DEF KW_MAIN '(' ')' ':' listofinstructions . KW_ENDDEF ';'
 
-    $default  reduce using rule 44 (const_declaration)
+    KW_ENDDEF  shift, and go to state 86
 
 
 State 65
 
-   46 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR .
+   54 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER .
 
-    $default  reduce using rule 46 (const_declaration)
+    $default  reduce using rule 54 (const_declaration)
 
 
 State 66
 
-   47 const_declaration: KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN .
+   53 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR .
 
-    $default  reduce using rule 47 (const_declaration)
+    $default  reduce using rule 53 (const_declaration)
 
 
 State 67
 
-   48 const_declaration: KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN .
+   55 const_declaration: KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR .
 
-    $default  reduce using rule 48 (const_declaration)
+    $default  reduce using rule 55 (const_declaration)
 
 
 State 68
+
+   56 const_declaration: KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN .
+
+    $default  reduce using rule 56 (const_declaration)
+
+
+State 69
+
+   57 const_declaration: KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN .
+
+    $default  reduce using rule 57 (const_declaration)
+
+
+State 70
+
+   13 expr: . TK_CONSTINT
+   14     | . TK_CONSTFLOAT
+   15     | . TK_IDENT
+   16     | . expr KW_OR expr
+   17     | . expr KW_AND expr
+   18     | . KW_NOT expr
+   19     | . expr TK_NOTEQ expr
+   20     | . expr TK_EQEQ expr
+   21     | . expr TK_LESEQ expr
+   22     | . expr TK_GREEQ expr
+   23     | . expr '<' expr
+   24     | . expr '>' expr
+   25     | . expr '+' expr
+   26     | . expr '-' expr
+   27     | . expr '*' expr
+   28     | . expr '/' expr
+   29     | . expr '%' expr
+   30     | . expr TK_POW expr
+   31     | . '-' expr
+   32     | . '+' expr
+   33     | . '(' expr ')'
+   34     | . TK_IDENT '[' expr ']'
+   35     | . expr '.' expr
+   42 statement: TK_IDENT TK_PLUEQ . expr ';'
+
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
+
+    expr  go to state 94
+
+
+State 71
+
+   13 expr: . TK_CONSTINT
+   14     | . TK_CONSTFLOAT
+   15     | . TK_IDENT
+   16     | . expr KW_OR expr
+   17     | . expr KW_AND expr
+   18     | . KW_NOT expr
+   19     | . expr TK_NOTEQ expr
+   20     | . expr TK_EQEQ expr
+   21     | . expr TK_LESEQ expr
+   22     | . expr TK_GREEQ expr
+   23     | . expr '<' expr
+   24     | . expr '>' expr
+   25     | . expr '+' expr
+   26     | . expr '-' expr
+   27     | . expr '*' expr
+   28     | . expr '/' expr
+   29     | . expr '%' expr
+   30     | . expr TK_POW expr
+   31     | . '-' expr
+   32     | . '+' expr
+   33     | . '(' expr ')'
+   34     | . TK_IDENT '[' expr ']'
+   35     | . expr '.' expr
+   43 statement: TK_IDENT TK_MINEQ . expr ';'
+
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
+
+    expr  go to state 95
+
+
+State 72
+
+   13 expr: . TK_CONSTINT
+   14     | . TK_CONSTFLOAT
+   15     | . TK_IDENT
+   16     | . expr KW_OR expr
+   17     | . expr KW_AND expr
+   18     | . KW_NOT expr
+   19     | . expr TK_NOTEQ expr
+   20     | . expr TK_EQEQ expr
+   21     | . expr TK_LESEQ expr
+   22     | . expr TK_GREEQ expr
+   23     | . expr '<' expr
+   24     | . expr '>' expr
+   25     | . expr '+' expr
+   26     | . expr '-' expr
+   27     | . expr '*' expr
+   28     | . expr '/' expr
+   29     | . expr '%' expr
+   30     | . expr TK_POW expr
+   31     | . '-' expr
+   32     | . '+' expr
+   33     | . '(' expr ')'
+   34     | . TK_IDENT '[' expr ']'
+   35     | . expr '.' expr
+   44 statement: TK_IDENT TK_MULEQ . expr ';'
+
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
+
+    expr  go to state 96
+
+
+State 73
+
+   13 expr: . TK_CONSTINT
+   14     | . TK_CONSTFLOAT
+   15     | . TK_IDENT
+   16     | . expr KW_OR expr
+   17     | . expr KW_AND expr
+   18     | . KW_NOT expr
+   19     | . expr TK_NOTEQ expr
+   20     | . expr TK_EQEQ expr
+   21     | . expr TK_LESEQ expr
+   22     | . expr TK_GREEQ expr
+   23     | . expr '<' expr
+   24     | . expr '>' expr
+   25     | . expr '+' expr
+   26     | . expr '-' expr
+   27     | . expr '*' expr
+   28     | . expr '/' expr
+   29     | . expr '%' expr
+   30     | . expr TK_POW expr
+   31     | . '-' expr
+   32     | . '+' expr
+   33     | . '(' expr ')'
+   34     | . TK_IDENT '[' expr ']'
+   35     | . expr '.' expr
+   46 statement: TK_IDENT TK_DIVEQ . expr ';'
+
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
+
+    expr  go to state 97
+
+
+State 74
+
+   13 expr: . TK_CONSTINT
+   14     | . TK_CONSTFLOAT
+   15     | . TK_IDENT
+   16     | . expr KW_OR expr
+   17     | . expr KW_AND expr
+   18     | . KW_NOT expr
+   19     | . expr TK_NOTEQ expr
+   20     | . expr TK_EQEQ expr
+   21     | . expr TK_LESEQ expr
+   22     | . expr TK_GREEQ expr
+   23     | . expr '<' expr
+   24     | . expr '>' expr
+   25     | . expr '+' expr
+   26     | . expr '-' expr
+   27     | . expr '*' expr
+   28     | . expr '/' expr
+   29     | . expr '%' expr
+   30     | . expr TK_POW expr
+   31     | . '-' expr
+   32     | . '+' expr
+   33     | . '(' expr ')'
+   34     | . TK_IDENT '[' expr ']'
+   35     | . expr '.' expr
+   45 statement: TK_IDENT TK_MODEQ . expr ';'
+
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
+
+    expr  go to state 98
+
+
+State 75
+
+   13 expr: . TK_CONSTINT
+   14     | . TK_CONSTFLOAT
+   15     | . TK_IDENT
+   16     | . expr KW_OR expr
+   17     | . expr KW_AND expr
+   18     | . KW_NOT expr
+   19     | . expr TK_NOTEQ expr
+   20     | . expr TK_EQEQ expr
+   21     | . expr TK_LESEQ expr
+   22     | . expr TK_GREEQ expr
+   23     | . expr '<' expr
+   24     | . expr '>' expr
+   25     | . expr '+' expr
+   26     | . expr '-' expr
+   27     | . expr '*' expr
+   28     | . expr '/' expr
+   29     | . expr '%' expr
+   30     | . expr TK_POW expr
+   31     | . '-' expr
+   32     | . '+' expr
+   33     | . '(' expr ')'
+   34     | . TK_IDENT '[' expr ']'
+   35     | . expr '.' expr
+   47 statement: TK_IDENT TK_COLEQ . expr ';'
+
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
+
+    expr  go to state 99
+
+
+State 76
 
    11 listofexpr: . expr
    12           | . listofexpr expr
@@ -938,131 +1225,207 @@ State 68
    33     | . '(' expr ')'
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
-   41 statement: TK_IDENT '=' . listofexpr
+   41 statement: TK_IDENT '=' . listofexpr ';'
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    listofexpr  go to state 85
-    expr        go to state 86
+    listofexpr  go to state 100
+    expr        go to state 101
 
 
-State 69
+State 77
+
+   11 listofexpr: . expr
+   12           | . listofexpr expr
+   13 expr: . TK_CONSTINT
+   14     | . TK_CONSTFLOAT
+   15     | . TK_IDENT
+   16     | . expr KW_OR expr
+   17     | . expr KW_AND expr
+   18     | . KW_NOT expr
+   19     | . expr TK_NOTEQ expr
+   20     | . expr TK_EQEQ expr
+   21     | . expr TK_LESEQ expr
+   22     | . expr TK_GREEQ expr
+   23     | . expr '<' expr
+   24     | . expr '>' expr
+   25     | . expr '+' expr
+   26     | . expr '-' expr
+   27     | . expr '*' expr
+   28     | . expr '/' expr
+   29     | . expr '%' expr
+   30     | . expr TK_POW expr
+   31     | . '-' expr
+   32     | . '+' expr
+   33     | . '(' expr ')'
+   34     | . TK_IDENT '[' expr ']'
+   35     | . expr '.' expr
+   49 if_statement: KW_IF '(' . listofexpr ')' ':' statements KW_ENDIF
+   50             | KW_IF '(' . listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
+
+    listofexpr  go to state 102
+    expr        go to state 101
+
+
+State 78
 
     9 function_block: KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_ENDDEF .
 
     $default  reduce using rule 9 (function_block)
 
 
-State 70
+State 79
 
    10 function_block: KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN . ';' KW_ENDDEF
 
-    ';'  shift, and go to state 87
+    ';'  shift, and go to state 103
 
 
-State 71
+State 80
 
-   41 statement: TK_IDENT . '=' listofexpr
+   41 statement: TK_IDENT . '=' listofexpr ';'
+   42          | TK_IDENT . TK_PLUEQ expr ';'
+   43          | TK_IDENT . TK_MINEQ expr ';'
+   44          | TK_IDENT . TK_MULEQ expr ';'
+   45          | TK_IDENT . TK_MODEQ expr ';'
+   46          | TK_IDENT . TK_DIVEQ expr ';'
+   47          | TK_IDENT . TK_COLEQ expr ';'
 
-    '='  shift, and go to state 68
-
-
-State 72
-
-   40 statements: statements statement . ';'
-
-    ';'  shift, and go to state 88
-
-
-State 73
-
-   39 statements: statement ';' .
-
-    $default  reduce using rule 39 (statements)
+    TK_PLUEQ  shift, and go to state 70
+    TK_MINEQ  shift, and go to state 71
+    TK_MULEQ  shift, and go to state 72
+    TK_DIVEQ  shift, and go to state 73
+    TK_MODEQ  shift, and go to state 74
+    TK_COLEQ  shift, and go to state 75
+    '='       shift, and go to state 76
 
 
-State 74
+State 81
+
+   40 statements: statements statement .
+
+    $default  reduce using rule 40 (statements)
+
+
+State 82
+
+   48 statement: if_statement ';' .
+
+    $default  reduce using rule 48 (statement)
+
+
+State 83
 
    37 listofinstructions: const_declarations var_declarations . statements
-   39 statements: . statement ';'
-   40           | . statements statement ';'
-   41 statement: . TK_IDENT '=' listofexpr
-   50 var_declarations: var_declarations . var_declaration ';'
-   51 var_declaration: . TK_IDENT ':' data_type
+   39 statements: . statement
+   40           | . statements statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+   59 var_declarations: var_declarations . var_declaration ';'
+   60 var_declaration: . TK_IDENT ':' data_type
 
     TK_IDENT  shift, and go to state 55
+    KW_IF     shift, and go to state 56
 
-    statements       go to state 89
-    statement        go to state 58
+    statements       go to state 104
+    statement        go to state 59
+    if_statement     go to state 60
     var_declaration  go to state 25
 
 
-State 75
+State 84
 
    36 listofinstructions: var_declarations const_declarations . statements
-   39 statements: . statement ';'
-   40           | . statements statement ';'
-   41 statement: . TK_IDENT '=' listofexpr
-   43 const_declarations: const_declarations . const_declaration ';'
-   44 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
-   45                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
-   46                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
-   47                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
-   48                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
+   39 statements: . statement
+   40           | . statements statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+   52 const_declarations: const_declarations . const_declaration ';'
+   53 const_declaration: . KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR
+   54                  | . KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER
+   55                  | . KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR
+   56                  | . KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN
+   57                  | . KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN
 
-    TK_IDENT  shift, and go to state 71
+    TK_IDENT  shift, and go to state 80
     KW_CONST  shift, and go to state 3
+    KW_IF     shift, and go to state 56
 
-    statements         go to state 90
-    statement          go to state 58
+    statements         go to state 105
+    statement          go to state 59
+    if_statement       go to state 60
     const_declaration  go to state 20
 
 
-State 76
+State 85
 
     5 main_block: KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF ';' .
 
     $default  reduce using rule 5 (main_block)
 
 
-State 77
+State 86
 
     6 main_block: KW_DEF KW_MAIN '(' ')' ':' listofinstructions KW_ENDDEF . ';'
 
-    ';'  shift, and go to state 91
+    ';'  shift, and go to state 106
 
 
-State 78
+State 87
 
    15 expr: TK_IDENT .  [TK_IDENT, TK_CONSTINT, TK_CONSTFLOAT, TK_POW, TK_EQEQ, TK_NOTEQ, TK_GREEQ, TK_LESEQ, KW_AND, KW_OR, KW_NOT, '<', '>', '+', '-', '*', '/', '%', '.', '(', ')', ']', ';']
    34     | TK_IDENT . '[' expr ']'
 
-    '['  shift, and go to state 92
+    '['  shift, and go to state 107
 
     $default  reduce using rule 15 (expr)
 
 
-State 79
+State 88
 
    13 expr: TK_CONSTINT .
 
     $default  reduce using rule 13 (expr)
 
 
-State 80
+State 89
 
    14 expr: TK_CONSTFLOAT .
 
     $default  reduce using rule 14 (expr)
 
 
-State 81
+State 90
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1089,18 +1452,18 @@ State 81
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 93
+    expr  go to state 108
 
 
-State 82
+State 91
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1127,18 +1490,18 @@ State 82
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 94
+    expr  go to state 109
 
 
-State 83
+State 92
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1165,18 +1528,18 @@ State 83
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 95
+    expr  go to state 110
 
 
-State 84
+State 93
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1203,18 +1566,240 @@ State 84
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 96
+    expr  go to state 111
 
 
-State 85
+State 94
+
+   16 expr: expr . KW_OR expr
+   17     | expr . KW_AND expr
+   19     | expr . TK_NOTEQ expr
+   20     | expr . TK_EQEQ expr
+   21     | expr . TK_LESEQ expr
+   22     | expr . TK_GREEQ expr
+   23     | expr . '<' expr
+   24     | expr . '>' expr
+   25     | expr . '+' expr
+   26     | expr . '-' expr
+   27     | expr . '*' expr
+   28     | expr . '/' expr
+   29     | expr . '%' expr
+   30     | expr . TK_POW expr
+   35     | expr . '.' expr
+   42 statement: TK_IDENT TK_PLUEQ expr . ';'
+
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
+    ';'       shift, and go to state 127
+
+
+State 95
+
+   16 expr: expr . KW_OR expr
+   17     | expr . KW_AND expr
+   19     | expr . TK_NOTEQ expr
+   20     | expr . TK_EQEQ expr
+   21     | expr . TK_LESEQ expr
+   22     | expr . TK_GREEQ expr
+   23     | expr . '<' expr
+   24     | expr . '>' expr
+   25     | expr . '+' expr
+   26     | expr . '-' expr
+   27     | expr . '*' expr
+   28     | expr . '/' expr
+   29     | expr . '%' expr
+   30     | expr . TK_POW expr
+   35     | expr . '.' expr
+   43 statement: TK_IDENT TK_MINEQ expr . ';'
+
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
+    ';'       shift, and go to state 128
+
+
+State 96
+
+   16 expr: expr . KW_OR expr
+   17     | expr . KW_AND expr
+   19     | expr . TK_NOTEQ expr
+   20     | expr . TK_EQEQ expr
+   21     | expr . TK_LESEQ expr
+   22     | expr . TK_GREEQ expr
+   23     | expr . '<' expr
+   24     | expr . '>' expr
+   25     | expr . '+' expr
+   26     | expr . '-' expr
+   27     | expr . '*' expr
+   28     | expr . '/' expr
+   29     | expr . '%' expr
+   30     | expr . TK_POW expr
+   35     | expr . '.' expr
+   44 statement: TK_IDENT TK_MULEQ expr . ';'
+
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
+    ';'       shift, and go to state 129
+
+
+State 97
+
+   16 expr: expr . KW_OR expr
+   17     | expr . KW_AND expr
+   19     | expr . TK_NOTEQ expr
+   20     | expr . TK_EQEQ expr
+   21     | expr . TK_LESEQ expr
+   22     | expr . TK_GREEQ expr
+   23     | expr . '<' expr
+   24     | expr . '>' expr
+   25     | expr . '+' expr
+   26     | expr . '-' expr
+   27     | expr . '*' expr
+   28     | expr . '/' expr
+   29     | expr . '%' expr
+   30     | expr . TK_POW expr
+   35     | expr . '.' expr
+   46 statement: TK_IDENT TK_DIVEQ expr . ';'
+
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
+    ';'       shift, and go to state 130
+
+
+State 98
+
+   16 expr: expr . KW_OR expr
+   17     | expr . KW_AND expr
+   19     | expr . TK_NOTEQ expr
+   20     | expr . TK_EQEQ expr
+   21     | expr . TK_LESEQ expr
+   22     | expr . TK_GREEQ expr
+   23     | expr . '<' expr
+   24     | expr . '>' expr
+   25     | expr . '+' expr
+   26     | expr . '-' expr
+   27     | expr . '*' expr
+   28     | expr . '/' expr
+   29     | expr . '%' expr
+   30     | expr . TK_POW expr
+   35     | expr . '.' expr
+   45 statement: TK_IDENT TK_MODEQ expr . ';'
+
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
+    ';'       shift, and go to state 131
+
+
+State 99
+
+   16 expr: expr . KW_OR expr
+   17     | expr . KW_AND expr
+   19     | expr . TK_NOTEQ expr
+   20     | expr . TK_EQEQ expr
+   21     | expr . TK_LESEQ expr
+   22     | expr . TK_GREEQ expr
+   23     | expr . '<' expr
+   24     | expr . '>' expr
+   25     | expr . '+' expr
+   26     | expr . '-' expr
+   27     | expr . '*' expr
+   28     | expr . '/' expr
+   29     | expr . '%' expr
+   30     | expr . TK_POW expr
+   35     | expr . '.' expr
+   47 statement: TK_IDENT TK_COLEQ expr . ';'
+
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
+    ';'       shift, and go to state 132
+
+
+State 100
 
    12 listofexpr: listofexpr . expr
    13 expr: . TK_CONSTINT
@@ -1240,24 +1825,23 @@ State 85
    33     | . '(' expr ')'
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
-   41 statement: TK_IDENT '=' listofexpr .  [';']
+   41 statement: TK_IDENT '=' listofexpr . ';'
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
+    ';'            shift, and go to state 133
 
-    $default  reduce using rule 41 (statement)
-
-    expr  go to state 97
+    expr  go to state 134
 
 
-State 86
+State 101
 
-   11 listofexpr: expr .  [TK_IDENT, TK_CONSTINT, TK_CONSTFLOAT, KW_NOT, '+', '-', '(', ';']
+   11 listofexpr: expr .  [TK_IDENT, TK_CONSTINT, TK_CONSTFLOAT, KW_NOT, '+', '-', '(', ')', ';']
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
    19     | expr . TK_NOTEQ expr
@@ -1274,75 +1858,131 @@ State 86
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW    shift, and go to state 98
-    TK_EQEQ   shift, and go to state 99
-    TK_NOTEQ  shift, and go to state 100
-    TK_GREEQ  shift, and go to state 101
-    TK_LESEQ  shift, and go to state 102
-    KW_AND    shift, and go to state 103
-    KW_OR     shift, and go to state 104
-    '<'       shift, and go to state 105
-    '>'       shift, and go to state 106
-    '+'       shift, and go to state 107
-    '-'       shift, and go to state 108
-    '*'       shift, and go to state 109
-    '/'       shift, and go to state 110
-    '%'       shift, and go to state 111
-    '.'       shift, and go to state 112
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
 
     '+'       [reduce using rule 11 (listofexpr)]
     '-'       [reduce using rule 11 (listofexpr)]
     $default  reduce using rule 11 (listofexpr)
 
 
-State 87
+State 102
+
+   12 listofexpr: listofexpr . expr
+   13 expr: . TK_CONSTINT
+   14     | . TK_CONSTFLOAT
+   15     | . TK_IDENT
+   16     | . expr KW_OR expr
+   17     | . expr KW_AND expr
+   18     | . KW_NOT expr
+   19     | . expr TK_NOTEQ expr
+   20     | . expr TK_EQEQ expr
+   21     | . expr TK_LESEQ expr
+   22     | . expr TK_GREEQ expr
+   23     | . expr '<' expr
+   24     | . expr '>' expr
+   25     | . expr '+' expr
+   26     | . expr '-' expr
+   27     | . expr '*' expr
+   28     | . expr '/' expr
+   29     | . expr '%' expr
+   30     | . expr TK_POW expr
+   31     | . '-' expr
+   32     | . '+' expr
+   33     | . '(' expr ')'
+   34     | . TK_IDENT '[' expr ']'
+   35     | . expr '.' expr
+   49 if_statement: KW_IF '(' listofexpr . ')' ':' statements KW_ENDIF
+   50             | KW_IF '(' listofexpr . ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
+    ')'            shift, and go to state 135
+
+    expr  go to state 134
+
+
+State 103
 
    10 function_block: KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN ';' . KW_ENDDEF
 
-    KW_ENDDEF  shift, and go to state 113
+    KW_ENDDEF  shift, and go to state 136
 
 
-State 88
-
-   40 statements: statements statement ';' .
-
-    $default  reduce using rule 40 (statements)
-
-
-State 89
+State 104
 
    37 listofinstructions: const_declarations var_declarations statements .  [KW_ENDDEF, KW_RETURN]
-   40 statements: statements . statement ';'
-   41 statement: . TK_IDENT '=' listofexpr
+   40 statements: statements . statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
 
-    TK_IDENT  shift, and go to state 71
+    TK_IDENT  shift, and go to state 80
+    KW_IF     shift, and go to state 56
 
     $default  reduce using rule 37 (listofinstructions)
 
-    statement  go to state 72
+    statement     go to state 81
+    if_statement  go to state 60
 
 
-State 90
+State 105
 
    36 listofinstructions: var_declarations const_declarations statements .  [KW_ENDDEF, KW_RETURN]
-   40 statements: statements . statement ';'
-   41 statement: . TK_IDENT '=' listofexpr
+   40 statements: statements . statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
 
-    TK_IDENT  shift, and go to state 71
+    TK_IDENT  shift, and go to state 80
+    KW_IF     shift, and go to state 56
 
     $default  reduce using rule 36 (listofinstructions)
 
-    statement  go to state 72
+    statement     go to state 81
+    if_statement  go to state 60
 
 
-State 91
+State 106
 
     6 main_block: KW_DEF KW_MAIN '(' ')' ':' listofinstructions KW_ENDDEF ';' .
 
     $default  reduce using rule 6 (main_block)
 
 
-State 92
+State 107
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1369,18 +2009,18 @@ State 92
    34     | TK_IDENT '[' . expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 114
+    expr  go to state 137
 
 
-State 93
+State 108
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -1399,19 +2039,19 @@ State 93
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW    shift, and go to state 98
-    TK_EQEQ   shift, and go to state 99
-    TK_NOTEQ  shift, and go to state 100
-    TK_GREEQ  shift, and go to state 101
-    TK_LESEQ  shift, and go to state 102
-    '<'       shift, and go to state 105
-    '>'       shift, and go to state 106
-    '+'       shift, and go to state 107
-    '-'       shift, and go to state 108
-    '*'       shift, and go to state 109
-    '/'       shift, and go to state 110
-    '%'       shift, and go to state 111
-    '.'       shift, and go to state 112
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
 
     $default  reduce using rule 18 (expr)
 
@@ -1432,7 +2072,7 @@ State 93
     Conflict between rule 18 and token '.' resolved as shift (KW_NOT < '.').
 
 
-State 94
+State 109
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -1451,8 +2091,8 @@ State 94
    32     | '+' expr .  [TK_IDENT, TK_CONSTINT, TK_CONSTFLOAT, TK_EQEQ, TK_NOTEQ, TK_GREEQ, TK_LESEQ, KW_AND, KW_OR, KW_NOT, '<', '>', '+', '-', '*', '/', '%', '(', ')', ']', ';']
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 32 (expr)
 
@@ -1473,7 +2113,7 @@ State 94
     Conflict between rule 32 and token '.' resolved as shift (UPLUS < '.').
 
 
-State 95
+State 110
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -1492,8 +2132,8 @@ State 95
    31     | '-' expr .  [TK_IDENT, TK_CONSTINT, TK_CONSTFLOAT, TK_EQEQ, TK_NOTEQ, TK_GREEQ, TK_LESEQ, KW_AND, KW_OR, KW_NOT, '<', '>', '+', '-', '*', '/', '%', '(', ')', ']', ';']
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 31 (expr)
 
@@ -1514,7 +2154,7 @@ State 95
     Conflict between rule 31 and token '.' resolved as shift (UMINUS < '.').
 
 
-State 96
+State 111
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -1533,65 +2173,25 @@ State 96
    33     | '(' expr . ')'
    35     | expr . '.' expr
 
-    TK_POW    shift, and go to state 98
-    TK_EQEQ   shift, and go to state 99
-    TK_NOTEQ  shift, and go to state 100
-    TK_GREEQ  shift, and go to state 101
-    TK_LESEQ  shift, and go to state 102
-    KW_AND    shift, and go to state 103
-    KW_OR     shift, and go to state 104
-    '<'       shift, and go to state 105
-    '>'       shift, and go to state 106
-    '+'       shift, and go to state 107
-    '-'       shift, and go to state 108
-    '*'       shift, and go to state 109
-    '/'       shift, and go to state 110
-    '%'       shift, and go to state 111
-    '.'       shift, and go to state 112
-    ')'       shift, and go to state 115
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
+    ')'       shift, and go to state 138
 
 
-State 97
-
-   12 listofexpr: listofexpr expr .  [TK_IDENT, TK_CONSTINT, TK_CONSTFLOAT, KW_NOT, '+', '-', '(', ';']
-   16 expr: expr . KW_OR expr
-   17     | expr . KW_AND expr
-   19     | expr . TK_NOTEQ expr
-   20     | expr . TK_EQEQ expr
-   21     | expr . TK_LESEQ expr
-   22     | expr . TK_GREEQ expr
-   23     | expr . '<' expr
-   24     | expr . '>' expr
-   25     | expr . '+' expr
-   26     | expr . '-' expr
-   27     | expr . '*' expr
-   28     | expr . '/' expr
-   29     | expr . '%' expr
-   30     | expr . TK_POW expr
-   35     | expr . '.' expr
-
-    TK_POW    shift, and go to state 98
-    TK_EQEQ   shift, and go to state 99
-    TK_NOTEQ  shift, and go to state 100
-    TK_GREEQ  shift, and go to state 101
-    TK_LESEQ  shift, and go to state 102
-    KW_AND    shift, and go to state 103
-    KW_OR     shift, and go to state 104
-    '<'       shift, and go to state 105
-    '>'       shift, and go to state 106
-    '+'       shift, and go to state 107
-    '-'       shift, and go to state 108
-    '*'       shift, and go to state 109
-    '/'       shift, and go to state 110
-    '%'       shift, and go to state 111
-    '.'       shift, and go to state 112
-
-    '+'       [reduce using rule 12 (listofexpr)]
-    '-'       [reduce using rule 12 (listofexpr)]
-    $default  reduce using rule 12 (listofexpr)
-
-
-State 98
+State 112
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1618,18 +2218,18 @@ State 98
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 116
+    expr  go to state 139
 
 
-State 99
+State 113
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1656,18 +2256,18 @@ State 99
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 117
+    expr  go to state 140
 
 
-State 100
+State 114
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1694,18 +2294,18 @@ State 100
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 118
+    expr  go to state 141
 
 
-State 101
+State 115
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1732,18 +2332,18 @@ State 101
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 119
+    expr  go to state 142
 
 
-State 102
+State 116
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1770,18 +2370,18 @@ State 102
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 120
+    expr  go to state 143
 
 
-State 103
+State 117
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1808,18 +2408,18 @@ State 103
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 121
+    expr  go to state 144
 
 
-State 104
+State 118
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1846,18 +2446,18 @@ State 104
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 122
+    expr  go to state 145
 
 
-State 105
+State 119
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1884,18 +2484,18 @@ State 105
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 123
+    expr  go to state 146
 
 
-State 106
+State 120
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1922,18 +2522,18 @@ State 106
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 124
+    expr  go to state 147
 
 
-State 107
+State 121
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1960,18 +2560,18 @@ State 107
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 125
+    expr  go to state 148
 
 
-State 108
+State 122
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -1998,18 +2598,18 @@ State 108
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 126
+    expr  go to state 149
 
 
-State 109
+State 123
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -2036,18 +2636,18 @@ State 109
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 127
+    expr  go to state 150
 
 
-State 110
+State 124
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -2074,18 +2674,18 @@ State 110
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 128
+    expr  go to state 151
 
 
-State 111
+State 125
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -2112,18 +2712,18 @@ State 111
    34     | . TK_IDENT '[' expr ']'
    35     | . expr '.' expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 129
+    expr  go to state 152
 
 
-State 112
+State 126
 
    13 expr: . TK_CONSTINT
    14     | . TK_CONSTFLOAT
@@ -2150,25 +2750,122 @@ State 112
    35     | . expr '.' expr
    35     | expr '.' . expr
 
-    TK_IDENT       shift, and go to state 78
-    TK_CONSTINT    shift, and go to state 79
-    TK_CONSTFLOAT  shift, and go to state 80
-    KW_NOT         shift, and go to state 81
-    '+'            shift, and go to state 82
-    '-'            shift, and go to state 83
-    '('            shift, and go to state 84
+    TK_IDENT       shift, and go to state 87
+    TK_CONSTINT    shift, and go to state 88
+    TK_CONSTFLOAT  shift, and go to state 89
+    KW_NOT         shift, and go to state 90
+    '+'            shift, and go to state 91
+    '-'            shift, and go to state 92
+    '('            shift, and go to state 93
 
-    expr  go to state 130
+    expr  go to state 153
 
 
-State 113
+State 127
+
+   42 statement: TK_IDENT TK_PLUEQ expr ';' .
+
+    $default  reduce using rule 42 (statement)
+
+
+State 128
+
+   43 statement: TK_IDENT TK_MINEQ expr ';' .
+
+    $default  reduce using rule 43 (statement)
+
+
+State 129
+
+   44 statement: TK_IDENT TK_MULEQ expr ';' .
+
+    $default  reduce using rule 44 (statement)
+
+
+State 130
+
+   46 statement: TK_IDENT TK_DIVEQ expr ';' .
+
+    $default  reduce using rule 46 (statement)
+
+
+State 131
+
+   45 statement: TK_IDENT TK_MODEQ expr ';' .
+
+    $default  reduce using rule 45 (statement)
+
+
+State 132
+
+   47 statement: TK_IDENT TK_COLEQ expr ';' .
+
+    $default  reduce using rule 47 (statement)
+
+
+State 133
+
+   41 statement: TK_IDENT '=' listofexpr ';' .
+
+    $default  reduce using rule 41 (statement)
+
+
+State 134
+
+   12 listofexpr: listofexpr expr .  [TK_IDENT, TK_CONSTINT, TK_CONSTFLOAT, KW_NOT, '+', '-', '(', ')', ';']
+   16 expr: expr . KW_OR expr
+   17     | expr . KW_AND expr
+   19     | expr . TK_NOTEQ expr
+   20     | expr . TK_EQEQ expr
+   21     | expr . TK_LESEQ expr
+   22     | expr . TK_GREEQ expr
+   23     | expr . '<' expr
+   24     | expr . '>' expr
+   25     | expr . '+' expr
+   26     | expr . '-' expr
+   27     | expr . '*' expr
+   28     | expr . '/' expr
+   29     | expr . '%' expr
+   30     | expr . TK_POW expr
+   35     | expr . '.' expr
+
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
+
+    '+'       [reduce using rule 12 (listofexpr)]
+    '-'       [reduce using rule 12 (listofexpr)]
+    $default  reduce using rule 12 (listofexpr)
+
+
+State 135
+
+   49 if_statement: KW_IF '(' listofexpr ')' . ':' statements KW_ENDIF
+   50             | KW_IF '(' listofexpr ')' . ':' statements KW_ELSE ':' statements KW_ENDIF
+
+    ':'  shift, and go to state 154
+
+
+State 136
 
    10 function_block: KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF .
 
     $default  reduce using rule 10 (function_block)
 
 
-State 114
+State 137
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2187,32 +2884,32 @@ State 114
    34     | TK_IDENT '[' expr . ']'
    35     | expr . '.' expr
 
-    TK_POW    shift, and go to state 98
-    TK_EQEQ   shift, and go to state 99
-    TK_NOTEQ  shift, and go to state 100
-    TK_GREEQ  shift, and go to state 101
-    TK_LESEQ  shift, and go to state 102
-    KW_AND    shift, and go to state 103
-    KW_OR     shift, and go to state 104
-    '<'       shift, and go to state 105
-    '>'       shift, and go to state 106
-    '+'       shift, and go to state 107
-    '-'       shift, and go to state 108
-    '*'       shift, and go to state 109
-    '/'       shift, and go to state 110
-    '%'       shift, and go to state 111
-    '.'       shift, and go to state 112
-    ']'       shift, and go to state 131
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    KW_OR     shift, and go to state 118
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
+    ']'       shift, and go to state 155
 
 
-State 115
+State 138
 
    33 expr: '(' expr ')' .
 
     $default  reduce using rule 33 (expr)
 
 
-State 116
+State 139
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2231,8 +2928,8 @@ State 116
    30     | expr TK_POW expr .  [TK_IDENT, TK_CONSTINT, TK_CONSTFLOAT, TK_EQEQ, TK_NOTEQ, TK_GREEQ, TK_LESEQ, KW_AND, KW_OR, KW_NOT, '<', '>', '+', '-', '*', '/', '%', '(', ')', ']', ';']
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 30 (expr)
 
@@ -2253,7 +2950,7 @@ State 116
     Conflict between rule 30 and token '.' resolved as shift (TK_POW < '.').
 
 
-State 117
+State 140
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2272,17 +2969,17 @@ State 117
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW    shift, and go to state 98
-    TK_GREEQ  shift, and go to state 101
-    TK_LESEQ  shift, and go to state 102
-    '<'       shift, and go to state 105
-    '>'       shift, and go to state 106
-    '+'       shift, and go to state 107
-    '-'       shift, and go to state 108
-    '*'       shift, and go to state 109
-    '/'       shift, and go to state 110
-    '%'       shift, and go to state 111
-    '.'       shift, and go to state 112
+    TK_POW    shift, and go to state 112
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
 
     $default  reduce using rule 20 (expr)
 
@@ -2303,7 +3000,7 @@ State 117
     Conflict between rule 20 and token '.' resolved as shift (TK_EQEQ < '.').
 
 
-State 118
+State 141
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2322,17 +3019,17 @@ State 118
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW    shift, and go to state 98
-    TK_GREEQ  shift, and go to state 101
-    TK_LESEQ  shift, and go to state 102
-    '<'       shift, and go to state 105
-    '>'       shift, and go to state 106
-    '+'       shift, and go to state 107
-    '-'       shift, and go to state 108
-    '*'       shift, and go to state 109
-    '/'       shift, and go to state 110
-    '%'       shift, and go to state 111
-    '.'       shift, and go to state 112
+    TK_POW    shift, and go to state 112
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
 
     $default  reduce using rule 19 (expr)
 
@@ -2353,7 +3050,7 @@ State 118
     Conflict between rule 19 and token '.' resolved as shift (TK_NOTEQ < '.').
 
 
-State 119
+State 142
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2372,13 +3069,13 @@ State 119
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '+'     shift, and go to state 107
-    '-'     shift, and go to state 108
-    '*'     shift, and go to state 109
-    '/'     shift, and go to state 110
-    '%'     shift, and go to state 111
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '+'     shift, and go to state 121
+    '-'     shift, and go to state 122
+    '*'     shift, and go to state 123
+    '/'     shift, and go to state 124
+    '%'     shift, and go to state 125
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 22 (expr)
 
@@ -2399,7 +3096,7 @@ State 119
     Conflict between rule 22 and token '.' resolved as shift (TK_GREEQ < '.').
 
 
-State 120
+State 143
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2418,13 +3115,13 @@ State 120
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '+'     shift, and go to state 107
-    '-'     shift, and go to state 108
-    '*'     shift, and go to state 109
-    '/'     shift, and go to state 110
-    '%'     shift, and go to state 111
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '+'     shift, and go to state 121
+    '-'     shift, and go to state 122
+    '*'     shift, and go to state 123
+    '/'     shift, and go to state 124
+    '%'     shift, and go to state 125
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 21 (expr)
 
@@ -2445,7 +3142,7 @@ State 120
     Conflict between rule 21 and token '.' resolved as shift (TK_LESEQ < '.').
 
 
-State 121
+State 144
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2464,19 +3161,19 @@ State 121
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW    shift, and go to state 98
-    TK_EQEQ   shift, and go to state 99
-    TK_NOTEQ  shift, and go to state 100
-    TK_GREEQ  shift, and go to state 101
-    TK_LESEQ  shift, and go to state 102
-    '<'       shift, and go to state 105
-    '>'       shift, and go to state 106
-    '+'       shift, and go to state 107
-    '-'       shift, and go to state 108
-    '*'       shift, and go to state 109
-    '/'       shift, and go to state 110
-    '%'       shift, and go to state 111
-    '.'       shift, and go to state 112
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
 
     $default  reduce using rule 17 (expr)
 
@@ -2497,7 +3194,7 @@ State 121
     Conflict between rule 17 and token '.' resolved as shift (KW_AND < '.').
 
 
-State 122
+State 145
 
    16 expr: expr . KW_OR expr
    16     | expr KW_OR expr .  [TK_IDENT, TK_CONSTINT, TK_CONSTFLOAT, KW_OR, KW_NOT, '(', ')', ']', ';']
@@ -2516,20 +3213,20 @@ State 122
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW    shift, and go to state 98
-    TK_EQEQ   shift, and go to state 99
-    TK_NOTEQ  shift, and go to state 100
-    TK_GREEQ  shift, and go to state 101
-    TK_LESEQ  shift, and go to state 102
-    KW_AND    shift, and go to state 103
-    '<'       shift, and go to state 105
-    '>'       shift, and go to state 106
-    '+'       shift, and go to state 107
-    '-'       shift, and go to state 108
-    '*'       shift, and go to state 109
-    '/'       shift, and go to state 110
-    '%'       shift, and go to state 111
-    '.'       shift, and go to state 112
+    TK_POW    shift, and go to state 112
+    TK_EQEQ   shift, and go to state 113
+    TK_NOTEQ  shift, and go to state 114
+    TK_GREEQ  shift, and go to state 115
+    TK_LESEQ  shift, and go to state 116
+    KW_AND    shift, and go to state 117
+    '<'       shift, and go to state 119
+    '>'       shift, and go to state 120
+    '+'       shift, and go to state 121
+    '-'       shift, and go to state 122
+    '*'       shift, and go to state 123
+    '/'       shift, and go to state 124
+    '%'       shift, and go to state 125
+    '.'       shift, and go to state 126
 
     $default  reduce using rule 16 (expr)
 
@@ -2550,7 +3247,7 @@ State 122
     Conflict between rule 16 and token '.' resolved as shift (KW_OR < '.').
 
 
-State 123
+State 146
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2569,13 +3266,13 @@ State 123
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '+'     shift, and go to state 107
-    '-'     shift, and go to state 108
-    '*'     shift, and go to state 109
-    '/'     shift, and go to state 110
-    '%'     shift, and go to state 111
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '+'     shift, and go to state 121
+    '-'     shift, and go to state 122
+    '*'     shift, and go to state 123
+    '/'     shift, and go to state 124
+    '%'     shift, and go to state 125
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 23 (expr)
 
@@ -2596,7 +3293,7 @@ State 123
     Conflict between rule 23 and token '.' resolved as shift ('<' < '.').
 
 
-State 124
+State 147
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2615,13 +3312,13 @@ State 124
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '+'     shift, and go to state 107
-    '-'     shift, and go to state 108
-    '*'     shift, and go to state 109
-    '/'     shift, and go to state 110
-    '%'     shift, and go to state 111
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '+'     shift, and go to state 121
+    '-'     shift, and go to state 122
+    '*'     shift, and go to state 123
+    '/'     shift, and go to state 124
+    '%'     shift, and go to state 125
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 24 (expr)
 
@@ -2642,7 +3339,7 @@ State 124
     Conflict between rule 24 and token '.' resolved as shift ('>' < '.').
 
 
-State 125
+State 148
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2661,11 +3358,11 @@ State 125
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '*'     shift, and go to state 109
-    '/'     shift, and go to state 110
-    '%'     shift, and go to state 111
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '*'     shift, and go to state 123
+    '/'     shift, and go to state 124
+    '%'     shift, and go to state 125
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 25 (expr)
 
@@ -2686,7 +3383,7 @@ State 125
     Conflict between rule 25 and token '.' resolved as shift ('+' < '.').
 
 
-State 126
+State 149
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2705,11 +3402,11 @@ State 126
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '*'     shift, and go to state 109
-    '/'     shift, and go to state 110
-    '%'     shift, and go to state 111
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '*'     shift, and go to state 123
+    '/'     shift, and go to state 124
+    '%'     shift, and go to state 125
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 26 (expr)
 
@@ -2730,7 +3427,7 @@ State 126
     Conflict between rule 26 and token '.' resolved as shift ('-' < '.').
 
 
-State 127
+State 150
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2749,8 +3446,8 @@ State 127
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 27 (expr)
 
@@ -2771,7 +3468,7 @@ State 127
     Conflict between rule 27 and token '.' resolved as shift ('*' < '.').
 
 
-State 128
+State 151
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2790,8 +3487,8 @@ State 128
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 28 (expr)
 
@@ -2812,7 +3509,7 @@ State 128
     Conflict between rule 28 and token '.' resolved as shift ('/' < '.').
 
 
-State 129
+State 152
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2831,8 +3528,8 @@ State 129
    30     | expr . TK_POW expr
    35     | expr . '.' expr
 
-    TK_POW  shift, and go to state 98
-    '.'     shift, and go to state 112
+    TK_POW  shift, and go to state 112
+    '.'     shift, and go to state 126
 
     $default  reduce using rule 29 (expr)
 
@@ -2853,7 +3550,7 @@ State 129
     Conflict between rule 29 and token '.' resolved as shift ('%' < '.').
 
 
-State 130
+State 153
 
    16 expr: expr . KW_OR expr
    17     | expr . KW_AND expr
@@ -2891,8 +3588,126 @@ State 130
     Conflict between rule 35 and token '.' resolved as reduce (%left '.').
 
 
-State 131
+State 154
+
+   39 statements: . statement
+   40           | . statements statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   49             | KW_IF '(' listofexpr ')' ':' . statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+   50             | KW_IF '(' listofexpr ')' ':' . statements KW_ELSE ':' statements KW_ENDIF
+
+    TK_IDENT  shift, and go to state 80
+    KW_IF     shift, and go to state 56
+
+    statements    go to state 156
+    statement     go to state 59
+    if_statement  go to state 60
+
+
+State 155
 
    34 expr: TK_IDENT '[' expr ']' .
 
     $default  reduce using rule 34 (expr)
+
+
+State 156
+
+   40 statements: statements . statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   49             | KW_IF '(' listofexpr ')' ':' statements . KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+   50             | KW_IF '(' listofexpr ')' ':' statements . KW_ELSE ':' statements KW_ENDIF
+
+    TK_IDENT  shift, and go to state 80
+    KW_IF     shift, and go to state 56
+    KW_ELSE   shift, and go to state 157
+    KW_ENDIF  shift, and go to state 158
+
+    statement     go to state 81
+    if_statement  go to state 60
+
+
+State 157
+
+   50 if_statement: KW_IF '(' listofexpr ')' ':' statements KW_ELSE . ':' statements KW_ENDIF
+
+    ':'  shift, and go to state 159
+
+
+State 158
+
+   49 if_statement: KW_IF '(' listofexpr ')' ':' statements KW_ENDIF .
+
+    $default  reduce using rule 49 (if_statement)
+
+
+State 159
+
+   39 statements: . statement
+   40           | . statements statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+   50             | KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' . statements KW_ENDIF
+
+    TK_IDENT  shift, and go to state 80
+    KW_IF     shift, and go to state 56
+
+    statements    go to state 160
+    statement     go to state 59
+    if_statement  go to state 60
+
+
+State 160
+
+   40 statements: statements . statement
+   41 statement: . TK_IDENT '=' listofexpr ';'
+   42          | . TK_IDENT TK_PLUEQ expr ';'
+   43          | . TK_IDENT TK_MINEQ expr ';'
+   44          | . TK_IDENT TK_MULEQ expr ';'
+   45          | . TK_IDENT TK_MODEQ expr ';'
+   46          | . TK_IDENT TK_DIVEQ expr ';'
+   47          | . TK_IDENT TK_COLEQ expr ';'
+   48          | . if_statement ';'
+   49 if_statement: . KW_IF '(' listofexpr ')' ':' statements KW_ENDIF
+   50             | . KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF
+   50             | KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements . KW_ENDIF
+
+    TK_IDENT  shift, and go to state 80
+    KW_IF     shift, and go to state 56
+    KW_ENDIF  shift, and go to state 161
+
+    statement     go to state 81
+    if_statement  go to state 60
+
+
+State 161
+
+   50 if_statement: KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF .
+
+    $default  reduce using rule 50 (if_statement)
