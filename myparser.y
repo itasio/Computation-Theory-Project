@@ -191,10 +191,10 @@ while_statement:
 	;
 
 for_statement:
-	KW_FOR TK_IDENT KW_IN '[' expr ':' expr ':' expr ']' ':' statements KW_ENDFOR {$$ = template("for (%s=%s; %s<%s; %s+=%s){\n%s\n}", $2, $5, $2, $7, $2, $9, $12);}
-	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ':' expr ']' ':' KW_ENDFOR {$$ = template("for (%s=%s; %s<%s; %s+=%s){\n}", $2, $5, $2, $7, $2, $9);}
-	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ']' ':' statements KW_ENDFOR {$$ = template("for (%s=%s; %s<%s; %s++){\n%s\n}", $2, $5, $2, $7, $2, $10);}
-	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ']' ':' KW_ENDFOR {$$ = template("for (%s=%s; %s<%s; %s++){\n}", $2, $5, $2, $7, $2);}
+	KW_FOR TK_IDENT KW_IN '[' expr ':' expr ':' expr ']' ':' statements KW_ENDFOR {$$ = template("for (int %s=%s; %s<%s; %s+=%s){\n%s\n}", $2, $5, $2, $7, $2, $9, $12);}
+	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ':' expr ']' ':' KW_ENDFOR {$$ = template("for (int %s=%s; %s<%s; %s+=%s){\n}", $2, $5, $2, $7, $2, $9);}
+	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ']' ':' statements KW_ENDFOR {$$ = template("for (int %s=%s; %s<%s; %s++){\n%s\n}", $2, $5, $2, $7, $2, $10);}
+	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ']' ':' KW_ENDFOR {$$ = template("for (int %s=%s; %s<%s; %s++){\n}", $2, $5, $2, $7, $2);}
 	;
 
 const_declarations:
