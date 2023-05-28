@@ -39,7 +39,7 @@ def loo():
     if (a + b > y):
     else:
     endif;
-    return 3;
+    return 3**2;
 enddef;
 
 def zen():

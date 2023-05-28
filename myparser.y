@@ -102,7 +102,8 @@ function_block:
 	| KW_DEF TK_IDENT '(' ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(){\nreturn;\n}", $2);}
 	| KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("void %s(){\n%s\nreturn %s;\n}", $2, $6, $8);}
 	| KW_DEF TK_IDENT '(' ')' ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("void %s(){\nreturn %s;\n}", $2, $7);}
-	;
+	;//todo na return xwris na epistrefei timh mono otan den exei dhlw8ei typos epistrofhs
+	 //na ftiaxw kai tis synarthseis me typo epistrofhs
 
 listofexpr:
 	expr {$$ = template("%s", $1);}
