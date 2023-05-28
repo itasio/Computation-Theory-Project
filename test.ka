@@ -39,11 +39,17 @@ def loo():
     if (a + b > y):
     else:
     endif;
+    return 3;
 enddef;
 
+def zen():
+
+return ;
+enddef;
 def main():
 z =4;
 d=4;
+
 while(x< 3):
     x += 3;
     if(x != 1):

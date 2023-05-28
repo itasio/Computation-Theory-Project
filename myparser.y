@@ -97,9 +97,12 @@ function_blocks:
 	;
 
 function_block:
-	KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_ENDDEF { printf("e");$$ = template("void %s(){\n%s\n}", $2, $6);}
-	| KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF { printf("r");$$ = template("void %s(){\n%s\nreturn;\n}", $2, $6);}
-	; 	/*????????todo*/
+	KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_ENDDEF {$$ = template("void %s(){\n%s\n}", $2, $6);}
+	| KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(){\n%s\nreturn;\n}", $2, $6);}
+	| KW_DEF TK_IDENT '(' ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(){\nreturn;\n}", $2);}
+	| KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("void %s(){\n%s\nreturn %s;\n}", $2, $6, $8);}
+	| KW_DEF TK_IDENT '(' ')' ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("void %s(){\nreturn %s;\n}", $2, $7);}
+	;
 
 listofexpr:
 	expr {$$ = template("%s", $1);}
@@ -165,6 +168,7 @@ statement:
 	| while_statement ';' {$$ = template("%s",$1);}
 	| KW_BREAK ';' {$$ = template("break;");}
 	| KW_CONTINUE ';' {$$ = template("continue;");}
+	| ';' {$$ = template("");}
 	;
 
 if_statement:
