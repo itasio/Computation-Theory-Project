@@ -52,6 +52,9 @@ while(x< 3):
     else:
         y +=3;
         continue;
+        for num in [3: limit+1]:
+
+        endfor;
     endif;
 endwhile;
 enddef;

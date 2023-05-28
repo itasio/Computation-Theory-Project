@@ -63,7 +63,7 @@
 %start program
 
 %type <str> statements listofexpr listofinstructions  main_block function_blocks var_declarations const_declarations /*comp_declarations*/
-%type <str> statement in_loop_stmts if_statement while_statement expr data_type const_declaration var_declaration function_block //array
+%type <str> statement in_loop_stmts if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block //array
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -161,6 +161,7 @@ statement:
 	| TK_IDENT TK_DIVEQ expr ';' {$$ = template("%s /= %s;",$1, $3);}
 	| TK_IDENT TK_COLEQ expr ';' {$$ = template("%s := %s;",$1, $3);}
 	| if_statement ';' {$$ = template("%s",$1);}
+	| for_statement ';' {$$ = template("%s",$1);}
 	| while_statement ';' {$$ = template("%s",$1);}
 	| KW_BREAK ';' {$$ = template("break;");}
 	| KW_CONTINUE ';' {$$ = template("continue;");}
@@ -189,8 +190,11 @@ while_statement:
 	| KW_WHILE '(' listofexpr ')' ':' KW_ENDWHILE {$$ = template("while(%s){\n}", $3);}
 	;
 
-for_loop:
-	KW_FOR TK_IDENT KW_IN '[' ']'
+for_statement:
+	KW_FOR TK_IDENT KW_IN '[' expr ':' expr ':' expr ']' ':' statements KW_ENDFOR {$$ = template("for (%s=%s; %s<%s; %s+=%s){\n%s\n}", $2, $5, $2, $7, $2, $9, $12);}
+	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ':' expr ']' ':' KW_ENDFOR {$$ = template("for (%s=%s; %s<%s; %s+=%s){\n}", $2, $5, $2, $7, $2, $9);}
+	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ']' ':' statements KW_ENDFOR {$$ = template("for (%s=%s; %s<%s; %s++){\n%s\n}", $2, $5, $2, $7, $2, $10);}
+	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ']' ':' KW_ENDFOR {$$ = template("for (%s=%s; %s<%s; %s++){\n}", $2, $5, $2, $7, $2);}
 	;
 
 const_declarations:
