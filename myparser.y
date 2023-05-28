@@ -63,7 +63,7 @@
 %start program
 
 %type <str> statements listofexpr listofinstructions  main_block function_blocks var_declarations const_declarations /*comp_declarations*/
-%type <str> statement if_statement expr data_type const_declaration var_declaration function_block //array
+%type <str> statement if_statement while_statement expr data_type const_declaration var_declaration function_block //array
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -161,12 +161,23 @@ statement:
 	| TK_IDENT TK_DIVEQ expr ';' {$$ = template("%s /= %s;",$1, $3);}
 	| TK_IDENT TK_COLEQ expr ';' {$$ = template("%s := %s;",$1, $3);}
 	| if_statement ';' {$$ = template("%s",$1);}
+	| while_statement ';' {$$ = template("%s",$1);}
 	;
 
 if_statement:
 	KW_IF '(' listofexpr ')' ':' statements KW_ENDIF {$$ = template("if(%s){\n%s\n}", $3, $6);}
-	| KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF {$$ = template("if(%s){\n%s\nelse{\n%s\n}\n}", $3, $6, $9);}
+	| KW_IF '(' listofexpr ')' ':' KW_ENDIF {$$ = template("if(%s){\n}", $3);}
+	| KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':' statements KW_ENDIF {$$ = template("if(%s){\n%s\n}\nelse{\n%s\n}", $3, $6, $9);}
+	| KW_IF '(' listofexpr ')' ':'  KW_ELSE ':' statements KW_ENDIF {$$ = template("if(%s){\n}\nelse{\n%s\n}", $3, $8);}
+	| KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':'  KW_ENDIF {$$ = template("if(%s){\n%s\n}\nelse{\n}", $3, $6);}
+	| KW_IF '(' listofexpr ')' ':' KW_ELSE ':'  KW_ENDIF {$$ = template("if(%s){\n}\nelse{\n}", $3);}
 	;
+
+while_statement:
+	KW_WHILE '(' listofexpr ')' ':' statements KW_ENDWHILE {$$ = template("while(%s){\n%s\n}", $3, $6);}
+	| KW_WHILE '(' listofexpr ')' ':' KW_ENDWHILE {$$ = template("while(%s){\n}", $3);}
+	;
+
 
 const_declarations:
 	const_declaration ';' {$$ = template("%s;", $1);}
