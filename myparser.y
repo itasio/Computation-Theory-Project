@@ -64,6 +64,7 @@
 
 %type <str> statements listofexpr listofinstructions  main_block function_blocks var_declarations const_declarations /*comp_declarations*/
 %type <str> statement expr instruction data_type const_declaration var_declaration function_block //array
+%type <str> if_stmt for_loop while_loop
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -165,8 +166,12 @@ statements:
 
 statement:
 	TK_IDENT '=' listofexpr {$$ = template("%s = %s",$1, $3);}
+	| for_loop {$$ = template("%s\n",$1);}
 	;
 
+for_loop:
+	KW_FOR TK_IDENT KW_IN '[' ']'
+	;
 
 const_declarations:
 	const_declaration ';' {$$ = template("%s;", $1);}
