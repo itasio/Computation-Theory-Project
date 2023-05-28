@@ -23,13 +23,32 @@ z =-1**2;
 enddef;
 
 def loo():
-l = (a <= b) and (d <= c);
-l = (c+a) != (2*d);
-l = (a+1) % cube(b+3);
+    if (x>y):
+        total = total + 5;
+        if (r and b):
+            x = 8;
+        else:
+        endif;
+        if (r and b):
+        else:
+            x = 8;
+        endif;
+    else:
+        total %= 3;
+    endif;
+    if (a + b > y):
+    else:
+    endif;
 enddef;
 
 def main():
 z =4;
 d=4;
+while(x< 3):
+    x += 3;
+    if(x != 1):
+        y = 1;
+    endif;
+endwhile;
 enddef;
 
