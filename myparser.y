@@ -87,8 +87,8 @@ program:
 	*/;
 
 main_block:
-	KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF ';' { printf("q");$$ = template("int main(){}");}
-	| KW_DEF KW_MAIN '(' ')' ':' listofinstructions KW_ENDDEF ';' { printf("w");$$ = template("int main(){\n%s\n}",$6);}
+	KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF ';' {$$ = template("int main(){}");}
+	| KW_DEF KW_MAIN '(' ')' ':' listofinstructions KW_ENDDEF ';' {$$ = template("int main(){\n%s\n}",$6);}
 	;
 
 function_blocks:
