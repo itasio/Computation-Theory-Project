@@ -8,8 +8,12 @@ y : integer;
 k : scalar;
 
 
-def zen(z: integer, k: str, l: scalar, m: boolean)->integer:
-
+def zen(z: integer, k: str, l: scalar, m: boolean, b[]: scalar)->integer:
+a[10]: integer;
+gesda[100]: str;
+sdagv[100]: boolean;
+gesdfasda[100]: scalar;
+x = 3;
 return a;
 enddef;
 

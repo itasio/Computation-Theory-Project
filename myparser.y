@@ -64,7 +64,7 @@
 %start program
 
 %type <str> statements listofexpr listofinstructions  main_block function_blocks function_param function_return_type var_declarations const_declarations /*comp_declarations*/
-%type <str> statement in_loop_stmts if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block //array
+%type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block //array_type
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -161,6 +161,8 @@ listofinstructions:
 	var_declarations const_declarations statements {$$ = template("%s\n%s\n%s",$1, $2, $3);}
 	| const_declarations var_declarations statements {$$ = template("%s\n%s\n%s",$1, $2, $3);}
 	| statements {$$ = template("%s",$1);}
+	| var_declarations statements {$$ = template("%s\n%s",$1, $2);}
+	| const_declarations statements {$$ = template("%s\n%s",$1, $2);}
 	;
 
 
@@ -231,12 +233,14 @@ const_declaration:
 
 
 var_declarations:
-	var_declaration ';' {$$ = template("%s;", $1);}
-	| var_declarations var_declaration ';' {$$ = template("%s \n%s;", $1, $2);}
+	var_declaration ';' {printf("b\n");$$ = template("%s;", $1);}
+	| var_declarations var_declaration ';' {printf("a\n"); $$ = template("%s \n%s;", $1, $2);}
 	;
 
-var_declaration:
-	TK_IDENT ':' data_type {$$ = template("%s %s", $3, $1);}
+var_declaration://todo multiple declarations in one line
+	TK_IDENT ':' data_type {printf("h\n"); $$ = template("%s %s", $3, $1);}
+	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {printf("c\n");$$ = template("%s %s[%s]", $6, $1, $3);}
+	| TK_IDENT '[' ']' ':' data_type {$$ = template("%s* %s", $5, $1);}
 	;
 
 data_type:
@@ -244,12 +248,11 @@ data_type:
 	| KW_SCALAR {$$ = template("double");}
 	| KW_STR {$$ = template("char*");}
 	| KW_BOOLEAN  {$$ = template("int");}
-	/*| array		????????????
-	| KW_COMP ????????????
-	*/
+	//| KW_COMP ????????????
 	;
 
-/*array:
+/*
+array_type:
 	'[' TK_CONSTINT ']' ':' data_type
 	| '[' ']' ':' data_type
 	;
