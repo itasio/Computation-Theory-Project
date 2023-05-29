@@ -66,7 +66,7 @@
 
 %type <str> statements listofexpr listofinstructions  main_block function_blocks function_param function_return_type var_declarations const_declarations /*comp_declarations*/
 %type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var //array_type
-%type <str> multi_var multi_var_1 multi_var_2 //multi_var_3
+%type <str> multi_var multi_var_1 multi_var_2 multi_var_3
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -253,8 +253,26 @@ one_var:
 multi_var:
 	multi_var_1 {$$ = template("%s", $1);}		//a, b :type
 	| multi_var_2 {$$ = template("%s", $1);}	//a[N], b[N]: type
-	//| multi_var_3 {$$ = template("%s", $1);}	//a[], b[]: type
+	| multi_var_3 {$$ = template("%s", $1);}	//a[], b[]: type
 	;
+
+multi_var_3:
+	TK_IDENT '[' ']' ',' TK_IDENT '[' ']' ':' data_type {if(strcmp($9, "char*") == 0){
+											isStr = 1;
+											$$ = template("%s* %s, **%s", $9, $1, $5);
+										}
+										else{
+											isStr = 0;
+											$$ = template("%s* %s, *%s", $9, $1, $5);
+										}}
+	| TK_IDENT '[' ']' ',' multi_var_3  {if(isStr == 1){
+											$$ = template("%s, **%s", $5, $1);
+										}
+										else{
+											isStr = 0;
+											$$ = template("%s, *%s", $5, $1);
+										}}
+	; 
 
 multi_var_2:
 	TK_IDENT '[' TK_CONSTINT ']' ',' TK_IDENT '[' TK_CONSTINT ']' ':' data_type {if(strcmp($11, "char*") == 0){
