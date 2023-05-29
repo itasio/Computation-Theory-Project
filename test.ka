@@ -20,6 +20,13 @@ enddef;
 def main():
 x, y, z, l,hukg, hikug, vsd: str;
 f, h: integer;
+c : str;
+v, ewe : str;
+w: boolean;
+a[10], b[20], c[30]: integer;
+a[10], b[20], c[30]: scalar;
+s[5]: str;
+r[3]: boolean;
 z =4;
 d=4;
 
