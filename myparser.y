@@ -1,12 +1,13 @@
 %{
 	#include <stdio.h>
 	#include <stdlib.h>
+	#include <string.h>
 	#include <math.h>
   	#include "cgen.h"
 	
 	extern int yylex(void);
-	int i1, i2;
-	double d1, d2;
+	int isStr = 0;
+
 
 %}
 
@@ -249,8 +250,21 @@ one_var:
 	;
 
 multi_var:
-	TK_IDENT ',' TK_IDENT ':' data_type {$$ = template("%s %s, %s", $5, $1, $3);}
-	| TK_IDENT ',' multi_var  {$$ = template("%s, %s", $3, $1);}
+	TK_IDENT ',' TK_IDENT ':' data_type {if(strcmp($5, "char*") == 0){
+											isStr = 1;
+											$$ = template("%s %s, *%s", $5, $1, $3);
+										}
+										else{
+											isStr = 0;
+											$$ = template("%s %s, %s", $5, $1, $3);
+										}}
+	| TK_IDENT ',' multi_var  	{if(isStr == 1){
+									$$ = template("%s, *%s", $3, $1);
+								}
+								else{
+								isStr = 0;
+								$$ = template("%s, %s", $3, $1);
+								}}
 	; 
 
 data_type:

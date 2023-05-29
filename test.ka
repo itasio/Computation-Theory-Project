@@ -19,6 +19,7 @@ enddef;
 
 def main():
 x, y, z, l,hukg, hikug, vsd: str;
+f, h: integer;
 z =4;
 d=4;
 
