@@ -86,6 +86,7 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 "!="									return TK_NOTEQ;
 ">="									return TK_GREEQ;
 "<="									return TK_LESEQ;
+"->"									return TK_FUNC_RET;
 "<"			return '<';
 ">"			return '>';
 ";"			return ';';

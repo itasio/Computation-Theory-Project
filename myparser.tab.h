@@ -64,35 +64,36 @@ extern int yydebug;
     TK_GREEQ = 270,
     TK_LESEQ = 271,
     TK_COLEQ = 272,
-    KW_AND = 273,
-    KW_OR = 274,
-    KW_NOT = 275,
-    KW_INTEGER = 276,
-    KW_FOR = 277,
-    KW_BREAK = 278,
-    KW_DEF = 279,
-    KW_ENDCOMP = 280,
-    KW_SCALAR = 281,
-    KW_CONST = 282,
-    KW_IN = 283,
-    KW_CONTINUE = 284,
-    KW_ENDDEF = 285,
-    KW_OF = 286,
-    KW_STR = 287,
-    KW_IF = 288,
-    KW_ENDFOR = 289,
-    KW_MAIN = 290,
-    KW_BOOLEAN = 291,
-    KW_ELSE = 292,
-    KW_WHILE = 293,
-    KW_RETURN = 294,
-    KW_ENDIF = 295,
-    KW_ENDWHILE = 296,
-    KW_COMP = 297,
-    KW_TRUE = 298,
-    KW_FALSE = 299,
-    UMINUS = 300,
-    UPLUS = 301
+    TK_FUNC_RET = 273,
+    KW_AND = 274,
+    KW_OR = 275,
+    KW_NOT = 276,
+    KW_INTEGER = 277,
+    KW_FOR = 278,
+    KW_BREAK = 279,
+    KW_DEF = 280,
+    KW_ENDCOMP = 281,
+    KW_SCALAR = 282,
+    KW_CONST = 283,
+    KW_IN = 284,
+    KW_CONTINUE = 285,
+    KW_ENDDEF = 286,
+    KW_OF = 287,
+    KW_STR = 288,
+    KW_IF = 289,
+    KW_ENDFOR = 290,
+    KW_MAIN = 291,
+    KW_BOOLEAN = 292,
+    KW_ELSE = 293,
+    KW_WHILE = 294,
+    KW_RETURN = 295,
+    KW_ENDIF = 296,
+    KW_ENDWHILE = 297,
+    KW_COMP = 298,
+    KW_TRUE = 299,
+    KW_FALSE = 300,
+    UMINUS = 301,
+    UPLUS = 302
   };
 #endif
 
@@ -104,7 +105,7 @@ union YYSTYPE
 
 	char* str;
 
-#line 108 "myparser.tab.h"
+#line 109 "myparser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

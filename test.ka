@@ -7,61 +7,15 @@ const i = False : boolean;
 y : integer;
 k : scalar;
 
-def foo():
-d=5;
-f=5;
-z = +4;
-f = d+ s;
-x = 3 % 2;
-Z = (-a-1) % f;
-z = 4 + 50.0*x / 2.45;
-x = a + b[(k+1)*2];
-k = x**4+2;
-l = 3-2;
-z = -1;
-z =-1**2;
+
+def zen(z: integer, k: str, l: scalar, m: boolean)->integer:
+
+return a;
 enddef;
 
-def loo():
-    if (x>y):
-        total = total + 5;
-        if (r and b):
-            x = 8;
-        else:
-        endif;
-        if (r and b):
-        else:
-            x = 8;
-        endif;
-    else:
-        total %= 3;
-    endif;
-    if (a + b > y):
-    else:
-    endif;
-    return 3**2;
-enddef;
-
-def zen():
-
-return ;
-enddef;
 def main():
 z =4;
 d=4;
 
-while(x< 3):
-    x += 3;
-    if(x != 1):
-        y = 1;
-        break;
-    else:
-        y +=3;
-        continue;
-        for num in [3: limit+1]:
-
-        endfor;
-    endif;
-endwhile;
 enddef;
 

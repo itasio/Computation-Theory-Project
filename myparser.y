@@ -31,6 +31,7 @@
 %token TK_GREEQ
 %token TK_LESEQ
 %token TK_COLEQ
+%token TK_FUNC_RET
 
 %token KW_AND
 %token KW_OR
@@ -62,7 +63,7 @@
 
 %start program
 
-%type <str> statements listofexpr listofinstructions  main_block function_blocks var_declarations const_declarations /*comp_declarations*/
+%type <str> statements listofexpr listofinstructions  main_block function_blocks function_param function_return_type var_declarations const_declarations /*comp_declarations*/
 %type <str> statement in_loop_stmts if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block //array
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
@@ -91,19 +92,32 @@ main_block:
 	| KW_DEF KW_MAIN '(' ')' ':' listofinstructions KW_ENDDEF ';' {$$ = template("int main(){\n%s\n}",$6);}
 	;
 
+function_param:
+	%empty {$$ = template("");}
+	| var_declaration {$$ = template("%s", $1);}
+	| function_param ',' var_declaration {$$ = template("%s, %s", $1, $3);}
+	;
+
+function_return_type:
+	TK_FUNC_RET KW_INTEGER {$$ = template("int");}
+	| TK_FUNC_RET KW_SCALAR {$$ = template("double");}
+	| TK_FUNC_RET KW_STR {$$ = template("char*");}
+	| TK_FUNC_RET KW_BOOLEAN  {$$ = template("int");}
+	//| "->" KW_COMP ????????????todo
+	;
+
 function_blocks:
 	function_block ';' {$$ = template("%s", $1);}
 	| function_blocks function_block ';' {$$ = template("%s \n%s", $1, $2);}
 	;
 
 function_block:
-	KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_ENDDEF {$$ = template("void %s(){\n%s\n}", $2, $6);}
-	| KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(){\n%s\nreturn;\n}", $2, $6);}
-	| KW_DEF TK_IDENT '(' ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(){\nreturn;\n}", $2);}
-	| KW_DEF TK_IDENT '(' ')' ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("void %s(){\n%s\nreturn %s;\n}", $2, $6, $8);}
-	| KW_DEF TK_IDENT '(' ')' ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("void %s(){\nreturn %s;\n}", $2, $7);}
-	;//todo na return xwris na epistrefei timh mono otan den exei dhlw8ei typos epistrofhs
-	 //na ftiaxw kai tis synarthseis me typo epistrofhs
+	KW_DEF TK_IDENT '(' function_param ')' ':' listofinstructions KW_ENDDEF {$$ = template("void %s(%s){\n%s\n}", $2, $4, $7);}
+	| KW_DEF TK_IDENT '(' function_param ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\n%s\nreturn;\n}", $2, $4, $7);}
+	| KW_DEF TK_IDENT '(' function_param ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\nreturn;\n}", $2, $4);}
+	| KW_DEF TK_IDENT '(' function_param ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);}
+	| KW_DEF TK_IDENT '(' function_param ')' function_return_type ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\nreturn %s;\n}", $6, $2, $4, $9);}
+	;
 
 listofexpr:
 	expr {$$ = template("%s", $1);}
@@ -214,6 +228,7 @@ const_declaration:
 	|	KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN {$$ = template("const int %s = 1", $2);}
 	|	KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN {$$ = template("const int %s = 0", $2);}
 	;
+
 
 var_declarations:
 	var_declaration ';' {$$ = template("%s;", $1);}
