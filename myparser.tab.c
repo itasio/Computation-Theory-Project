@@ -2202,7 +2202,7 @@ yyreduce:
 #line 260 "myparser.y"
                                                                                     {if(strcmp((yyvsp[0].str), "char*") == 0){
 											isStr = 1;
-											(yyval.str) = template("%s %s[%s], *%s", (yyvsp[0].str), (yyvsp[-10].str), (yyvsp[-8].str));
+											(yyval.str) = template("%s %s[%s], *%s[%s]", (yyvsp[0].str), (yyvsp[-10].str), (yyvsp[-8].str), (yyvsp[-5].str), (yyvsp[-3].str));
 										}
 										else{
 											isStr = 0;
@@ -2214,7 +2214,7 @@ yyreduce:
   case 96:
 #line 268 "myparser.y"
                                                                 {if(isStr == 1){
-									(yyval.str) = template("%s, *%s", (yyvsp[-3].str), (yyvsp[-5].str));
+									(yyval.str) = template("%s, *%s[%s]", (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-3].str));
 								}
 								else{
 									isStr = 0;

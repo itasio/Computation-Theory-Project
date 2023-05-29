@@ -24,7 +24,7 @@ c : str;
 v, ewe : str;
 w: boolean;
 a[10], b[20], c[30]: integer;
-a[10], b[20], c[30]: scalar;
+a[10], b[20], c[30]: str;
 s[5]: str;
 r[3]: boolean;
 z =4;

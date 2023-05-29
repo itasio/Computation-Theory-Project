@@ -259,14 +259,14 @@ multi_var:
 multi_var_2:
 	TK_IDENT '[' TK_CONSTINT ']' ',' TK_IDENT '[' TK_CONSTINT ']' ':' data_type {if(strcmp($11, "char*") == 0){
 											isStr = 1;
-											$$ = template("%s %s[%s], *%s", $11, $1, $3);
+											$$ = template("%s %s[%s], *%s[%s]", $11, $1, $3, $6, $8);
 										}
 										else{
 											isStr = 0;
 											$$ = template("%s %s[%s], %s[%s]", $11, $1, $3, $6, $8);
 										}}
 	| TK_IDENT '[' TK_CONSTINT ']' ',' multi_var_2  	{if(isStr == 1){
-									$$ = template("%s, *%s", $3, $1);
+									$$ = template("%s, *%s[%s]", $6, $1, $3);
 								}
 								else{
 									isStr = 0;
