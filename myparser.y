@@ -64,7 +64,7 @@
 %start program
 
 %type <str> statements listofexpr listofinstructions  main_block function_blocks function_param function_return_type var_declarations const_declarations /*comp_declarations*/
-%type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block //array_type
+%type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var multi_var //array_type
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -238,10 +238,20 @@ var_declarations:
 	;
 
 var_declaration://todo multiple declarations in one line
-	TK_IDENT ':' data_type {printf("h\n"); $$ = template("%s %s", $3, $1);}
-	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {printf("c\n");$$ = template("%s %s[%s]", $6, $1, $3);}
+	one_var {$$ = template("%s", $1);}
+	| multi_var {$$ = template("%s", $1);}
+	;
+
+one_var:
+	TK_IDENT ':' data_type {$$ = template("%s %s", $3, $1);}
+	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {$$ = template("%s %s[%s]", $6, $1, $3);}
 	| TK_IDENT '[' ']' ':' data_type {$$ = template("%s* %s", $5, $1);}
 	;
+
+multi_var:
+	TK_IDENT ',' TK_IDENT ':' data_type {$$ = template("%s %s, %s", $5, $1, $3);}
+	| TK_IDENT ',' multi_var  {$$ = template("%s, %s", $3, $1);}
+	; 
 
 data_type:
 	KW_INTEGER {$$ = template("int");}
