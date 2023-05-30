@@ -209,7 +209,7 @@ statements:
 	;
 
 statement:
-	TK_IDENT '=' listofexpr ';' {$$ = template("%s = %s;",$1, $3);}
+	TK_IDENT '=' listofexpr ';' {$$ = template("%s = %s;",$1, $3);}		//todo na balw kai gia stoixeia pinaka a[d] = ...
 	| TK_IDENT TK_PLUEQ expr ';' {$$ = template("%s += %s;",$1, $3);}
 	| TK_IDENT TK_MINEQ expr ';' {$$ = template("%s -= %s;",$1, $3);}
 	| TK_IDENT TK_MULEQ expr ';' {$$ = template("%s *= %s;",$1, $3);}
@@ -285,7 +285,7 @@ var_declaration:
 
 one_var:
 	TK_IDENT ':' data_type {$$ = template("%s %s", $3, $1);}
-	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {$$ = template("%s %s[%s]", $6, $1, $3);}
+	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {$$ = template("%s %s[%s]", $6, $1, $3);}		//todo na einai kai TK_IDENT kai sto multivar. Orise token fict int eite str... 
 	| TK_IDENT '[' ']' ':' data_type {$$ = template("%s* %s", $5, $1);}
 	;
 
