@@ -2,7 +2,11 @@
 
 def main(): 
     j = (N - n) + cube(k);
+    l = cube(k);
+    l = cube(k).x().s();
+    x = 5 + (3 -cube.k());
+    l = cube.k();
     a = readInteger(x+3);
     b = readInteger();
-   add(a, b); -- Here you can see some dummy comments!
+   --add(a, b); -- Here you can see some dummy comments!
 enddef;

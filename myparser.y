@@ -123,12 +123,13 @@ function_block:
 
 function_call:
 	TK_IDENT '=' TK_IDENT '(' func_param_call ')' {$$ = template("%s = %s(%s)", $1, $3, $5);}
+	| TK_IDENT '=' TK_IDENT '(' ')' {$$ = template("%s = %s()", $1, $3);}
 	| TK_IDENT '(' func_param_call ')' {$$ = template("%s(%s)", $1, $3);}
+	| TK_IDENT '(' ')' {$$ = template("%s()", $1);}
 	;
 
 func_param_call:
-	%empty {$$ = template("");}
-	| expr {$$ = template("%s", $1);}
+	expr {$$ = template("%s", $1);}
 	| function_call {$$ = template("%s", $1);}
 	| func_param_call ',' func_param_call {$$ = template("%s, %s", $1, $3);}
 	;
@@ -170,6 +171,7 @@ expr:
 	| '(' expr ')' {$$ = template("(%s)", $2);}
 	| TK_IDENT '[' expr ']' {$$ = template("%s[%s]", $1, $3);}
 	| expr '.' expr {$$ = template("%s.%s", $1, $3);}
+	| function_call {$$ = template("%s", $1);}
 	;
 
 listofinstructions:
@@ -200,7 +202,6 @@ statement:
 	| while_statement ';' {$$ = template("%s",$1);}
 	| KW_BREAK ';' {$$ = template("break;");}
 	| KW_CONTINUE ';' {$$ = template("continue;");}
-	| function_call ';' {$$ = template("%s;", $1);}
 	| ';' {$$ = template("");}
 	;
 
