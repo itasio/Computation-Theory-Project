@@ -30,6 +30,9 @@ s[5]: str;
 r[3]: boolean;
 z =4;
 d=4;
+createPerson("Christos","Papadimitriou","cpap@gmail.com", -(-2+2), a);
+x = createPerson("Christos","Papadimitriou","cpap@gmail.com", 12345, a);
+x = 3+(5-(2+4-(4-1)));
 
 enddef;
 

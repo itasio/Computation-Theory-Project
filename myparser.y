@@ -64,9 +64,9 @@
 
 %start program
 
-%type <str> statements listofexpr listofinstructions  main_block function_blocks function_param function_return_type var_declarations const_declarations /*comp_declarations*/
+%type <str> statements listofexpr listofinstructions  main_block function_blocks function_param_decl function_return_type var_declarations const_declarations /*comp_declarations*/
 %type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var //array_type
-%type <str> multi_var multi_var_1 multi_var_2 multi_var_3
+%type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call function_call
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -94,10 +94,10 @@ main_block:
 	| KW_DEF KW_MAIN '(' ')' ':' listofinstructions KW_ENDDEF ';' {$$ = template("int main(){\n%s\n}",$6);}
 	;
 
-function_param:
+function_param_decl:
 	%empty {$$ = template("");}
 	| var_declaration {$$ = template("%s", $1);}
-	| function_param ',' var_declaration {$$ = template("%s, %s", $1, $3);}
+	| function_param_decl ',' var_declaration {$$ = template("%s, %s", $1, $3);}
 	;
 
 function_return_type:
@@ -114,11 +114,22 @@ function_blocks:
 	;
 
 function_block:
-	KW_DEF TK_IDENT '(' function_param ')' ':' listofinstructions KW_ENDDEF {$$ = template("void %s(%s){\n%s\n}", $2, $4, $7);}
-	| KW_DEF TK_IDENT '(' function_param ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\n%s\nreturn;\n}", $2, $4, $7);}
-	| KW_DEF TK_IDENT '(' function_param ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\nreturn;\n}", $2, $4);}
-	| KW_DEF TK_IDENT '(' function_param ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);}
-	| KW_DEF TK_IDENT '(' function_param ')' function_return_type ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\nreturn %s;\n}", $6, $2, $4, $9);}
+	KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_ENDDEF {$$ = template("void %s(%s){\n%s\n}", $2, $4, $7);}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\n%s\nreturn;\n}", $2, $4, $7);}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\nreturn;\n}", $2, $4);}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\nreturn %s;\n}", $6, $2, $4, $9);}
+	;
+
+function_call:
+	TK_IDENT '=' TK_IDENT '(' func_param_call ')' {$$ = template("%s = %s(%s)", $1, $3, $5);}
+	| TK_IDENT '(' func_param_call ')' {$$ = template("%s(%s)", $1, $3);}
+	;
+
+func_param_call:
+	%empty {$$ = template("");}
+	| expr {$$ = template("%s", $1);}
+	| func_param_call ',' expr {$$ = template("%s, %s", $1, $3);}
 	;
 
 listofexpr:
@@ -130,6 +141,7 @@ expr:
 	TK_CONSTINT
 	| TK_CONSTFLOAT
 	| TK_IDENT
+	| TK_CONSTSTR
 	//| TK_IDENT '=' expr {$$ = template("%s = %s",$1, $3);}
 	//| TK_IDENT TK_PLUEQ expr {$$ = template("%s += %s",$1, $3);}
 	//| TK_IDENT TK_MINEQ expr {$$ = template("%s -= %s",$1, $3);}
@@ -187,6 +199,7 @@ statement:
 	| while_statement ';' {$$ = template("%s",$1);}
 	| KW_BREAK ';' {$$ = template("break;");}
 	| KW_CONTINUE ';' {$$ = template("continue;");}
+	| function_call ';' {$$ = template("%s;", $1);}
 	| ';' {$$ = template("");}
 	;
 
@@ -239,7 +252,7 @@ var_declarations:
 	| var_declarations var_declaration ';' {printf("a\n"); $$ = template("%s \n%s;", $1, $2);}
 	;
 
-var_declaration://todo multiple declarations in one line
+var_declaration:
 	one_var {$$ = template("%s", $1);}
 	| multi_var {$$ = template("%s", $1);}
 	;
