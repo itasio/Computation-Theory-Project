@@ -66,7 +66,7 @@
 
 %type <str> statements listofexpr listofinstructions  main_block function_blocks function_return_type var_declarations const_declarations /*comp_declarations*/
 %type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var //array_type
-%type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call function_call function_param_decl
+%type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call /*function_call*/ function_param_decl /*function_call_with_assgn*/ function_call_no_assgn
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -120,18 +120,35 @@ function_block:
 	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);}
 	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\nreturn %s;\n}", $6, $2, $4, $9);}
 	;
-
+/*
 function_call:
 	TK_IDENT '=' TK_IDENT '(' func_param_call ')' {$$ = template("%s = %s(%s)", $1, $3, $5);}
 	| TK_IDENT '=' TK_IDENT '(' ')' {$$ = template("%s = %s()", $1, $3);}
 	| TK_IDENT '(' func_param_call ')' {$$ = template("%s(%s)", $1, $3);}
 	| TK_IDENT '(' ')' {$$ = template("%s()", $1);}
 	;
-
+*/
+/*
 func_param_call:
 	expr {$$ = template("%s", $1);}
 	| function_call {$$ = template("%s", $1);}
 	| func_param_call ',' func_param_call {$$ = template("%s, %s", $1, $3);}
+	;
+*/
+/*
+function_call_with_assgn:
+	TK_IDENT '=' TK_IDENT '(' func_param_call ')' {$$ = template("%s = %s(%s)", $1, $3, $5);}
+	| TK_IDENT '=' TK_IDENT '(' ')' {$$ = template("%s = %s()", $1, $3);}
+	;
+*/
+function_call_no_assgn:
+	TK_IDENT '(' func_param_call ')' {$$ = template("%s(%s)", $1, $3);}
+	| TK_IDENT '(' ')' {$$ = template("%s()", $1);}
+	;
+
+func_param_call:
+	expr {$$ = template("%s", $1);}
+	| func_param_call ',' expr {$$ = template("%s, %s", $1, $3);}
 	;
 
 listofexpr:
@@ -144,6 +161,8 @@ expr:
 	| TK_CONSTFLOAT
 	| TK_IDENT
 	| TK_CONSTSTR
+	| KW_FALSE	{$$ = template("0");}
+	| KW_TRUE	{$$ = template("1");}
 	//| TK_IDENT '=' expr {$$ = template("%s = %s",$1, $3);}
 	//| TK_IDENT TK_PLUEQ expr {$$ = template("%s += %s",$1, $3);}
 	//| TK_IDENT TK_MINEQ expr {$$ = template("%s -= %s",$1, $3);}
@@ -171,7 +190,7 @@ expr:
 	| '(' expr ')' {$$ = template("(%s)", $2);}
 	| TK_IDENT '[' expr ']' {$$ = template("%s[%s]", $1, $3);}
 	| expr '.' expr {$$ = template("%s.%s", $1, $3);}
-	| function_call {$$ = template("%s", $1);}
+	| function_call_no_assgn {$$ = template("%s", $1);}
 	;
 
 listofinstructions:
@@ -202,6 +221,7 @@ statement:
 	| while_statement ';' {$$ = template("%s",$1);}
 	| KW_BREAK ';' {$$ = template("break;");}
 	| KW_CONTINUE ';' {$$ = template("continue;");}
+	| function_call_no_assgn ';' {$$ = template("%s;",$1);}
 	| ';' {$$ = template("");}
 	;
 
