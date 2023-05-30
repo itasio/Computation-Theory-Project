@@ -6,7 +6,7 @@
   	#include "cgen.h"
 	
 	extern int yylex(void);
-	int isStr = 0;
+	int isStr = 0;	//used for multiple variables declaration in one line
 
 
 %}
@@ -64,9 +64,9 @@
 
 %start program
 
-%type <str> statements listofexpr listofinstructions  main_block function_blocks function_param_decl function_return_type var_declarations const_declarations /*comp_declarations*/
+%type <str> statements listofexpr listofinstructions  main_block function_blocks function_return_type var_declarations const_declarations /*comp_declarations*/
 %type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var //array_type
-%type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call function_call
+%type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call function_call function_param_decl
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
@@ -129,7 +129,8 @@ function_call:
 func_param_call:
 	%empty {$$ = template("");}
 	| expr {$$ = template("%s", $1);}
-	| func_param_call ',' expr {$$ = template("%s, %s", $1, $3);}
+	| function_call {$$ = template("%s", $1);}
+	| func_param_call ',' func_param_call {$$ = template("%s, %s", $1, $3);}
 	;
 
 listofexpr:
@@ -240,7 +241,11 @@ const_declarations:
 	
 const_declaration:
 	KW_CONST TK_IDENT '=' TK_CONSTFLOAT ':' KW_SCALAR {$$ = template("const double %s = %s", $2, $4);}
+	| KW_CONST TK_IDENT '=' '+' TK_CONSTFLOAT ':' KW_SCALAR {$$ = template("const double %s = %s", $2, $5);}
+	| KW_CONST TK_IDENT '=' '-' TK_CONSTFLOAT ':' KW_SCALAR {$$ = template("const double %s = -%s", $2, $5);}
 	|	KW_CONST TK_IDENT '=' TK_CONSTINT ':' KW_INTEGER {$$ = template("const int %s = %s", $2, $4);}
+	|	KW_CONST TK_IDENT '=' '+' TK_CONSTINT ':' KW_INTEGER {$$ = template("const int %s = %s", $2, $5);}
+	|	KW_CONST TK_IDENT '=' '-' TK_CONSTINT ':' KW_INTEGER {$$ = template("const int %s = -%s", $2, $5);}
 	|	KW_CONST TK_IDENT '=' TK_CONSTSTR ':' KW_STR {$$ = template("const char* %s = %s", $2, $4);}
 	|	KW_CONST TK_IDENT '=' KW_TRUE ':' KW_BOOLEAN {$$ = template("const int %s = 1", $2);}
 	|	KW_CONST TK_IDENT '=' KW_FALSE ':' KW_BOOLEAN {$$ = template("const int %s = 0", $2);}
@@ -248,8 +253,8 @@ const_declaration:
 
 
 var_declarations:
-	var_declaration ';' {printf("b\n");$$ = template("%s;", $1);}
-	| var_declarations var_declaration ';' {printf("a\n"); $$ = template("%s \n%s;", $1, $2);}
+	var_declaration ';' {$$ = template("%s;", $1);}
+	| var_declarations var_declaration ';' { $$ = template("%s \n%s;", $1, $2);}
 	;
 
 var_declaration:
