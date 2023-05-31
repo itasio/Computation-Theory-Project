@@ -1,4 +1,9 @@
-def main(): 
+def main():
+    l : integer;
+    --y[l] : integer;
+    y[3] : integer;
+    y[z] = 3 + y[2];
+    y[2] =y[s];
     j = (N - n) + cube(k);
     l = cube(k);
     l = cube(k).x().s();

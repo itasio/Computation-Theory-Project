@@ -67,7 +67,7 @@
 %type <str> statements listofexpr listofinstructions  main_block function_blocks function_return_type var_declarations const_declarations /*comp_declarations*/
 %type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var //array_type
 %type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call /*function_call*/ function_param_decl /*function_call_with_assgn*/ function_call_no_assgn
-
+%type <str> fict_token
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
 %left KW_AND
@@ -209,13 +209,13 @@ statements:
 	;
 
 statement:
-	TK_IDENT '=' listofexpr ';' {$$ = template("%s = %s;",$1, $3);}		//todo na balw kai gia stoixeia pinaka a[d] = ...
-	| TK_IDENT TK_PLUEQ expr ';' {$$ = template("%s += %s;",$1, $3);}
-	| TK_IDENT TK_MINEQ expr ';' {$$ = template("%s -= %s;",$1, $3);}
-	| TK_IDENT TK_MULEQ expr ';' {$$ = template("%s *= %s;",$1, $3);}
-	| TK_IDENT TK_MODEQ expr ';' {$$ = template("%s %= %s;",$1, $3);}
-	| TK_IDENT TK_DIVEQ expr ';' {$$ = template("%s /= %s;",$1, $3);}
-	| TK_IDENT TK_COLEQ expr ';' {$$ = template("%s := %s;",$1, $3);}
+	fict_token '=' listofexpr ';' {$$ = template("%s = %s;",$1, $3);}
+	| fict_token TK_PLUEQ expr ';' {$$ = template("%s += %s;",$1, $3);}
+	| fict_token TK_MINEQ expr ';' {$$ = template("%s -= %s;",$1, $3);}
+	| fict_token TK_MULEQ expr ';' {$$ = template("%s *= %s;",$1, $3);}
+	| fict_token TK_MODEQ expr ';' {$$ = template("%s %= %s;",$1, $3);}
+	| fict_token TK_DIVEQ expr ';' {$$ = template("%s /= %s;",$1, $3);}
+	| fict_token TK_COLEQ expr ';' {$$ = template("%s := %s;",$1, $3);}
 	| if_statement ';' {$$ = template("%s",$1);}
 	| for_statement ';' {$$ = template("%s",$1);}
 	| while_statement ';' {$$ = template("%s",$1);}
@@ -223,6 +223,12 @@ statement:
 	| KW_CONTINUE ';' {$$ = template("continue;");}
 	| function_call_no_assgn ';' {$$ = template("%s;",$1);}
 	| ';' {$$ = template("");}
+	;
+
+fict_token:
+	TK_IDENT { $$ = template("%s", $1);}
+	| TK_IDENT '[' TK_CONSTINT ']' {$$ = template("%s[%s]",$1, $3);}
+	| TK_IDENT '[' TK_IDENT ']' {$$ = template("%s[%s]",$1, $3);}
 	;
 
 if_statement:
@@ -285,7 +291,7 @@ var_declaration:
 
 one_var:
 	TK_IDENT ':' data_type {$$ = template("%s %s", $3, $1);}
-	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {$$ = template("%s %s[%s]", $6, $1, $3);}		//todo na einai kai TK_IDENT kai sto multivar. Orise token fict int eite str... 
+	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {$$ = template("%s %s[%s]", $6, $1, $3);}
 	| TK_IDENT '[' ']' ':' data_type {$$ = template("%s* %s", $5, $1);}
 	;
 
