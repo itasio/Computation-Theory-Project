@@ -67,7 +67,7 @@
 %type <str> statements listofexpr listofinstructions  main_block function_blocks function_return_type var_declarations const_declarations /*comp_declarations*/
 %type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var //array_type
 %type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call /*function_call*/ function_param_decl /*function_call_with_assgn*/ function_call_no_assgn
-%type <str> fict_token
+%type <str> fict_token listCompr_with_int_values //listCompr_with_array
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
 %left KW_AND
@@ -222,6 +222,8 @@ statement:
 	| KW_BREAK ';' {$$ = template("break;");}
 	| KW_CONTINUE ';' {$$ = template("continue;");}
 	| function_call_no_assgn ';' {$$ = template("%s;",$1);}
+	| listCompr_with_int_values ';'{$$ = template("%s;",$1);}
+	//| listCompr_with_array {$$ = template("%s;",$1);}
 	| ';' {$$ = template("");}
 	;
 
@@ -259,6 +261,10 @@ for_statement:
 	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ':' expr ']' ':' KW_ENDFOR {$$ = template("for (int %s=%s; %s<%s; %s+=%s){\n}", $2, $5, $2, $7, $2, $9);}
 	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ']' ':' statements KW_ENDFOR {$$ = template("for (int %s=%s; %s<%s; %s++){\n%s\n}", $2, $5, $2, $7, $2, $10);}
 	| KW_FOR TK_IDENT KW_IN '[' expr ':' expr ']' ':' KW_ENDFOR {$$ = template("for (int %s=%s; %s<%s; %s++){\n}", $2, $5, $2, $7, $2);}
+	;
+
+listCompr_with_int_values:
+	TK_IDENT TK_COLEQ '[' expr KW_FOR TK_IDENT ':' TK_CONSTINT ']' ':' data_type {$$ = template("%s* %s = (%s*)malloc(%s * sizeof(%s));\nfor(int %s = 0; %s < %s; ++%s)\n%s[%s] = %s", $11, $1, $11, $8, $11, $6, $6, $8, $6, $1, $6, $4);}
 	;
 
 const_declarations:

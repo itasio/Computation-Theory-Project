@@ -13,5 +13,7 @@ def main():
     b = readInteger();
    add(a, b); -- Here you can see some dummy comments!
    x += var(3*2+ (s-4)).s();
+   a := [i+1 for i:100]:integer;
+   writeStr("Array generated: ");
+   z = next()%1000;
 enddef;
-
