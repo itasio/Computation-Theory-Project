@@ -308,50 +308,42 @@ multi_var:
 	;
 
 multi_var_3:
-	TK_IDENT '[' ']' ',' TK_IDENT '[' ']' ':' data_type {if(strcmp($9, "char*") == 0){
-											isStr = 1;
+	TK_IDENT '[' ']' ',' TK_IDENT '[' ']' ':' data_type {if(isStr == 1){
 											$$ = template("%s* %s, **%s", $9, $1, $5);
 										}
 										else{
-											isStr = 0;
 											$$ = template("%s* %s, *%s", $9, $1, $5);
 										}}
 	| TK_IDENT '[' ']' ',' multi_var_3  {if(isStr == 1){
 											$$ = template("%s, **%s", $5, $1);
 										}
 										else{
-											isStr = 0;
 											$$ = template("%s, *%s", $5, $1);
 										}}
 	; 
 
 multi_var_2:
-	TK_IDENT '[' TK_CONSTINT ']' ',' TK_IDENT '[' TK_CONSTINT ']' ':' data_type {if(strcmp($11, "char*") == 0){
-											isStr = 1;
+	TK_IDENT '[' TK_CONSTINT ']' ',' TK_IDENT '[' TK_CONSTINT ']' ':' data_type {if(isStr == 1){
 											$$ = template("%s %s[%s], *%s[%s]", $11, $1, $3, $6, $8);
 										}
 										else{
-											isStr = 0;
 											$$ = template("%s %s[%s], %s[%s]", $11, $1, $3, $6, $8);
 										}}
 	| TK_IDENT '[' TK_CONSTINT ']' ',' multi_var_2  	{if(isStr == 1){
 									$$ = template("%s, *%s[%s]", $6, $1, $3);
 								}
 								else{
-									isStr = 0;
 									$$ = template("%s, %s[%s]", $6, $1, $3);
 								}}
 	; 
 
 multi_var_1:
-	TK_IDENT ',' TK_IDENT ':' data_type {if(strcmp($5, "char*") == 0){
-											isStr = 1;
+	TK_IDENT ',' TK_IDENT ':' data_type {if (isStr == 1){
 											$$ = template("%s %s, *%s", $5, $1, $3);
 										}
 										else{
-											isStr = 0;
 											if(isComp == 1){
-											$$ = template("%s %s = ctor_%s, %s = ctor_%s", $5, $1, $5, $3, $5);
+												$$ = template("%s %s = ctor_%s, %s = ctor_%s", $5, $1, $5, $3, $5);
 											}else
 											$$ = template("%s %s, %s", $5, $1, $3);
 										}}
@@ -359,20 +351,20 @@ multi_var_1:
 									$$ = template("%s, *%s", $3, $1);
 								}
 								else{
-									isStr = 0;
 									if(isComp == 1){
-									$$ = template("%s, %s = ctor_%s", $3, $1, temp);
+										$$ = template("%s, %s = ctor_%s", $3, $1, temp);
 									}else
 									$$ = template("%s, %s", $3, $1);
 								}}
 	; 
 
 data_type:
-	KW_INTEGER {$$ = template("int"); isComp = 0;}
-	| KW_SCALAR {$$ = template("double"); isComp = 0;}
-	| KW_STR {$$ = template("char*"); isComp = 0;}
-	| KW_BOOLEAN  {$$ = template("int"); isComp = 0;}
-	| TK_IDENT { if(find_comp($1) == 1){
+	KW_INTEGER {$$ = template("int"); isComp = 0; isStr = 0;}
+	| KW_SCALAR {$$ = template("double"); isComp = 0; isStr = 0;}
+	| KW_STR {$$ = template("char*"); isComp = 0; isStr = 1;}
+	| KW_BOOLEAN  {$$ = template("int"); isComp = 0; isStr = 0;}
+	| TK_IDENT { isStr = 0;
+					if(find_comp($1) == 1){
 					isComp = 1;
 					$$ = template("%s", $1);
 					}else{

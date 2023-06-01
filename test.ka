@@ -3,6 +3,9 @@ L, x, y : scalar;
     a, a1, a3, ss: Adress;
     a1: Adress;
     x : scalar;
+    dfd: str;
+    sag, fas: str;
+    sf[11], fasw[3], fasw[3], fasw[3] : str;
 
     l+=1;
 enddef;
