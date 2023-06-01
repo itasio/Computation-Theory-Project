@@ -1,21 +1,6 @@
 def main():
-    l : integer;
-    --y[l] : integer;
-    y[3] : integer;
-    y[z] = 3 + y[2];
-    y[2] =y[s];
-    j = (N - n) + cube(k);
-    l = cube(k);
-    l = cube(k).x().s();
-    x = 5 + (3 -cube.k());
-    l = cube.k();
-    a = readInteger(x+3);
-    b = readInteger();
-   add(a, b); -- Here you can see some dummy comments!
-   x += var(3*2+ (s-4)).s();
-   --a := [i+1 for i:100]:integer;
-   --a := [next()%1000 for i:100]:integer;
-   f := [x+3**2 for x:integer in a of 100]: scalar;
-   writeStr("Array generated: ");
-   --z = next()%1000;
+
+    a, a1, a3: Adress;
+    a1: Adress;
+    l+=1;
 enddef;

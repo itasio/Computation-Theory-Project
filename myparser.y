@@ -4,11 +4,14 @@
 	#include <string.h>
 	#include <math.h>
   	#include "cgen.h"
-	
+	#define MAX_COMPS 100 	//number of comp types permitted in ka language
 	extern int yylex(void);
 	int isStr = 0;	//used for multiple variables declaration in one line
 	char expression[100], toBeReplaced[100], replacer[100];		//for list comprehension
 	void replaceWord(char* str, char* oldWord, char* newWord);
+	char* comps[MAX_COMPS];	//name of comp types will be stored here
+	int numOfComps = 1;
+	int find_comp(char* compToSearch);
 
 
 %}
@@ -66,7 +69,7 @@
 
 %start program
 
-%type <str> statements listofexpr listofinstructions  main_block function_blocks function_return_type var_declarations const_declarations /*comp_declarations*/
+%type <str> statements listofexpr listofinstructions  main_block function_blocks function_return_type var_declarations const_declarations //comp_declarations
 %type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var //array_type
 %type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call /*function_call*/ function_param_decl /*function_call_with_assgn*/ function_call_no_assgn
 %type <str> fict_token listCompr_with_int_values listCompr_with_array
@@ -88,8 +91,8 @@ program:
 	| function_blocks main_block  														{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
 	| var_declarations function_blocks main_block 										{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s", $1, $2, $3);}}
 	| const_declarations var_declarations function_blocks main_block						{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s", $1, $2, $3, $4);}}
-	/*| comp_declarations const_declarations var_declarations function_blocks main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
-	*/;
+	//| comp_declarations const_declarations var_declarations function_blocks main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
+	;
 
 main_block:
 	KW_DEF KW_MAIN '(' ')' ':' KW_ENDDEF ';' {$$ = template("int main(){}");}
@@ -383,7 +386,13 @@ data_type:
 	| KW_SCALAR {$$ = template("double");}
 	| KW_STR {$$ = template("char*");}
 	| KW_BOOLEAN  {$$ = template("int");}
-	//| KW_COMP ????????????
+	| TK_IDENT { if(find_comp($1) == 1){
+					$$ = template("%s", $1);
+					}else{
+						yyerror("Unknown data type");
+					}
+
+				}
 	;
 
 /*
@@ -422,12 +431,19 @@ void replaceWord(char* str, char* oldWord, char* newWord)
 	}
 }
 
+int find_comp(char* compToSearch){
+	for(int i = 0; i< numOfComps; i++){
+		if(strcmp(compToSearch, comps[i]) == 0){
+			return 1;	//comp exists
+		}
+	}
+	return 0; //comp does not exist
+}
+
 int main ()
 {
-   if ( yyparse() == 0 )
-		printf("Accepted!\n");
-	else
-		printf("Rejected!\n");
+	comps[0] = "Adress";
+	yyparse();
 }
 
 
