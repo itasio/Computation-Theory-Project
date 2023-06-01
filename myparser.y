@@ -11,6 +11,8 @@
 	void replaceWord(char* str, char* oldWord, char* newWord);
 	char* comps[MAX_COMPS];	//name of comp types will be stored here
 	int numOfComps = 1;
+	int isComp = 0; // used for Comp type variables
+	char* temp;		//used to temporarily store name of an Adress(multiple var decl per line)
 	int find_comp(char* compToSearch);
 
 
@@ -125,27 +127,8 @@ function_block:
 	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);}
 	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\nreturn %s;\n}", $6, $2, $4, $9);}
 	;
-/*
-function_call:
-	TK_IDENT '=' TK_IDENT '(' func_param_call ')' {$$ = template("%s = %s(%s)", $1, $3, $5);}
-	| TK_IDENT '=' TK_IDENT '(' ')' {$$ = template("%s = %s()", $1, $3);}
-	| TK_IDENT '(' func_param_call ')' {$$ = template("%s(%s)", $1, $3);}
-	| TK_IDENT '(' ')' {$$ = template("%s()", $1);}
-	;
-*/
-/*
-func_param_call:
-	expr {$$ = template("%s", $1);}
-	| function_call {$$ = template("%s", $1);}
-	| func_param_call ',' func_param_call {$$ = template("%s, %s", $1, $3);}
-	;
-*/
-/*
-function_call_with_assgn:
-	TK_IDENT '=' TK_IDENT '(' func_param_call ')' {$$ = template("%s = %s(%s)", $1, $3, $5);}
-	| TK_IDENT '=' TK_IDENT '(' ')' {$$ = template("%s = %s()", $1, $3);}
-	;
-*/
+
+
 function_call_no_assgn:
 	TK_IDENT '(' func_param_call ')' {$$ = template("%s(%s)", $1, $3);}
 	| TK_IDENT '(' ')' {$$ = template("%s()", $1);}
@@ -246,13 +229,7 @@ if_statement:
 	| KW_IF '(' listofexpr ')' ':' statements KW_ELSE ':'  KW_ENDIF {$$ = template("if(%s){\n%s\n}\nelse{\n}", $3, $6);}
 	| KW_IF '(' listofexpr ')' ':' KW_ELSE ':'  KW_ENDIF {$$ = template("if(%s){\n}\nelse{\n}", $3);}
 	;
-/*
-in_loop_stmts:
-	statements {$$ = template("%s", $1);}
-	| KW_BREAK {$$ = template("break;");}
-	| KW_CONTINUE {$$ = template("continue;");}
-	;
-*/
+
 
 
 
@@ -316,7 +293,10 @@ var_declaration:
 	;
 
 one_var:
-	TK_IDENT ':' data_type {$$ = template("%s %s", $3, $1);}
+	TK_IDENT ':' data_type {if(isComp == 1){
+							$$ = template("%s %s = ctor_%s", $3, $1, $3);
+							}else
+							$$ = template("%s %s", $3, $1);}
 	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {$$ = template("%s %s[%s]", $6, $1, $3);}
 	| TK_IDENT '[' ']' ':' data_type {$$ = template("%s* %s", $5, $1);}
 	;
@@ -370,6 +350,9 @@ multi_var_1:
 										}
 										else{
 											isStr = 0;
+											if(isComp == 1){
+											$$ = template("%s %s = ctor_%s, %s = ctor_%s", $5, $1, $5, $3, $5);
+											}else
 											$$ = template("%s %s, %s", $5, $1, $3);
 										}}
 	| TK_IDENT ',' multi_var_1  	{if(isStr == 1){
@@ -377,16 +360,20 @@ multi_var_1:
 								}
 								else{
 									isStr = 0;
+									if(isComp == 1){
+									$$ = template("%s, %s = ctor_%s", $3, $1, temp);
+									}else
 									$$ = template("%s, %s", $3, $1);
 								}}
 	; 
 
 data_type:
-	KW_INTEGER {$$ = template("int");}
-	| KW_SCALAR {$$ = template("double");}
-	| KW_STR {$$ = template("char*");}
-	| KW_BOOLEAN  {$$ = template("int");}
+	KW_INTEGER {$$ = template("int"); isComp = 0;}
+	| KW_SCALAR {$$ = template("double"); isComp = 0;}
+	| KW_STR {$$ = template("char*"); isComp = 0;}
+	| KW_BOOLEAN  {$$ = template("int"); isComp = 0;}
 	| TK_IDENT { if(find_comp($1) == 1){
+					isComp = 1;
 					$$ = template("%s", $1);
 					}else{
 						yyerror("Unknown data type");
@@ -395,12 +382,7 @@ data_type:
 				}
 	;
 
-/*
-array_type:
-	'[' TK_CONSTINT ']' ':' data_type
-	| '[' ']' ':' data_type
-	;
-*/
+
 %%
 void replaceWord(char* str, char* oldWord, char* newWord)
 {
@@ -434,6 +416,7 @@ void replaceWord(char* str, char* oldWord, char* newWord)
 int find_comp(char* compToSearch){
 	for(int i = 0; i< numOfComps; i++){
 		if(strcmp(compToSearch, comps[i]) == 0){
+			temp = compToSearch;
 			return 1;	//comp exists
 		}
 	}

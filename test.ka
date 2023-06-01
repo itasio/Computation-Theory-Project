@@ -1,6 +1,8 @@
 def main():
-
-    a, a1, a3: Adress;
+L, x, y : scalar;
+    a, a1, a3, ss: Adress;
     a1: Adress;
+    x : scalar;
+
     l+=1;
 enddef;
