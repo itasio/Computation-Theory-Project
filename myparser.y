@@ -7,7 +7,7 @@
 	
 	extern int yylex(void);
 	int isStr = 0;	//used for multiple variables declaration in one line
-
+	char expression[100], toBeReplaced[100], replacer[100];		//for list comprehension
 	void replaceWord(char* str, char* oldWord, char* newWord);
 
 
@@ -272,8 +272,15 @@ listCompr_with_int_values:
 
 listCompr_with_array:
 	TK_IDENT TK_COLEQ '[' expr KW_FOR TK_IDENT ':' data_type KW_IN TK_IDENT KW_OF TK_CONSTINT ']' ':' data_type
-	{	replaceWord($4, $6, strcat($10, strcat("[", strcat( $10, "_i]"))));
-		$$ = template("%s* %s = (%s*)malloc(%s * sizeof(%s));\nfor(int %s_i = 0; %s_i < %s; ++%s_i)\n%s[%s_i] = %s", $15, $1, $15, $12, $15, $10, $10, $12, $10, $1, $10, $4);
+	{	strcpy(expression, $4);
+		strcpy(toBeReplaced, $6);
+		strcpy(replacer, $10);
+		strcat(replacer, "[");
+		strcat(replacer, $10);
+		strcat(replacer, "_i]");
+		//strcpy(replacer, $10);							//strcat($10,strcat("[", strcat( $10, "_i]")))
+		replaceWord(expression, toBeReplaced, replacer);
+		$$ = template("%s* %s = (%s*)malloc(%s * sizeof(%s));\nfor(int %s_i = 0; %s_i < %s; ++%s_i)\n%s[%s_i] = %s", $15, $1, $15, $12, $15, $10, $10, $12, $10, $1, $10, expression);
 		}
 	;
 

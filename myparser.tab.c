@@ -76,7 +76,7 @@
 	
 	extern int yylex(void);
 	int isStr = 0;	//used for multiple variables declaration in one line
-
+	char expression[100], toBeReplaced[100], replacer[100];		//for list comprehension
 	void replaceWord(char* str, char* oldWord, char* newWord);
 
 
@@ -574,10 +574,10 @@ static const yytype_int16 yyrline[] =
      209,   210,   214,   215,   216,   217,   218,   219,   220,   221,
      222,   223,   224,   225,   226,   227,   228,   229,   233,   234,
      235,   239,   240,   241,   242,   243,   244,   257,   258,   262,
-     263,   264,   265,   269,   274,   281,   282,   286,   287,   288,
-     289,   290,   291,   292,   293,   294,   299,   300,   304,   305,
-     309,   310,   311,   315,   316,   317,   321,   329,   339,   347,
-     357,   365,   375,   376,   377,   378
+     263,   264,   265,   269,   274,   288,   289,   293,   294,   295,
+     296,   297,   298,   299,   300,   301,   306,   307,   311,   312,
+     316,   317,   318,   322,   323,   324,   328,   336,   346,   354,
+     364,   372,   382,   383,   384,   385
 };
 #endif
 
@@ -2240,140 +2240,147 @@ yyreduce:
 
   case 94:
 #line 275 "myparser.y"
-        {	replaceWord((yyvsp[-11].str), (yyvsp[-9].str), strcat((yyvsp[-5].str), strcat("[", strcat( (yyvsp[-5].str), "_i]"))));
-		(yyval.str) = template("%s* %s = (%s*)malloc(%s * sizeof(%s));\nfor(int %s_i = 0; %s_i < %s; ++%s_i)\n%s[%s_i] = %s", (yyvsp[0].str), (yyvsp[-14].str), (yyvsp[0].str), (yyvsp[-3].str), (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-5].str), (yyvsp[-3].str), (yyvsp[-5].str), (yyvsp[-14].str), (yyvsp[-5].str), (yyvsp[-11].str));
+        {	strcpy(expression, (yyvsp[-11].str));
+		strcpy(toBeReplaced, (yyvsp[-9].str));
+		strcpy(replacer, (yyvsp[-5].str));
+		strcat(replacer, "[");
+		strcat(replacer, (yyvsp[-5].str));
+		strcat(replacer, "_i]");
+		//strcpy(replacer, $10);							//strcat($10,strcat("[", strcat( $10, "_i]")))
+		replaceWord(expression, toBeReplaced, replacer);
+		(yyval.str) = template("%s* %s = (%s*)malloc(%s * sizeof(%s));\nfor(int %s_i = 0; %s_i < %s; ++%s_i)\n%s[%s_i] = %s", (yyvsp[0].str), (yyvsp[-14].str), (yyvsp[0].str), (yyvsp[-3].str), (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-5].str), (yyvsp[-3].str), (yyvsp[-5].str), (yyvsp[-14].str), (yyvsp[-5].str), expression);
 		}
-#line 2247 "myparser.tab.c"
+#line 2254 "myparser.tab.c"
     break;
 
   case 95:
-#line 281 "myparser.y"
+#line 288 "myparser.y"
                               {(yyval.str) = template("%s;", (yyvsp[-1].str));}
-#line 2253 "myparser.tab.c"
+#line 2260 "myparser.tab.c"
     break;
 
   case 96:
-#line 282 "myparser.y"
+#line 289 "myparser.y"
                                                    {(yyval.str) = template("%s \n%s;", (yyvsp[-2].str), (yyvsp[-1].str));}
-#line 2259 "myparser.tab.c"
+#line 2266 "myparser.tab.c"
     break;
 
   case 97:
-#line 286 "myparser.y"
+#line 293 "myparser.y"
                                                           {(yyval.str) = template("const double %s = %s", (yyvsp[-4].str), (yyvsp[-2].str));}
-#line 2265 "myparser.tab.c"
+#line 2272 "myparser.tab.c"
     break;
 
   case 98:
-#line 287 "myparser.y"
+#line 294 "myparser.y"
                                                                 {(yyval.str) = template("const double %s = %s", (yyvsp[-5].str), (yyvsp[-2].str));}
-#line 2271 "myparser.tab.c"
+#line 2278 "myparser.tab.c"
     break;
 
   case 99:
-#line 288 "myparser.y"
+#line 295 "myparser.y"
                                                                 {(yyval.str) = template("const double %s = -%s", (yyvsp[-5].str), (yyvsp[-2].str));}
-#line 2277 "myparser.tab.c"
+#line 2284 "myparser.tab.c"
     break;
 
   case 100:
-#line 289 "myparser.y"
+#line 296 "myparser.y"
                                                                  {(yyval.str) = template("const int %s = %s", (yyvsp[-4].str), (yyvsp[-2].str));}
-#line 2283 "myparser.tab.c"
+#line 2290 "myparser.tab.c"
     break;
 
   case 101:
-#line 290 "myparser.y"
+#line 297 "myparser.y"
                                                                      {(yyval.str) = template("const int %s = %s", (yyvsp[-5].str), (yyvsp[-2].str));}
-#line 2289 "myparser.tab.c"
+#line 2296 "myparser.tab.c"
     break;
 
   case 102:
-#line 291 "myparser.y"
+#line 298 "myparser.y"
                                                                      {(yyval.str) = template("const int %s = -%s", (yyvsp[-5].str), (yyvsp[-2].str));}
-#line 2295 "myparser.tab.c"
+#line 2302 "myparser.tab.c"
     break;
 
   case 103:
-#line 292 "myparser.y"
+#line 299 "myparser.y"
                                                              {(yyval.str) = template("const char* %s = %s", (yyvsp[-4].str), (yyvsp[-2].str));}
-#line 2301 "myparser.tab.c"
+#line 2308 "myparser.tab.c"
     break;
 
   case 104:
-#line 293 "myparser.y"
+#line 300 "myparser.y"
                                                              {(yyval.str) = template("const int %s = 1", (yyvsp[-4].str));}
-#line 2307 "myparser.tab.c"
+#line 2314 "myparser.tab.c"
     break;
 
   case 105:
-#line 294 "myparser.y"
+#line 301 "myparser.y"
                                                               {(yyval.str) = template("const int %s = 0", (yyvsp[-4].str));}
-#line 2313 "myparser.tab.c"
+#line 2320 "myparser.tab.c"
     break;
 
   case 106:
-#line 299 "myparser.y"
+#line 306 "myparser.y"
                             {(yyval.str) = template("%s;", (yyvsp[-1].str));}
-#line 2319 "myparser.tab.c"
+#line 2326 "myparser.tab.c"
     break;
 
   case 107:
-#line 300 "myparser.y"
+#line 307 "myparser.y"
                                                { (yyval.str) = template("%s \n%s;", (yyvsp[-2].str), (yyvsp[-1].str));}
-#line 2325 "myparser.tab.c"
+#line 2332 "myparser.tab.c"
     break;
 
   case 108:
-#line 304 "myparser.y"
+#line 311 "myparser.y"
                 {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2331 "myparser.tab.c"
+#line 2338 "myparser.tab.c"
     break;
 
   case 109:
-#line 305 "myparser.y"
+#line 312 "myparser.y"
                     {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2337 "myparser.tab.c"
+#line 2344 "myparser.tab.c"
     break;
 
   case 110:
-#line 309 "myparser.y"
+#line 316 "myparser.y"
                                {(yyval.str) = template("%s %s", (yyvsp[0].str), (yyvsp[-2].str));}
-#line 2343 "myparser.tab.c"
+#line 2350 "myparser.tab.c"
     break;
 
   case 111:
-#line 310 "myparser.y"
+#line 317 "myparser.y"
                                                      {(yyval.str) = template("%s %s[%s]", (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-3].str));}
-#line 2349 "myparser.tab.c"
+#line 2356 "myparser.tab.c"
     break;
 
   case 112:
-#line 311 "myparser.y"
+#line 318 "myparser.y"
                                          {(yyval.str) = template("%s* %s", (yyvsp[0].str), (yyvsp[-4].str));}
-#line 2355 "myparser.tab.c"
+#line 2362 "myparser.tab.c"
     break;
 
   case 113:
-#line 315 "myparser.y"
+#line 322 "myparser.y"
                     {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2361 "myparser.tab.c"
+#line 2368 "myparser.tab.c"
     break;
 
   case 114:
-#line 316 "myparser.y"
+#line 323 "myparser.y"
                       {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2367 "myparser.tab.c"
+#line 2374 "myparser.tab.c"
     break;
 
   case 115:
-#line 317 "myparser.y"
+#line 324 "myparser.y"
                       {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2373 "myparser.tab.c"
+#line 2380 "myparser.tab.c"
     break;
 
   case 116:
-#line 321 "myparser.y"
+#line 328 "myparser.y"
                                                             {if(strcmp((yyvsp[0].str), "char*") == 0){
 											isStr = 1;
 											(yyval.str) = template("%s* %s, **%s", (yyvsp[0].str), (yyvsp[-8].str), (yyvsp[-4].str));
@@ -2382,11 +2389,11 @@ yyreduce:
 											isStr = 0;
 											(yyval.str) = template("%s* %s, *%s", (yyvsp[0].str), (yyvsp[-8].str), (yyvsp[-4].str));
 										}}
-#line 2386 "myparser.tab.c"
+#line 2393 "myparser.tab.c"
     break;
 
   case 117:
-#line 329 "myparser.y"
+#line 336 "myparser.y"
                                             {if(isStr == 1){
 											(yyval.str) = template("%s, **%s", (yyvsp[0].str), (yyvsp[-4].str));
 										}
@@ -2394,11 +2401,11 @@ yyreduce:
 											isStr = 0;
 											(yyval.str) = template("%s, *%s", (yyvsp[0].str), (yyvsp[-4].str));
 										}}
-#line 2398 "myparser.tab.c"
+#line 2405 "myparser.tab.c"
     break;
 
   case 118:
-#line 339 "myparser.y"
+#line 346 "myparser.y"
                                                                                     {if(strcmp((yyvsp[0].str), "char*") == 0){
 											isStr = 1;
 											(yyval.str) = template("%s %s[%s], *%s[%s]", (yyvsp[0].str), (yyvsp[-10].str), (yyvsp[-8].str), (yyvsp[-5].str), (yyvsp[-3].str));
@@ -2407,11 +2414,11 @@ yyreduce:
 											isStr = 0;
 											(yyval.str) = template("%s %s[%s], %s[%s]", (yyvsp[0].str), (yyvsp[-10].str), (yyvsp[-8].str), (yyvsp[-5].str), (yyvsp[-3].str));
 										}}
-#line 2411 "myparser.tab.c"
+#line 2418 "myparser.tab.c"
     break;
 
   case 119:
-#line 347 "myparser.y"
+#line 354 "myparser.y"
                                                                 {if(isStr == 1){
 									(yyval.str) = template("%s, *%s[%s]", (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-3].str));
 								}
@@ -2419,11 +2426,11 @@ yyreduce:
 									isStr = 0;
 									(yyval.str) = template("%s, %s[%s]", (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-3].str));
 								}}
-#line 2423 "myparser.tab.c"
+#line 2430 "myparser.tab.c"
     break;
 
   case 120:
-#line 357 "myparser.y"
+#line 364 "myparser.y"
                                             {if(strcmp((yyvsp[0].str), "char*") == 0){
 											isStr = 1;
 											(yyval.str) = template("%s %s, *%s", (yyvsp[0].str), (yyvsp[-4].str), (yyvsp[-2].str));
@@ -2432,11 +2439,11 @@ yyreduce:
 											isStr = 0;
 											(yyval.str) = template("%s %s, %s", (yyvsp[0].str), (yyvsp[-4].str), (yyvsp[-2].str));
 										}}
-#line 2436 "myparser.tab.c"
+#line 2443 "myparser.tab.c"
     break;
 
   case 121:
-#line 365 "myparser.y"
+#line 372 "myparser.y"
                                         {if(isStr == 1){
 									(yyval.str) = template("%s, *%s", (yyvsp[0].str), (yyvsp[-2].str));
 								}
@@ -2444,35 +2451,35 @@ yyreduce:
 									isStr = 0;
 									(yyval.str) = template("%s, %s", (yyvsp[0].str), (yyvsp[-2].str));
 								}}
-#line 2448 "myparser.tab.c"
+#line 2455 "myparser.tab.c"
     break;
 
   case 122:
-#line 375 "myparser.y"
+#line 382 "myparser.y"
                    {(yyval.str) = template("int");}
-#line 2454 "myparser.tab.c"
+#line 2461 "myparser.tab.c"
     break;
 
   case 123:
-#line 376 "myparser.y"
+#line 383 "myparser.y"
                     {(yyval.str) = template("double");}
-#line 2460 "myparser.tab.c"
+#line 2467 "myparser.tab.c"
     break;
 
   case 124:
-#line 377 "myparser.y"
+#line 384 "myparser.y"
                  {(yyval.str) = template("char*");}
-#line 2466 "myparser.tab.c"
+#line 2473 "myparser.tab.c"
     break;
 
   case 125:
-#line 378 "myparser.y"
+#line 385 "myparser.y"
                       {(yyval.str) = template("int");}
-#line 2472 "myparser.tab.c"
+#line 2479 "myparser.tab.c"
     break;
 
 
-#line 2476 "myparser.tab.c"
+#line 2483 "myparser.tab.c"
 
       default: break;
     }
@@ -2704,7 +2711,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 388 "myparser.y"
+#line 395 "myparser.y"
 
 void replaceWord(char* str, char* oldWord, char* newWord)
 {
