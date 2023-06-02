@@ -74,7 +74,8 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 "*"			return '*';
 "/"			return '/';
 "%"			return '%';
-"="			return '=';	
+"="			return '=';
+"#"			return '#';	
 "**"									return TK_POW;
 "+="									return TK_PLUEQ;
 "-="									return TK_MINEQ;

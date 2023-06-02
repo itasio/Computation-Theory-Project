@@ -71,10 +71,12 @@
 
 %start program
 
-%type <str> statements listofexpr listofinstructions  main_block function_blocks function_return_type var_declarations const_declarations //comp_declarations
-%type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var //array_type
-%type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call /*function_call*/ function_param_decl /*function_call_with_assgn*/ function_call_no_assgn
-%type <str> fict_token listCompr_with_int_values listCompr_with_array
+%type <str> statements listofexpr listofinstructions  main_block function_blocks function_return_type var_declarations const_declarations comp_declarations
+%type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var comp_declaration
+%type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call function_param_decl function_call_no_assgn listof_comp_instructions comp_multi_var
+%type <str> fict_token listCompr_with_int_values listCompr_with_array comp_var_declarations comp_var_declaration comp_function_blocks comp_function_block
+%type <str> comp_multi_var_1 comp_multi_var_2 comp_multi_var_3
+
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
 %left KW_OR
 %left KW_AND
@@ -92,8 +94,8 @@ program:
 	main_block 																			{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n", $1);}}
 	| function_blocks main_block  														{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
 	| var_declarations function_blocks main_block 										{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s", $1, $2, $3);}}
-	| const_declarations var_declarations function_blocks main_block						{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s", $1, $2, $3, $4);}}
-	//| comp_declarations const_declarations var_declarations function_blocks main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
+	| const_declarations var_declarations function_blocks main_block					{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s", $1, $2, $3, $4);}}
+	| comp_declarations const_declarations var_declarations function_blocks main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
 	;
 
 main_block:
@@ -258,10 +260,108 @@ listCompr_with_array:
 		strcat(replacer, "[");
 		strcat(replacer, $10);
 		strcat(replacer, "_i]");
-		//strcpy(replacer, $10);							//strcat($10,strcat("[", strcat( $10, "_i]")))
+		//strcpy(replacer, $10);
 		replaceWord(expression, toBeReplaced, replacer);
 		$$ = template("%s* %s = (%s*)malloc(%s * sizeof(%s));\nfor(int %s_i = 0; %s_i < %s; ++%s_i)\n%s[%s_i] = %s", $15, $1, $15, $12, $15, $10, $10, $12, $10, $1, $10, expression);
 		}
+	;
+
+comp_declarations:
+	comp_declaration ';' {$$ = template("%s;", $1);}
+	| comp_declarations comp_declaration ';' {$$ = template("%s \n%s;", $1, $2);}
+	;
+
+comp_declaration:
+	KW_COMP TK_IDENT ':' listof_comp_instructions KW_ENDCOMP {$$ = template("typedef struct %s{\n%s\n}%s", $2, $4, $2); comps[numOfComps] = $2; numOfComps++; printf("%d", numOfComps);}
+	;
+
+listof_comp_instructions:
+	comp_var_declarations	{$$ = template("%s", $1);}
+	//| comp_function_blocks	{$$ = template("%s", $1);}
+	//| comp_var_declarations comp_function_blocks {$$ = template("%s\n%s", $1, $2);}
+	;
+
+comp_var_declarations:
+	comp_var_declaration ';' {$$ = template("%s;", $1);}
+	| comp_var_declarations comp_var_declaration ';' { $$ = template("%s \n%s;", $1, $2);}
+	;
+
+
+/*========================================================================================*/
+/*========================================================================================*/
+/*========================================================================================*/
+comp_var_declaration:
+	'#' one_var {$$ = template("%s", $2);}
+	| comp_multi_var {$$ = template("%s", $1);}
+	;
+
+comp_multi_var:
+	comp_multi_var_1 {$$ = template("%s", $1);}		//a, b :type
+	| comp_multi_var_2 {$$ = template("%s", $1);}	//a[N], b[N]: type
+	| comp_multi_var_3 {$$ = template("%s", $1);}	//a[], b[]: type
+	;
+
+comp_multi_var_3:
+	TK_IDENT '[' ']' ',' TK_IDENT '[' ']' ':' data_type {if(isStr == 1){
+											$$ = template("%s* %s, **%s", $9, $1, $5);
+										}
+										else{
+											$$ = template("%s* %s, *%s", $9, $1, $5);
+										}}
+	| TK_IDENT '[' ']' ',' comp_multi_var_3  {if(isStr == 1){
+											$$ = template("%s, **%s", $5, $1);
+										}
+										else{
+											$$ = template("%s, *%s", $5, $1);
+										}}
+	; 
+
+comp_multi_var_2:
+	TK_IDENT '[' TK_CONSTINT ']' ',' TK_IDENT '[' TK_CONSTINT ']' ':' data_type {if(isStr == 1){
+											$$ = template("%s %s[%s], *%s[%s]", $11, $1, $3, $6, $8);
+										}
+										else{
+											$$ = template("%s %s[%s], %s[%s]", $11, $1, $3, $6, $8);
+										}}
+	| TK_IDENT '[' TK_CONSTINT ']' ',' comp_multi_var_2  	{if(isStr == 1){
+									$$ = template("%s, *%s[%s]", $6, $1, $3);
+								}
+								else{
+									$$ = template("%s, %s[%s]", $6, $1, $3);
+								}}
+	; 
+
+comp_multi_var_1:
+	'#' TK_IDENT ',' '#' TK_IDENT ':' data_type {if (isStr == 1){
+											$$ = template("%s %s, *%s", $7, $2, $5);
+										}
+										else{
+											if(isComp == 1){
+												$$ = template("%s %s = ctor_%s, %s = ctor_%s", $7, $2, $7, $5, $7);
+											}else
+											$$ = template("%s %s, %s", $7, $2, $5);
+										}}
+	| '#' TK_IDENT ',' comp_multi_var_1  	{if(isStr == 1){
+									$$ = template("%s, *%s", $4, $2);
+								}
+								else{
+									if(isComp == 1){
+										$$ = template("%s, %s = ctor_%s", $4, $2, temp);
+									}else
+									$$ = template("%s, %s", $4, $2);
+								}}
+	;
+
+/*========================================================================================*/
+/*========================================================================================*/
+/*========================================================================================*/
+comp_function_blocks:
+	comp_function_block ';' {$$ = template("%s", $1);}
+	| comp_function_blocks comp_function_block ';' {$$ = template("%s \n%s", $1, $2);}
+	;
+
+comp_function_block:
+	KW_AND KW_BREAK KW_AND{$$ = template("gadsg");}
 	;
 
 const_declarations:
@@ -297,7 +397,7 @@ one_var:
 							$$ = template("%s %s = ctor_%s", $3, $1, $3);
 							}else
 							$$ = template("%s %s", $3, $1);}
-	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {$$ = template("%s %s[%s]", $6, $1, $3);}
+	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {	$$ = template("%s %s[%s]", $6, $1, $3);	}
 	| TK_IDENT '[' ']' ':' data_type {$$ = template("%s* %s", $5, $1);}
 	;
 

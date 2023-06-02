@@ -1,11 +1,31 @@
+comp City:
+    #adyubd, #z, #x: scalar;
+    #adyubd, #z, #x: scalar;
+    #adyubd, #z, #x: boolean;
+    #adyubd, #z, #x: str;
+    #bla: scalar;
+    #a : integer;
+endcomp;
+
+comp City:
+    #adyubd: boolean;
+    #bla[3]: scalar;
+    #a[] : integer;
+endcomp;
+
+const x = 3: integer;
+
+orderId: integer;
+def foo():
+;
+enddef;
 def main():
-L, x, y : scalar;
+    L, x, y : scalar;
     a, a1, a3, ss: Adress;
     a1: Adress;
-    x : scalar;
-    dfd: str;
-    sag, fas: str;
-    sf[11], fasw[3], fasw[3], fasw[3] : str;
-
+    x[3], x[5]: Adress;
+    x[], y[]: Adress;
     l+=1;
 enddef;
+
+
