@@ -287,9 +287,6 @@ comp_var_declarations:
 	;
 
 
-/*========================================================================================*/
-/*========================================================================================*/
-/*========================================================================================*/
 comp_var_declaration:
 	'#' one_var {$$ = template("%s", $2);}
 	| comp_multi_var {$$ = template("%s", $1);}
@@ -302,32 +299,32 @@ comp_multi_var:
 	;
 
 comp_multi_var_3:
-	TK_IDENT '[' ']' ',' TK_IDENT '[' ']' ':' data_type {if(isStr == 1){
-											$$ = template("%s* %s, **%s", $9, $1, $5);
+	'#' TK_IDENT '[' ']' ',' '#' TK_IDENT '[' ']' ':' data_type {if(isStr == 1){
+											$$ = template("%s* %s, **%s", $11, $2, $7);
 										}
 										else{
-											$$ = template("%s* %s, *%s", $9, $1, $5);
+											$$ = template("%s* %s, *%s", $11, $2, $7);
 										}}
-	| TK_IDENT '[' ']' ',' comp_multi_var_3  {if(isStr == 1){
-											$$ = template("%s, **%s", $5, $1);
+	| '#' TK_IDENT '[' ']' ',' comp_multi_var_3  {if(isStr == 1){
+											$$ = template("%s, **%s", $6, $2);
 										}
 										else{
-											$$ = template("%s, *%s", $5, $1);
+											$$ = template("%s, *%s", $6, $2);
 										}}
 	; 
 
 comp_multi_var_2:
-	TK_IDENT '[' TK_CONSTINT ']' ',' TK_IDENT '[' TK_CONSTINT ']' ':' data_type {if(isStr == 1){
-											$$ = template("%s %s[%s], *%s[%s]", $11, $1, $3, $6, $8);
+	'#' TK_IDENT '[' TK_CONSTINT ']' ',' '#' TK_IDENT '[' TK_CONSTINT ']' ':' data_type {if(isStr == 1){
+											$$ = template("%s %s[%s], *%s[%s]", $13, $2, $4, $8, $10);
 										}
 										else{
-											$$ = template("%s %s[%s], %s[%s]", $11, $1, $3, $6, $8);
+											$$ = template("%s %s[%s], %s[%s]", $13, $2, $4, $8, $10);
 										}}
-	| TK_IDENT '[' TK_CONSTINT ']' ',' comp_multi_var_2  	{if(isStr == 1){
-									$$ = template("%s, *%s[%s]", $6, $1, $3);
+	| '#' TK_IDENT '[' TK_CONSTINT ']' ',' comp_multi_var_2  	{if(isStr == 1){
+									$$ = template("%s, *%s[%s]", $7, $2, $4);
 								}
 								else{
-									$$ = template("%s, %s[%s]", $6, $1, $3);
+									$$ = template("%s, %s[%s]", $7, $2, $4);
 								}}
 	; 
 
@@ -352,9 +349,6 @@ comp_multi_var_1:
 								}}
 	;
 
-/*========================================================================================*/
-/*========================================================================================*/
-/*========================================================================================*/
 comp_function_blocks:
 	comp_function_block ';' {$$ = template("%s", $1);}
 	| comp_function_blocks comp_function_block ';' {$$ = template("%s \n%s", $1, $2);}

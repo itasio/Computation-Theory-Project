@@ -5,6 +5,7 @@
 ?? func().x(); δεν το παιρνει
 ?? να παιρνει το c1, c2: Circle ; (Circle ειναι comp)
 
+? Να γινεται να υπάρχει comp kai mai() χωρίς τα ενδιάμεσα
 
  !! Το αρχείο prime.ka έχει: 
  for num in [3: limit+1] (line 44) 

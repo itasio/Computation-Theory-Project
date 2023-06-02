@@ -9,8 +9,8 @@ endcomp;
 
 comp City:
     #adyubd: boolean;
-    #bla[3]: scalar;
-    #a[] : integer;
+    #bla[3], #x[4], #x[4]: str;
+    #a[], #b[], #x[] : str;
 endcomp;
 
 const x = 3: integer;
