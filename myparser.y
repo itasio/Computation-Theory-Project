@@ -5,14 +5,21 @@
 	#include <math.h>
   	#include "cgen.h"
 	#define MAX_COMPS 100 	//number of comp types permitted in ka language
-	extern int yylex(void);
-	int isStr = 0;	//used for multiple variables declaration in one line
+	#define MAX_COMP_VARS 100 //number of variables permitted per comp in ka language
+
 	char expression[100], toBeReplaced[100], replacer[100];		//for list comprehension
-	void replaceWord(char* str, char* oldWord, char* newWord);
 	char* comps[MAX_COMPS];	//name of comp types will be stored here
-	int numOfComps = 1;
+	char* comp_vars[MAX_COMP_VARS];	//name of comp variables will be stored here for each comp, during comp declaration. After that elements will be erased. 
+	char* temp;		//used to temporarily store name of a Comp(multiple var decl per line)
+	char* comp_var_name;		//used to temporarily store name of a Comp variable
+	
+	int numOfCompVars = 0; //num of variables per comp. Used in conjunction with comp_vars[MAX_COMP_VARS]
+	int isStr = 0;	//used for multiple variables declaration in one line
+	int numOfComps = 0;		//number of different Comp types declared in program
 	int isComp = 0; // used for Comp type variables
-	char* temp;		//used to temporarily store name of an Adress(multiple var decl per line)
+	
+	void replaceWord(char* str, char* oldWord, char* newWord);
+	extern int yylex(void);
 	int find_comp(char* compToSearch);
 
 
@@ -272,7 +279,7 @@ comp_declarations:
 	;
 
 comp_declaration:
-	KW_COMP TK_IDENT ':' listof_comp_instructions KW_ENDCOMP {$$ = template("typedef struct %s{\n%s\n}%s", $2, $4, $2); comps[numOfComps] = $2; numOfComps++; printf("%d", numOfComps);}
+	KW_COMP TK_IDENT ':' listof_comp_instructions KW_ENDCOMP {$$ = template("typedef struct %s{\n%s\n}%s", $2, $4, $2); comps[numOfComps] = $2; numOfComps++;}
 	;
 
 listof_comp_instructions:
@@ -288,7 +295,7 @@ comp_var_declarations:
 
 
 comp_var_declaration:
-	'#' one_var {$$ = template("%s", $2);}
+	'#' one_var {$$ = template("%s", $2); comp_vars[numOfCompVars] = comp_var_name; numOfCompVars++;}
 	| comp_multi_var {$$ = template("%s", $1);}
 	;
 
@@ -299,18 +306,23 @@ comp_multi_var:
 	;
 
 comp_multi_var_3:
-	'#' TK_IDENT '[' ']' ',' '#' TK_IDENT '[' ']' ':' data_type {if(isStr == 1){
-											$$ = template("%s* %s, **%s", $11, $2, $7);
+	'#' TK_IDENT '[' ']' ',' '#' TK_IDENT '[' ']' ':' data_type {	if(isStr == 1){
+																		$$ = template("%s* %s, **%s", $11, $2, $7);
+																	}
+																	else{
+																		$$ = template("%s* %s, *%s", $11, $2, $7);
+																	}
+										comp_vars[numOfCompVars] = $2; numOfCompVars++;
+										comp_vars[numOfCompVars] = $7; numOfCompVars++;
 										}
-										else{
-											$$ = template("%s* %s, *%s", $11, $2, $7);
-										}}
-	| '#' TK_IDENT '[' ']' ',' comp_multi_var_3  {if(isStr == 1){
-											$$ = template("%s, **%s", $6, $2);
+	| '#' TK_IDENT '[' ']' ',' comp_multi_var_3  {	if(isStr == 1){
+														$$ = template("%s, **%s", $6, $2);
+													}
+													else{
+														$$ = template("%s, *%s", $6, $2);
+													}
+										comp_vars[numOfCompVars] = $2; numOfCompVars++;
 										}
-										else{
-											$$ = template("%s, *%s", $6, $2);
-										}}
 	; 
 
 comp_multi_var_2:
@@ -319,13 +331,18 @@ comp_multi_var_2:
 										}
 										else{
 											$$ = template("%s %s[%s], %s[%s]", $13, $2, $4, $8, $10);
-										}}
-	| '#' TK_IDENT '[' TK_CONSTINT ']' ',' comp_multi_var_2  	{if(isStr == 1){
-									$$ = template("%s, *%s[%s]", $7, $2, $4);
+										}
+										comp_vars[numOfCompVars] = $2; numOfCompVars++;
+										comp_vars[numOfCompVars] = $8; numOfCompVars++;
+										}
+	| '#' TK_IDENT '[' TK_CONSTINT ']' ',' comp_multi_var_2 {	if(isStr == 1){
+																	$$ = template("%s, *%s[%s]", $7, $2, $4);
+																}
+																else{
+																	$$ = template("%s, %s[%s]", $7, $2, $4);
+																}
+								comp_vars[numOfCompVars] = $2; numOfCompVars++;
 								}
-								else{
-									$$ = template("%s, %s[%s]", $7, $2, $4);
-								}}
 	; 
 
 comp_multi_var_1:
@@ -337,16 +354,21 @@ comp_multi_var_1:
 												$$ = template("%s %s = ctor_%s, %s = ctor_%s", $7, $2, $7, $5, $7);
 											}else
 											$$ = template("%s %s, %s", $7, $2, $5);
-										}}
-	| '#' TK_IDENT ',' comp_multi_var_1  	{if(isStr == 1){
-									$$ = template("%s, *%s", $4, $2);
+										}
+										comp_vars[numOfCompVars] = $2; numOfCompVars++;
+										comp_vars[numOfCompVars] = $5; numOfCompVars++;
+										}
+	| '#' TK_IDENT ',' comp_multi_var_1 {	if(isStr == 1){
+												$$ = template("%s, *%s", $4, $2);
+											}
+											else{
+												if(isComp == 1){
+													$$ = template("%s, %s = ctor_%s", $4, $2, temp);
+												}else
+												$$ = template("%s, %s", $4, $2);
+											}
+								comp_vars[numOfCompVars] = $2; numOfCompVars++;
 								}
-								else{
-									if(isComp == 1){
-										$$ = template("%s, %s = ctor_%s", $4, $2, temp);
-									}else
-									$$ = template("%s, %s", $4, $2);
-								}}
 	;
 
 comp_function_blocks:
@@ -389,10 +411,12 @@ var_declaration:
 one_var:
 	TK_IDENT ':' data_type {if(isComp == 1){
 							$$ = template("%s %s = ctor_%s", $3, $1, $3);
-							}else
+							}else{
 							$$ = template("%s %s", $3, $1);}
-	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {	$$ = template("%s %s[%s]", $6, $1, $3);	}
-	| TK_IDENT '[' ']' ':' data_type {$$ = template("%s* %s", $5, $1);}
+							comp_var_name = $1;	//maybe not a comp var, but i need it if it is
+							 }
+	| TK_IDENT '[' TK_CONSTINT ']' ':' data_type {	$$ = template("%s %s[%s]", $6, $1, $3);	comp_var_name = $1;}
+	| TK_IDENT '[' ']' ':' data_type {$$ = template("%s* %s", $5, $1); comp_var_name = $1;}
 	;
 
 multi_var:
@@ -458,7 +482,7 @@ data_type:
 	| KW_STR {$$ = template("char*"); isComp = 0; isStr = 1;}
 	| KW_BOOLEAN  {$$ = template("int"); isComp = 0; isStr = 0;}
 	| TK_IDENT { isStr = 0;
-					if(find_comp($1) == 1){
+					if(find_comp($1) == 1){		//allow Comp data_type only if it is already declared 
 					isComp = 1;
 					$$ = template("%s", $1);
 					}else{

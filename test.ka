@@ -7,7 +7,7 @@ comp City:
     #a : integer;
 endcomp;
 
-comp City:
+comp Adress:
     #adyubd: boolean;
     #bla[3], #x[4], #x[4]: str;
     #a[], #b[], #x[] : str;
@@ -26,6 +26,7 @@ def main():
     x[3], x[5]: Adress;
     x[], y[]: Adress;
     l+=1;
+    write("Bookstore orders income: %.2f\n", bs.calculateTotalOrdersIncome());
 enddef;
 
 
