@@ -133,12 +133,15 @@ function_blocks:
 	;
 
 function_block:
-	KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_ENDDEF 
-		{if (insideCompDecl == 1){
+	KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_ENDDEF {
+		if (insideCompDecl == 1){
+			if(strcmp($4, "") == 1)$$ = template("void (*%s)(SELF,%s)", $2, $4);
+			else $$ = template("void (*%s)(SELF)", $2);
+			//strcat hgffuuyfgyuk
 		}else{
 			$$ = template("void %s(%s){\n%s\n}", $2, $4, $7);
 		}
-		}
+	}
 	| KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\n%s\nreturn;\n}", $2, $4, $7);}
 	| KW_DEF TK_IDENT '(' function_param_decl ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\nreturn;\n}", $2, $4);}
 	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);}
@@ -171,7 +174,7 @@ expr:
 				}
 	| '#' TK_IDENT 	{
 					if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
-							$$ = template("%s", $1);
+							$$ = template("self->%s", $2);
 					}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 					}
 	| TK_CONSTSTR
@@ -240,7 +243,7 @@ fict_token:
 			   }else {$$ = template("%s", $1);}
 			 }
 	| '#' TK_IDENT { if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
-			   			$$ = template("%s", $2);
+			   			$$ = template("self->%s", $2);
 			   		}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		 }
 	| TK_IDENT '[' TK_CONSTINT ']' 	{ if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
@@ -248,7 +251,7 @@ fict_token:
 									}else {$$ = template("%s[%s]",$1, $3);}
 									}
 	| '#' TK_IDENT '[' TK_CONSTINT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
-											$$ = template("%s[%s]",$2, $4);
+											$$ = template("self->%s[%s]",$2, $4);
 										}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		}
 	| TK_IDENT '[' TK_IDENT ']' { if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
@@ -256,7 +259,7 @@ fict_token:
 									}else {$$ = template("%s[%s]",$1, $3);}
 		}
 	| '#' TK_IDENT '[' TK_IDENT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
-											$$ = template("%s[%s]",$2, $4);
+											$$ = template("self->%s[%s]",$2, $4);
 									}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		}
 	;
@@ -310,7 +313,8 @@ comp_declarations:
 	;
 
 comp_declaration:
-	KW_COMP TK_IDENT ':' listof_comp_instructions KW_ENDCOMP {$$ = template("typedef struct %s{\n%s\n}%s", $2, $4, $2); comps[numOfComps] = $2; numOfComps++;}
+	KW_COMP TK_IDENT ':' listof_comp_instructions KW_ENDCOMP 
+	{$$ = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s",$2, $2, $4, $2); comps[numOfComps] = $2; numOfComps++; insideCompDecl = 0;//todo reset comp_vars}
 	;
 
 listof_comp_instructions:
