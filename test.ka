@@ -17,16 +17,10 @@ const x = 3: integer;
 
 orderId: integer;
 def foo():
-;
+
 enddef;
 def main():
-    L, x, y : scalar;
-    a, a1, a3, ss: Adress;
-    a1: Adress;
-    x[3], x[5]: Adress;
-    x[], y[]: Adress;
-    l+=1;
-    write("Bookstore orders income: %.2f\n", bs.calculateTotalOrdersIncome());
+
 enddef;
 
 

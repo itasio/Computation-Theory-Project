@@ -6,13 +6,16 @@
   	#include "cgen.h"
 	#define MAX_COMPS 100 	//number of comp types permitted in ka language
 	#define MAX_COMP_VARS 100 //number of variables permitted per comp in ka language
+	#define MAX_CHARS_FOR_FUNCTIONS 3000	//number of characters permitted for .c functions being translated from .ka language 
 
 	char expression[100], toBeReplaced[100], replacer[100];		//for list comprehension
+	char comp_func_to_C[MAX_CHARS_FOR_FUNCTIONS];
 	char* comps[MAX_COMPS];	//name of comp types will be stored here
 	char* comp_vars[MAX_COMP_VARS];	//name of comp variables will be stored here for each comp, during comp declaration. After that elements will be erased. 
 	char* temp;		//used to temporarily store name of a Comp(multiple var decl per line)
 	char* comp_var_name;		//used to temporarily store name of a Comp variable
 	
+	int insideCompDecl = 0;	//used to indicate that we are inside a comp declaration. For function comp variables handling inside functions
 	int numOfCompVars = 0; //num of variables per comp. Used in conjunction with comp_vars[MAX_COMP_VARS]
 	int isStr = 0;	//used for multiple variables declaration in one line
 	int numOfComps = 0;		//number of different Comp types declared in program
@@ -20,7 +23,7 @@
 	
 	void replaceWord(char* str, char* oldWord, char* newWord);
 	extern int yylex(void);
-	int find_comp(char* compToSearch);
+	int find_comp(char* compToSearch, char* whereToSearch);
 
 
 %}
@@ -130,7 +133,12 @@ function_blocks:
 	;
 
 function_block:
-	KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_ENDDEF {$$ = template("void %s(%s){\n%s\n}", $2, $4, $7);}
+	KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_ENDDEF 
+		{if (insideCompDecl == 1){
+		}else{
+			$$ = template("void %s(%s){\n%s\n}", $2, $4, $7);
+		}
+		}
 	| KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\n%s\nreturn;\n}", $2, $4, $7);}
 	| KW_DEF TK_IDENT '(' function_param_decl ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\nreturn;\n}", $2, $4);}
 	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);}
@@ -156,17 +164,19 @@ listofexpr:
 expr:
 	TK_CONSTINT
 	| TK_CONSTFLOAT
-	| TK_IDENT
+	| TK_IDENT	{
+				if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+							yyerror("Comp variables are preceded by # ");
+				}else {$$ = template("%s", $1);}
+				}
+	| '#' TK_IDENT 	{
+					if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+							$$ = template("%s", $1);
+					}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+					}
 	| TK_CONSTSTR
 	| KW_FALSE	{$$ = template("0");}
 	| KW_TRUE	{$$ = template("1");}
-	//| TK_IDENT '=' expr {$$ = template("%s = %s",$1, $3);}
-	//| TK_IDENT TK_PLUEQ expr {$$ = template("%s += %s",$1, $3);}
-	//| TK_IDENT TK_MINEQ expr {$$ = template("%s -= %s",$1, $3);}
-	//| TK_IDENT TK_MULEQ expr {$$ = template("%s *= %s",$1, $3);}
-	//| TK_IDENT TK_DIVEQ expr {$$ = template("%s /= %s",$1, $3);}
-	//| TK_IDENT TK_MODEQ expr {$$ = template("%s %= %s",$1, $3);}
-	//| TK_IDENT TK_COLEQ expr {$$ = template("%s := %s",$1, $3);}
 	| expr KW_OR expr {$$ = template("%s || %s", $1, $3);}
 	| expr KW_AND expr {$$ = template("%s && %s", $1, $3);}
 	| KW_NOT expr {$$ = template("!%s", $2);}
@@ -225,9 +235,30 @@ statement:
 	;
 
 fict_token:
-	TK_IDENT { $$ = template("%s", $1);}
-	| TK_IDENT '[' TK_CONSTINT ']' {$$ = template("%s[%s]",$1, $3);}
-	| TK_IDENT '[' TK_IDENT ']' {$$ = template("%s[%s]",$1, $3);}
+	TK_IDENT { if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+			   		yyerror("Comp variables are preceded by # ");
+			   }else {$$ = template("%s", $1);}
+			 }
+	| '#' TK_IDENT { if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+			   			$$ = template("%s", $2);
+			   		}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+		 }
+	| TK_IDENT '[' TK_CONSTINT ']' 	{ if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+										yyerror("Comp variables are preceded by # ");
+									}else {$$ = template("%s[%s]",$1, $3);}
+									}
+	| '#' TK_IDENT '[' TK_CONSTINT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+											$$ = template("%s[%s]",$2, $4);
+										}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+		}
+	| TK_IDENT '[' TK_IDENT ']' { if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+										yyerror("Comp variables are preceded by # ");
+									}else {$$ = template("%s[%s]",$1, $3);}
+		}
+	| '#' TK_IDENT '[' TK_IDENT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+											$$ = template("%s[%s]",$2, $4);
+									}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+		}
 	;
 
 if_statement:
@@ -283,13 +314,13 @@ comp_declaration:
 	;
 
 listof_comp_instructions:
-	comp_var_declarations	{$$ = template("%s", $1);}
+	//comp_var_declarations	{$$ = template("%s", $1);}
 	//| comp_function_blocks	{$$ = template("%s", $1);}
-	//| comp_var_declarations comp_function_blocks {$$ = template("%s\n%s", $1, $2);}
+	comp_var_declarations function_blocks {$$ = template("%s\n%s", $1, $2);}
 	;
 
 comp_var_declarations:
-	comp_var_declaration ';' {$$ = template("%s;", $1);}
+	comp_var_declaration ';' {$$ = template("%s;", $1); insideCompDecl = 1;}
 	| comp_var_declarations comp_var_declaration ';' { $$ = template("%s \n%s;", $1, $2);}
 	;
 
@@ -370,15 +401,21 @@ comp_multi_var_1:
 								comp_vars[numOfCompVars] = $2; numOfCompVars++;
 								}
 	;
-
+/*
 comp_function_blocks:
 	comp_function_block ';' {$$ = template("%s", $1);}
-	| comp_function_blocks comp_function_block ';' {$$ = template("%s \n%s", $1, $2);}
+	| comp_function_blocks comp_function_block ';' {$$ = template("%s\n%s", $1, $2);}
 	;
 
 comp_function_block:
-	KW_AND KW_BREAK KW_AND{$$ = template("gadsg");}
+	KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_ENDDEF {$$ = template("void %s(%s){\n%s\n}", $2, $4, $7);}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\n%s\nreturn;\n}", $2, $4, $7);}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\nreturn;\n}", $2, $4);}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\nreturn %s;\n}", $6, $2, $4, $9);}
 	;
+	
+*/
 
 const_declarations:
 	const_declaration ';' {$$ = template("%s;", $1);}
@@ -482,7 +519,7 @@ data_type:
 	| KW_STR {$$ = template("char*"); isComp = 0; isStr = 1;}
 	| KW_BOOLEAN  {$$ = template("int"); isComp = 0; isStr = 0;}
 	| TK_IDENT { isStr = 0;
-					if(find_comp($1) == 1){		//allow Comp data_type only if it is already declared 
+					if(find_comp($1, "comps") == 1){		//allow Comp data_type only if it is already declared 
 					isComp = 1;
 					$$ = template("%s", $1);
 					}else{
@@ -523,14 +560,28 @@ void replaceWord(char* str, char* oldWord, char* newWord)
 	}
 }
 
-int find_comp(char* compToSearch){
-	for(int i = 0; i< numOfComps; i++){
-		if(strcmp(compToSearch, comps[i]) == 0){
-			temp = compToSearch;
-			return 1;	//comp exists
+int find_comp(char* compToSearch, char* whereToSearch){
+	if(strcmp(whereToSearch, "comps") == 0){	//search in list of comps declared
+		for(int i = 0; i< numOfComps; i++){
+			if(strcmp(compToSearch, comps[i]) == 0){
+				temp = compToSearch;
+				return 1;	//comp exists
+			}
 		}
+		return 0; //comp does not exist
 	}
-	return 0; //comp does not exist
+	else if(strcmp(whereToSearch, "comp_vars") == 0){
+		for(int i = 0; i< numOfCompVars; i++){
+			if(strcmp(compToSearch, comp_vars[i]) == 0){
+				return 1;	//comp var exists
+			}
+		}
+		return 0; //comp does not exist
+	}
+	else{
+		yyerror("Unknown Comp / Comp variable");
+		return -1;
+	}
 }
 
 int main ()
