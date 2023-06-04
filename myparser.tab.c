@@ -78,7 +78,7 @@
 	#define MAX_CHARS_FOR_FUNCTIONS 3000	//number of characters permitted for .c functions being translated from .ka language 
 
 	char expression[100], toBeReplaced[100], replacer[100];		//for list comprehension
-	char comp_func_to_C[MAX_CHARS_FOR_FUNCTIONS];
+	char comp_func_to_C[MAX_CHARS_FOR_FUNCTIONS];			//used for struct functions
 	char* comps[MAX_COMPS];	//name of comp types will be stored here
 	char* comp_vars[MAX_COMP_VARS];	//name of comp variables will be stored here for each comp, during comp declaration. After that elements will be erased. 
 	char* temp;		//used to temporarily store name of a Comp(multiple var decl per line)
@@ -581,20 +581,20 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int16 yyrline[] =
 {
        0,   104,   104,   105,   106,   107,   108,   112,   113,   117,
-     118,   119,   123,   124,   125,   126,   131,   132,   136,   142,
-     143,   144,   145,   150,   151,   155,   156,   160,   161,   165,
-     166,   167,   172,   177,   178,   179,   180,   181,   182,   183,
-     184,   185,   186,   187,   188,   189,   190,   191,   192,   193,
-     194,   195,   196,   197,   198,   199,   200,   204,   205,   206,
-     207,   208,   214,   215,   219,   220,   221,   222,   223,   224,
-     225,   226,   227,   228,   229,   230,   231,   232,   233,   234,
-     238,   242,   246,   250,   254,   258,   265,   266,   267,   268,
-     269,   270,   277,   278,   282,   283,   284,   285,   289,   294,
-     308,   309,   313,   319,   323,   324,   329,   330,   334,   335,
-     336,   340,   349,   360,   369,   380,   392,   421,   422,   426,
-     427,   428,   429,   430,   431,   432,   433,   434,   439,   440,
-     444,   445,   449,   455,   456,   460,   461,   462,   466,   472,
-     481,   487,   496,   505,   517,   518,   519,   520,   521
+     118,   119,   123,   124,   125,   126,   131,   132,   136,   150,
+     151,   152,   153,   158,   159,   163,   164,   168,   169,   173,
+     174,   175,   180,   185,   186,   187,   188,   189,   190,   191,
+     192,   193,   194,   195,   196,   197,   198,   199,   200,   201,
+     202,   203,   204,   205,   206,   207,   208,   212,   213,   214,
+     215,   216,   222,   223,   227,   228,   229,   230,   231,   232,
+     233,   234,   235,   236,   237,   238,   239,   240,   241,   242,
+     246,   250,   254,   258,   262,   266,   273,   274,   275,   276,
+     277,   278,   285,   286,   290,   291,   292,   293,   297,   302,
+     316,   317,   321,   328,   332,   333,   338,   339,   343,   344,
+     345,   349,   358,   369,   378,   389,   401,   430,   431,   435,
+     436,   437,   438,   439,   440,   441,   442,   443,   448,   449,
+     453,   454,   458,   464,   465,   469,   470,   471,   475,   481,
+     490,   496,   505,   514,   526,   527,   528,   529,   530
 };
 #endif
 
@@ -1888,505 +1888,514 @@ yyreduce:
     break;
 
   case 18:
-#line 137 "myparser.y"
-                {if (insideCompDecl == 1){
+#line 136 "myparser.y"
+                                                                                     {
+		if (insideCompDecl == 1){
+			if(strcmp((yyvsp[-4].str), "") == 1)(yyval.str) = template("void (*%s)(SELF,%s);", (yyvsp[-6].str), (yyvsp[-4].str)); //empty parameters
+			else (yyval.str) = template("void (*%s)(SELF);", (yyvsp[-6].str));
+			strcpy(comp_func_to_C, "void ");
+			strcat(comp_func_to_C, (yyvsp[-6].str)); 
+			strcat(comp_func_to_C, "(SELF");
+			if(strcmp((yyvsp[-4].str), "") == 1) strcat(comp_func_to_C, ", ");	//empty parameters
+			strcat(comp_func_to_C, (yyvsp[-4].str)); strcat(comp_func_to_C, "){\n");
+			strcat(comp_func_to_C, (yyvsp[-1].str));   strcat(comp_func_to_C, "\n}");
 		}else{
 			(yyval.str) = template("void %s(%s){\n%s\n}", (yyvsp[-6].str), (yyvsp[-4].str), (yyvsp[-1].str));
 		}
-		}
-#line 1898 "myparser.tab.c"
+	}
+#line 1907 "myparser.tab.c"
     break;
 
   case 19:
-#line 142 "myparser.y"
+#line 150 "myparser.y"
                                                                                                      {(yyval.str) = template("void %s(%s){\n%s\nreturn;\n}", (yyvsp[-8].str), (yyvsp[-6].str), (yyvsp[-3].str));}
-#line 1904 "myparser.tab.c"
+#line 1913 "myparser.tab.c"
     break;
 
   case 20:
-#line 143 "myparser.y"
+#line 151 "myparser.y"
                                                                                    {(yyval.str) = template("void %s(%s){\nreturn;\n}", (yyvsp[-7].str), (yyvsp[-5].str));}
-#line 1910 "myparser.tab.c"
+#line 1919 "myparser.tab.c"
     break;
 
   case 21:
-#line 144 "myparser.y"
+#line 152 "myparser.y"
                                                                                                                                 {(yyval.str) = template("%s %s(%s){\n%s\nreturn %s;\n}", (yyvsp[-6].str), (yyvsp[-10].str), (yyvsp[-8].str), (yyvsp[-4].str), (yyvsp[-2].str));}
-#line 1916 "myparser.tab.c"
+#line 1925 "myparser.tab.c"
     break;
 
   case 22:
-#line 145 "myparser.y"
+#line 153 "myparser.y"
                                                                                                               {(yyval.str) = template("%s %s(%s){\nreturn %s;\n}", (yyvsp[-5].str), (yyvsp[-9].str), (yyvsp[-7].str), (yyvsp[-2].str));}
-#line 1922 "myparser.tab.c"
+#line 1931 "myparser.tab.c"
     break;
 
   case 23:
-#line 150 "myparser.y"
+#line 158 "myparser.y"
                                          {(yyval.str) = template("%s(%s)", (yyvsp[-3].str), (yyvsp[-1].str));}
-#line 1928 "myparser.tab.c"
+#line 1937 "myparser.tab.c"
     break;
 
   case 24:
-#line 151 "myparser.y"
+#line 159 "myparser.y"
                            {(yyval.str) = template("%s()", (yyvsp[-2].str));}
-#line 1934 "myparser.tab.c"
+#line 1943 "myparser.tab.c"
     break;
 
   case 25:
-#line 155 "myparser.y"
+#line 163 "myparser.y"
              {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 1940 "myparser.tab.c"
+#line 1949 "myparser.tab.c"
     break;
 
   case 26:
-#line 156 "myparser.y"
+#line 164 "myparser.y"
                                    {(yyval.str) = template("%s, %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 1946 "myparser.tab.c"
+#line 1955 "myparser.tab.c"
     break;
 
   case 27:
-#line 160 "myparser.y"
+#line 168 "myparser.y"
              {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 1952 "myparser.tab.c"
+#line 1961 "myparser.tab.c"
     break;
 
   case 28:
-#line 161 "myparser.y"
+#line 169 "myparser.y"
                           {(yyval.str) = template("%s \n%s", (yyvsp[-1].str), (yyvsp[0].str)); }
-#line 1958 "myparser.tab.c"
+#line 1967 "myparser.tab.c"
     break;
 
   case 31:
-#line 167 "myparser.y"
+#line 175 "myparser.y"
                         {
 				if( (insideCompDecl == 1) && (find_comp((yyvsp[0].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
 							yyerror("Comp variables are preceded by # ");
 				}else {(yyval.str) = template("%s", (yyvsp[0].str));}
 				}
-#line 1968 "myparser.tab.c"
+#line 1977 "myparser.tab.c"
     break;
 
   case 32:
-#line 172 "myparser.y"
+#line 180 "myparser.y"
                         {
 					if( (insideCompDecl == 1) && (find_comp((yyvsp[0].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
-							(yyval.str) = template("%s", (yyvsp[0].str));
+							(yyval.str) = template("self->%s", (yyvsp[0].str));
 					}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 					}
-#line 1978 "myparser.tab.c"
+#line 1987 "myparser.tab.c"
     break;
 
   case 34:
-#line 178 "myparser.y"
+#line 186 "myparser.y"
                         {(yyval.str) = template("0");}
-#line 1984 "myparser.tab.c"
+#line 1993 "myparser.tab.c"
     break;
 
   case 35:
-#line 179 "myparser.y"
+#line 187 "myparser.y"
                         {(yyval.str) = template("1");}
-#line 1990 "myparser.tab.c"
+#line 1999 "myparser.tab.c"
     break;
 
   case 36:
-#line 180 "myparser.y"
+#line 188 "myparser.y"
                           {(yyval.str) = template("%s || %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 1996 "myparser.tab.c"
+#line 2005 "myparser.tab.c"
     break;
 
   case 37:
-#line 181 "myparser.y"
+#line 189 "myparser.y"
                            {(yyval.str) = template("%s && %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2002 "myparser.tab.c"
+#line 2011 "myparser.tab.c"
     break;
 
   case 38:
-#line 182 "myparser.y"
+#line 190 "myparser.y"
                       {(yyval.str) = template("!%s", (yyvsp[0].str));}
-#line 2008 "myparser.tab.c"
+#line 2017 "myparser.tab.c"
     break;
 
   case 39:
-#line 183 "myparser.y"
+#line 191 "myparser.y"
                              {(yyval.str) = template("%s != %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2014 "myparser.tab.c"
+#line 2023 "myparser.tab.c"
     break;
 
   case 40:
-#line 184 "myparser.y"
+#line 192 "myparser.y"
                             {(yyval.str) = template("%s == %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2020 "myparser.tab.c"
+#line 2029 "myparser.tab.c"
     break;
 
   case 41:
-#line 185 "myparser.y"
+#line 193 "myparser.y"
                              {(yyval.str) = template("%s <= %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2026 "myparser.tab.c"
+#line 2035 "myparser.tab.c"
     break;
 
   case 42:
-#line 186 "myparser.y"
+#line 194 "myparser.y"
                              {(yyval.str) = template("%s >= %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2032 "myparser.tab.c"
+#line 2041 "myparser.tab.c"
     break;
 
   case 43:
-#line 187 "myparser.y"
+#line 195 "myparser.y"
                         {(yyval.str) = template("%s < %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2038 "myparser.tab.c"
+#line 2047 "myparser.tab.c"
     break;
 
   case 44:
-#line 188 "myparser.y"
+#line 196 "myparser.y"
                         {(yyval.str) = template("%s > %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2044 "myparser.tab.c"
+#line 2053 "myparser.tab.c"
     break;
 
   case 45:
-#line 189 "myparser.y"
+#line 197 "myparser.y"
                         {(yyval.str) = template("%s + %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2050 "myparser.tab.c"
+#line 2059 "myparser.tab.c"
     break;
 
   case 46:
-#line 190 "myparser.y"
+#line 198 "myparser.y"
                         {(yyval.str) = template("%s - %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2056 "myparser.tab.c"
+#line 2065 "myparser.tab.c"
     break;
 
   case 47:
-#line 191 "myparser.y"
+#line 199 "myparser.y"
                         {(yyval.str) = template("%s * %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2062 "myparser.tab.c"
+#line 2071 "myparser.tab.c"
     break;
 
   case 48:
-#line 192 "myparser.y"
+#line 200 "myparser.y"
                         {(yyval.str) = template("%s / %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2068 "myparser.tab.c"
+#line 2077 "myparser.tab.c"
     break;
 
   case 49:
-#line 193 "myparser.y"
+#line 201 "myparser.y"
                         {(yyval.str) = template("%s %% %s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2074 "myparser.tab.c"
+#line 2083 "myparser.tab.c"
     break;
 
   case 50:
-#line 194 "myparser.y"
+#line 202 "myparser.y"
                            {(yyval.str) = template("pow(%s, %s)", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2080 "myparser.tab.c"
+#line 2089 "myparser.tab.c"
     break;
 
   case 51:
-#line 195 "myparser.y"
+#line 203 "myparser.y"
                                 {(yyval.str) = template("- %s", (yyvsp[0].str));}
-#line 2086 "myparser.tab.c"
+#line 2095 "myparser.tab.c"
     break;
 
   case 52:
-#line 196 "myparser.y"
+#line 204 "myparser.y"
                                {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2092 "myparser.tab.c"
+#line 2101 "myparser.tab.c"
     break;
 
   case 53:
-#line 197 "myparser.y"
+#line 205 "myparser.y"
                        {(yyval.str) = template("(%s)", (yyvsp[-1].str));}
-#line 2098 "myparser.tab.c"
+#line 2107 "myparser.tab.c"
     break;
 
   case 54:
-#line 198 "myparser.y"
+#line 206 "myparser.y"
                                 {(yyval.str) = template("%s[%s]", (yyvsp[-3].str), (yyvsp[-1].str));}
-#line 2104 "myparser.tab.c"
+#line 2113 "myparser.tab.c"
     break;
 
   case 55:
-#line 199 "myparser.y"
+#line 207 "myparser.y"
                         {(yyval.str) = template("%s.%s", (yyvsp[-2].str), (yyvsp[0].str));}
-#line 2110 "myparser.tab.c"
+#line 2119 "myparser.tab.c"
     break;
 
   case 56:
-#line 200 "myparser.y"
+#line 208 "myparser.y"
                                  {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2116 "myparser.tab.c"
+#line 2125 "myparser.tab.c"
     break;
 
   case 57:
-#line 204 "myparser.y"
+#line 212 "myparser.y"
                                                        {(yyval.str) = template("%s\n%s\n%s",(yyvsp[-2].str), (yyvsp[-1].str), (yyvsp[0].str));}
-#line 2122 "myparser.tab.c"
+#line 2131 "myparser.tab.c"
     break;
 
   case 58:
-#line 205 "myparser.y"
+#line 213 "myparser.y"
                                                          {(yyval.str) = template("%s\n%s\n%s",(yyvsp[-2].str), (yyvsp[-1].str), (yyvsp[0].str));}
-#line 2128 "myparser.tab.c"
+#line 2137 "myparser.tab.c"
     break;
 
   case 59:
-#line 206 "myparser.y"
+#line 214 "myparser.y"
                      {(yyval.str) = template("%s",(yyvsp[0].str));}
-#line 2134 "myparser.tab.c"
+#line 2143 "myparser.tab.c"
     break;
 
   case 60:
-#line 207 "myparser.y"
+#line 215 "myparser.y"
                                       {(yyval.str) = template("%s\n%s",(yyvsp[-1].str), (yyvsp[0].str));}
-#line 2140 "myparser.tab.c"
+#line 2149 "myparser.tab.c"
     break;
 
   case 61:
-#line 208 "myparser.y"
+#line 216 "myparser.y"
                                         {(yyval.str) = template("%s\n%s",(yyvsp[-1].str), (yyvsp[0].str));}
-#line 2146 "myparser.tab.c"
+#line 2155 "myparser.tab.c"
     break;
 
   case 62:
-#line 214 "myparser.y"
+#line 222 "myparser.y"
                    { (yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2152 "myparser.tab.c"
+#line 2161 "myparser.tab.c"
     break;
 
   case 63:
-#line 215 "myparser.y"
+#line 223 "myparser.y"
                                { (yyval.str) = template("%s \n%s", (yyvsp[-1].str), (yyvsp[0].str)); }
-#line 2158 "myparser.tab.c"
+#line 2167 "myparser.tab.c"
     break;
 
   case 64:
-#line 219 "myparser.y"
+#line 227 "myparser.y"
                                       {(yyval.str) = template("%s = %s;",(yyvsp[-3].str), (yyvsp[-1].str));}
-#line 2164 "myparser.tab.c"
+#line 2173 "myparser.tab.c"
     break;
 
   case 65:
-#line 220 "myparser.y"
+#line 228 "myparser.y"
                                        {(yyval.str) = template("%s += %s;",(yyvsp[-3].str), (yyvsp[-1].str));}
-#line 2170 "myparser.tab.c"
+#line 2179 "myparser.tab.c"
     break;
 
   case 66:
-#line 221 "myparser.y"
+#line 229 "myparser.y"
                                        {(yyval.str) = template("%s -= %s;",(yyvsp[-3].str), (yyvsp[-1].str));}
-#line 2176 "myparser.tab.c"
+#line 2185 "myparser.tab.c"
     break;
 
   case 67:
-#line 222 "myparser.y"
+#line 230 "myparser.y"
                                        {(yyval.str) = template("%s *= %s;",(yyvsp[-3].str), (yyvsp[-1].str));}
-#line 2182 "myparser.tab.c"
+#line 2191 "myparser.tab.c"
     break;
 
   case 68:
-#line 223 "myparser.y"
+#line 231 "myparser.y"
                                        {(yyval.str) = template("%s %= %s;",(yyvsp[-3].str), (yyvsp[-1].str));}
-#line 2188 "myparser.tab.c"
+#line 2197 "myparser.tab.c"
     break;
 
   case 69:
-#line 224 "myparser.y"
+#line 232 "myparser.y"
                                        {(yyval.str) = template("%s /= %s;",(yyvsp[-3].str), (yyvsp[-1].str));}
-#line 2194 "myparser.tab.c"
+#line 2203 "myparser.tab.c"
     break;
 
   case 70:
-#line 225 "myparser.y"
+#line 233 "myparser.y"
                                        {(yyval.str) = template("%s := %s;",(yyvsp[-3].str), (yyvsp[-1].str));}
-#line 2200 "myparser.tab.c"
+#line 2209 "myparser.tab.c"
     break;
 
   case 71:
-#line 226 "myparser.y"
+#line 234 "myparser.y"
                            {(yyval.str) = template("%s",(yyvsp[-1].str));}
-#line 2206 "myparser.tab.c"
+#line 2215 "myparser.tab.c"
     break;
 
   case 72:
-#line 227 "myparser.y"
+#line 235 "myparser.y"
                             {(yyval.str) = template("%s",(yyvsp[-1].str));}
-#line 2212 "myparser.tab.c"
+#line 2221 "myparser.tab.c"
     break;
 
   case 73:
-#line 228 "myparser.y"
+#line 236 "myparser.y"
                               {(yyval.str) = template("%s",(yyvsp[-1].str));}
-#line 2218 "myparser.tab.c"
+#line 2227 "myparser.tab.c"
     break;
 
   case 74:
-#line 229 "myparser.y"
+#line 237 "myparser.y"
                        {(yyval.str) = template("break;");}
-#line 2224 "myparser.tab.c"
+#line 2233 "myparser.tab.c"
     break;
 
   case 75:
-#line 230 "myparser.y"
+#line 238 "myparser.y"
                           {(yyval.str) = template("continue;");}
-#line 2230 "myparser.tab.c"
+#line 2239 "myparser.tab.c"
     break;
 
   case 76:
-#line 231 "myparser.y"
+#line 239 "myparser.y"
                                      {(yyval.str) = template("%s;",(yyvsp[-1].str));}
-#line 2236 "myparser.tab.c"
+#line 2245 "myparser.tab.c"
     break;
 
   case 77:
-#line 232 "myparser.y"
+#line 240 "myparser.y"
                                        {(yyval.str) = template("%s;",(yyvsp[-1].str));}
-#line 2242 "myparser.tab.c"
+#line 2251 "myparser.tab.c"
     break;
 
   case 78:
-#line 233 "myparser.y"
+#line 241 "myparser.y"
                                    {(yyval.str) = template("%s;",(yyvsp[-1].str));}
-#line 2248 "myparser.tab.c"
+#line 2257 "myparser.tab.c"
     break;
 
   case 79:
-#line 234 "myparser.y"
+#line 242 "myparser.y"
               {(yyval.str) = template("");}
-#line 2254 "myparser.tab.c"
+#line 2263 "myparser.tab.c"
     break;
 
   case 80:
-#line 238 "myparser.y"
+#line 246 "myparser.y"
                  { if( (insideCompDecl == 1) && (find_comp((yyvsp[0].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
 			   		yyerror("Comp variables are preceded by # ");
 			   }else {(yyval.str) = template("%s", (yyvsp[0].str));}
 			 }
-#line 2263 "myparser.tab.c"
-    break;
-
-  case 81:
-#line 242 "myparser.y"
-                       { if( (insideCompDecl == 1) && (find_comp((yyvsp[0].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
-			   			(yyval.str) = template("%s", (yyvsp[0].str));
-			   		}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
-		 }
 #line 2272 "myparser.tab.c"
     break;
 
+  case 81:
+#line 250 "myparser.y"
+                       { if( (insideCompDecl == 1) && (find_comp((yyvsp[0].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+			   			(yyval.str) = template("self->%s", (yyvsp[0].str));
+			   		}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+		 }
+#line 2281 "myparser.tab.c"
+    break;
+
   case 82:
-#line 246 "myparser.y"
+#line 254 "myparser.y"
                                         { if( (insideCompDecl == 1) && (find_comp((yyvsp[-3].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
 										yyerror("Comp variables are preceded by # ");
 									}else {(yyval.str) = template("%s[%s]",(yyvsp[-3].str), (yyvsp[-1].str));}
 									}
-#line 2281 "myparser.tab.c"
-    break;
-
-  case 83:
-#line 250 "myparser.y"
-                                           {if( (insideCompDecl == 1) && (find_comp((yyvsp[-3].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
-											(yyval.str) = template("%s[%s]",(yyvsp[-3].str), (yyvsp[-1].str));
-										}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
-		}
 #line 2290 "myparser.tab.c"
     break;
 
-  case 84:
-#line 254 "myparser.y"
-                                    { if( (insideCompDecl == 1) && (find_comp((yyvsp[-3].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
-										yyerror("Comp variables are preceded by # ");
-									}else {(yyval.str) = template("%s[%s]",(yyvsp[-3].str), (yyvsp[-1].str));}
+  case 83:
+#line 258 "myparser.y"
+                                           {if( (insideCompDecl == 1) && (find_comp((yyvsp[-3].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+											(yyval.str) = template("self->%s[%s]",(yyvsp[-3].str), (yyvsp[-1].str));
+										}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		}
 #line 2299 "myparser.tab.c"
     break;
 
-  case 85:
-#line 258 "myparser.y"
-                                        {if( (insideCompDecl == 1) && (find_comp((yyvsp[-3].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
-											(yyval.str) = template("%s[%s]",(yyvsp[-3].str), (yyvsp[-1].str));
-									}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+  case 84:
+#line 262 "myparser.y"
+                                    { if( (insideCompDecl == 1) && (find_comp((yyvsp[-3].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+										yyerror("Comp variables are preceded by # ");
+									}else {(yyval.str) = template("%s[%s]",(yyvsp[-3].str), (yyvsp[-1].str));}
 		}
 #line 2308 "myparser.tab.c"
     break;
 
+  case 85:
+#line 266 "myparser.y"
+                                        {if( (insideCompDecl == 1) && (find_comp((yyvsp[-3].str), "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+											(yyval.str) = template("self->%s[%s]",(yyvsp[-3].str), (yyvsp[-1].str));
+									}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+		}
+#line 2317 "myparser.tab.c"
+    break;
+
   case 86:
-#line 265 "myparser.y"
+#line 273 "myparser.y"
                                                          {(yyval.str) = template("if(%s){\n%s\n}", (yyvsp[-4].str), (yyvsp[-1].str));}
-#line 2314 "myparser.tab.c"
+#line 2323 "myparser.tab.c"
     break;
 
   case 87:
-#line 266 "myparser.y"
+#line 274 "myparser.y"
                                                 {(yyval.str) = template("if(%s){\n}", (yyvsp[-3].str));}
-#line 2320 "myparser.tab.c"
+#line 2329 "myparser.tab.c"
     break;
 
   case 88:
-#line 267 "myparser.y"
+#line 275 "myparser.y"
                                                                                   {(yyval.str) = template("if(%s){\n%s\n}\nelse{\n%s\n}", (yyvsp[-7].str), (yyvsp[-4].str), (yyvsp[-1].str));}
-#line 2326 "myparser.tab.c"
+#line 2335 "myparser.tab.c"
     break;
 
   case 89:
-#line 268 "myparser.y"
+#line 276 "myparser.y"
                                                                         {(yyval.str) = template("if(%s){\n}\nelse{\n%s\n}", (yyvsp[-6].str), (yyvsp[-1].str));}
-#line 2332 "myparser.tab.c"
+#line 2341 "myparser.tab.c"
     break;
 
   case 90:
-#line 269 "myparser.y"
+#line 277 "myparser.y"
                                                                         {(yyval.str) = template("if(%s){\n%s\n}\nelse{\n}", (yyvsp[-6].str), (yyvsp[-3].str));}
-#line 2338 "myparser.tab.c"
+#line 2347 "myparser.tab.c"
     break;
 
   case 91:
-#line 270 "myparser.y"
+#line 278 "myparser.y"
                                                              {(yyval.str) = template("if(%s){\n}\nelse{\n}", (yyvsp[-5].str));}
-#line 2344 "myparser.tab.c"
+#line 2353 "myparser.tab.c"
     break;
 
   case 92:
-#line 277 "myparser.y"
+#line 285 "myparser.y"
                                                                {(yyval.str) = template("while(%s){\n%s\n}", (yyvsp[-4].str), (yyvsp[-1].str));}
-#line 2350 "myparser.tab.c"
+#line 2359 "myparser.tab.c"
     break;
 
   case 93:
-#line 278 "myparser.y"
+#line 286 "myparser.y"
                                                       {(yyval.str) = template("while(%s){\n}", (yyvsp[-3].str));}
-#line 2356 "myparser.tab.c"
+#line 2365 "myparser.tab.c"
     break;
 
   case 94:
-#line 282 "myparser.y"
+#line 290 "myparser.y"
                                                                                       {(yyval.str) = template("for (int %s=%s; %s<%s; %s+=%s){\n%s\n}", (yyvsp[-11].str), (yyvsp[-8].str), (yyvsp[-11].str), (yyvsp[-6].str), (yyvsp[-11].str), (yyvsp[-4].str), (yyvsp[-1].str));}
-#line 2362 "myparser.tab.c"
+#line 2371 "myparser.tab.c"
     break;
 
   case 95:
-#line 283 "myparser.y"
+#line 291 "myparser.y"
                                                                              {(yyval.str) = template("for (int %s=%s; %s<%s; %s+=%s){\n}", (yyvsp[-10].str), (yyvsp[-7].str), (yyvsp[-10].str), (yyvsp[-5].str), (yyvsp[-10].str), (yyvsp[-3].str));}
-#line 2368 "myparser.tab.c"
+#line 2377 "myparser.tab.c"
     break;
 
   case 96:
-#line 284 "myparser.y"
+#line 292 "myparser.y"
                                                                                {(yyval.str) = template("for (int %s=%s; %s<%s; %s++){\n%s\n}", (yyvsp[-9].str), (yyvsp[-6].str), (yyvsp[-9].str), (yyvsp[-4].str), (yyvsp[-9].str), (yyvsp[-1].str));}
-#line 2374 "myparser.tab.c"
+#line 2383 "myparser.tab.c"
     break;
 
   case 97:
-#line 285 "myparser.y"
+#line 293 "myparser.y"
                                                                     {(yyval.str) = template("for (int %s=%s; %s<%s; %s++){\n}", (yyvsp[-8].str), (yyvsp[-5].str), (yyvsp[-8].str), (yyvsp[-3].str), (yyvsp[-8].str));}
-#line 2380 "myparser.tab.c"
+#line 2389 "myparser.tab.c"
     break;
 
   case 98:
-#line 290 "myparser.y"
+#line 298 "myparser.y"
         {(yyval.str) = template("%s* %s = (%s*)malloc(%s * sizeof(%s));\nfor(int %s = 0; %s < %s; ++%s)\n%s[%s] = %s", (yyvsp[0].str), (yyvsp[-10].str), (yyvsp[0].str), (yyvsp[-3].str), (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-5].str), (yyvsp[-3].str), (yyvsp[-5].str), (yyvsp[-10].str), (yyvsp[-5].str), (yyvsp[-7].str));}
-#line 2386 "myparser.tab.c"
+#line 2395 "myparser.tab.c"
     break;
 
   case 99:
-#line 295 "myparser.y"
+#line 303 "myparser.y"
         {	strcpy(expression, (yyvsp[-11].str));
 		strcpy(toBeReplaced, (yyvsp[-9].str));
 		strcpy(replacer, (yyvsp[-5].str));
@@ -2397,77 +2406,77 @@ yyreduce:
 		replaceWord(expression, toBeReplaced, replacer);
 		(yyval.str) = template("%s* %s = (%s*)malloc(%s * sizeof(%s));\nfor(int %s_i = 0; %s_i < %s; ++%s_i)\n%s[%s_i] = %s", (yyvsp[0].str), (yyvsp[-14].str), (yyvsp[0].str), (yyvsp[-3].str), (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-5].str), (yyvsp[-3].str), (yyvsp[-5].str), (yyvsp[-14].str), (yyvsp[-5].str), expression);
 		}
-#line 2401 "myparser.tab.c"
+#line 2410 "myparser.tab.c"
     break;
 
   case 100:
-#line 308 "myparser.y"
+#line 316 "myparser.y"
                              {(yyval.str) = template("%s;", (yyvsp[-1].str));}
-#line 2407 "myparser.tab.c"
+#line 2416 "myparser.tab.c"
     break;
 
   case 101:
-#line 309 "myparser.y"
+#line 317 "myparser.y"
                                                  {(yyval.str) = template("%s \n%s;", (yyvsp[-2].str), (yyvsp[-1].str));}
-#line 2413 "myparser.tab.c"
+#line 2422 "myparser.tab.c"
     break;
 
   case 102:
-#line 313 "myparser.y"
-                                                                 {(yyval.str) = template("typedef struct %s{\n%s\n}%s", (yyvsp[-3].str), (yyvsp[-1].str), (yyvsp[-3].str)); comps[numOfComps] = (yyvsp[-3].str); numOfComps++;}
-#line 2419 "myparser.tab.c"
+#line 322 "myparser.y"
+        {(yyval.str) = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s",(yyvsp[-3].str), (yyvsp[-3].str), (yyvsp[-1].str), (yyvsp[-3].str)); comps[numOfComps] = (yyvsp[-3].str); numOfComps++; insideCompDecl = 0;}
+#line 2428 "myparser.tab.c"
     break;
 
   case 103:
-#line 319 "myparser.y"
+#line 328 "myparser.y"
                                               {(yyval.str) = template("%s\n%s", (yyvsp[-1].str), (yyvsp[0].str));}
-#line 2425 "myparser.tab.c"
+#line 2434 "myparser.tab.c"
     break;
 
   case 104:
-#line 323 "myparser.y"
+#line 332 "myparser.y"
                                  {(yyval.str) = template("%s;", (yyvsp[-1].str)); insideCompDecl = 1;}
-#line 2431 "myparser.tab.c"
+#line 2440 "myparser.tab.c"
     break;
 
   case 105:
-#line 324 "myparser.y"
+#line 333 "myparser.y"
                                                          { (yyval.str) = template("%s \n%s;", (yyvsp[-2].str), (yyvsp[-1].str));}
-#line 2437 "myparser.tab.c"
+#line 2446 "myparser.tab.c"
     break;
 
   case 106:
-#line 329 "myparser.y"
+#line 338 "myparser.y"
                     {(yyval.str) = template("%s", (yyvsp[0].str)); comp_vars[numOfCompVars] = comp_var_name; numOfCompVars++;}
-#line 2443 "myparser.tab.c"
+#line 2452 "myparser.tab.c"
     break;
 
   case 107:
-#line 330 "myparser.y"
+#line 339 "myparser.y"
                          {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2449 "myparser.tab.c"
+#line 2458 "myparser.tab.c"
     break;
 
   case 108:
-#line 334 "myparser.y"
+#line 343 "myparser.y"
                          {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2455 "myparser.tab.c"
+#line 2464 "myparser.tab.c"
     break;
 
   case 109:
-#line 335 "myparser.y"
+#line 344 "myparser.y"
                            {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2461 "myparser.tab.c"
+#line 2470 "myparser.tab.c"
     break;
 
   case 110:
-#line 336 "myparser.y"
+#line 345 "myparser.y"
                            {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2467 "myparser.tab.c"
+#line 2476 "myparser.tab.c"
     break;
 
   case 111:
-#line 340 "myparser.y"
+#line 349 "myparser.y"
                                                                     {	if(isStr == 1){
 																		(yyval.str) = template("%s* %s, **%s", (yyvsp[0].str), (yyvsp[-9].str), (yyvsp[-4].str));
 																	}
@@ -2477,11 +2486,11 @@ yyreduce:
 										comp_vars[numOfCompVars] = (yyvsp[-9].str); numOfCompVars++;
 										comp_vars[numOfCompVars] = (yyvsp[-4].str); numOfCompVars++;
 										}
-#line 2481 "myparser.tab.c"
+#line 2490 "myparser.tab.c"
     break;
 
   case 112:
-#line 349 "myparser.y"
+#line 358 "myparser.y"
                                                      {	if(isStr == 1){
 														(yyval.str) = template("%s, **%s", (yyvsp[0].str), (yyvsp[-4].str));
 													}
@@ -2490,11 +2499,11 @@ yyreduce:
 													}
 										comp_vars[numOfCompVars] = (yyvsp[-4].str); numOfCompVars++;
 										}
-#line 2494 "myparser.tab.c"
+#line 2503 "myparser.tab.c"
     break;
 
   case 113:
-#line 360 "myparser.y"
+#line 369 "myparser.y"
                                                                                             {if(isStr == 1){
 											(yyval.str) = template("%s %s[%s], *%s[%s]", (yyvsp[0].str), (yyvsp[-11].str), (yyvsp[-9].str), (yyvsp[-5].str), (yyvsp[-3].str));
 										}
@@ -2504,11 +2513,11 @@ yyreduce:
 										comp_vars[numOfCompVars] = (yyvsp[-11].str); numOfCompVars++;
 										comp_vars[numOfCompVars] = (yyvsp[-5].str); numOfCompVars++;
 										}
-#line 2508 "myparser.tab.c"
+#line 2517 "myparser.tab.c"
     break;
 
   case 114:
-#line 369 "myparser.y"
+#line 378 "myparser.y"
                                                                 {	if(isStr == 1){
 																	(yyval.str) = template("%s, *%s[%s]", (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-3].str));
 																}
@@ -2517,11 +2526,11 @@ yyreduce:
 																}
 								comp_vars[numOfCompVars] = (yyvsp[-5].str); numOfCompVars++;
 								}
-#line 2521 "myparser.tab.c"
+#line 2530 "myparser.tab.c"
     break;
 
   case 115:
-#line 380 "myparser.y"
+#line 389 "myparser.y"
                                                     {if (isStr == 1){
 											(yyval.str) = template("%s %s, *%s", (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-2].str));
 										}
@@ -2534,11 +2543,11 @@ yyreduce:
 										comp_vars[numOfCompVars] = (yyvsp[-5].str); numOfCompVars++;
 										comp_vars[numOfCompVars] = (yyvsp[-2].str); numOfCompVars++;
 										}
-#line 2538 "myparser.tab.c"
+#line 2547 "myparser.tab.c"
     break;
 
   case 116:
-#line 392 "myparser.y"
+#line 401 "myparser.y"
                                             {	if(isStr == 1){
 												(yyval.str) = template("%s, *%s", (yyvsp[0].str), (yyvsp[-2].str));
 											}
@@ -2550,186 +2559,186 @@ yyreduce:
 											}
 								comp_vars[numOfCompVars] = (yyvsp[-2].str); numOfCompVars++;
 								}
-#line 2554 "myparser.tab.c"
+#line 2563 "myparser.tab.c"
     break;
 
   case 117:
-#line 421 "myparser.y"
+#line 430 "myparser.y"
                               {(yyval.str) = template("%s;", (yyvsp[-1].str));}
-#line 2560 "myparser.tab.c"
+#line 2569 "myparser.tab.c"
     break;
 
   case 118:
-#line 422 "myparser.y"
+#line 431 "myparser.y"
                                                    {(yyval.str) = template("%s \n%s;", (yyvsp[-2].str), (yyvsp[-1].str));}
-#line 2566 "myparser.tab.c"
+#line 2575 "myparser.tab.c"
     break;
 
   case 119:
-#line 426 "myparser.y"
+#line 435 "myparser.y"
                                                           {(yyval.str) = template("const double %s = %s", (yyvsp[-4].str), (yyvsp[-2].str));}
-#line 2572 "myparser.tab.c"
+#line 2581 "myparser.tab.c"
     break;
 
   case 120:
-#line 427 "myparser.y"
+#line 436 "myparser.y"
                                                                 {(yyval.str) = template("const double %s = %s", (yyvsp[-5].str), (yyvsp[-2].str));}
-#line 2578 "myparser.tab.c"
+#line 2587 "myparser.tab.c"
     break;
 
   case 121:
-#line 428 "myparser.y"
+#line 437 "myparser.y"
                                                                 {(yyval.str) = template("const double %s = -%s", (yyvsp[-5].str), (yyvsp[-2].str));}
-#line 2584 "myparser.tab.c"
+#line 2593 "myparser.tab.c"
     break;
 
   case 122:
-#line 429 "myparser.y"
+#line 438 "myparser.y"
                                                                  {(yyval.str) = template("const int %s = %s", (yyvsp[-4].str), (yyvsp[-2].str));}
-#line 2590 "myparser.tab.c"
+#line 2599 "myparser.tab.c"
     break;
 
   case 123:
-#line 430 "myparser.y"
+#line 439 "myparser.y"
                                                                      {(yyval.str) = template("const int %s = %s", (yyvsp[-5].str), (yyvsp[-2].str));}
-#line 2596 "myparser.tab.c"
+#line 2605 "myparser.tab.c"
     break;
 
   case 124:
-#line 431 "myparser.y"
+#line 440 "myparser.y"
                                                                      {(yyval.str) = template("const int %s = -%s", (yyvsp[-5].str), (yyvsp[-2].str));}
-#line 2602 "myparser.tab.c"
+#line 2611 "myparser.tab.c"
     break;
 
   case 125:
-#line 432 "myparser.y"
+#line 441 "myparser.y"
                                                              {(yyval.str) = template("const char* %s = %s", (yyvsp[-4].str), (yyvsp[-2].str));}
-#line 2608 "myparser.tab.c"
+#line 2617 "myparser.tab.c"
     break;
 
   case 126:
-#line 433 "myparser.y"
+#line 442 "myparser.y"
                                                              {(yyval.str) = template("const int %s = 1", (yyvsp[-4].str));}
-#line 2614 "myparser.tab.c"
+#line 2623 "myparser.tab.c"
     break;
 
   case 127:
-#line 434 "myparser.y"
+#line 443 "myparser.y"
                                                               {(yyval.str) = template("const int %s = 0", (yyvsp[-4].str));}
-#line 2620 "myparser.tab.c"
+#line 2629 "myparser.tab.c"
     break;
 
   case 128:
-#line 439 "myparser.y"
+#line 448 "myparser.y"
                             {(yyval.str) = template("%s;", (yyvsp[-1].str));}
-#line 2626 "myparser.tab.c"
+#line 2635 "myparser.tab.c"
     break;
 
   case 129:
-#line 440 "myparser.y"
+#line 449 "myparser.y"
                                                { (yyval.str) = template("%s \n%s;", (yyvsp[-2].str), (yyvsp[-1].str));}
-#line 2632 "myparser.tab.c"
+#line 2641 "myparser.tab.c"
     break;
 
   case 130:
-#line 444 "myparser.y"
+#line 453 "myparser.y"
                 {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2638 "myparser.tab.c"
+#line 2647 "myparser.tab.c"
     break;
 
   case 131:
-#line 445 "myparser.y"
+#line 454 "myparser.y"
                     {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2644 "myparser.tab.c"
+#line 2653 "myparser.tab.c"
     break;
 
   case 132:
-#line 449 "myparser.y"
+#line 458 "myparser.y"
                                {if(isComp == 1){
 							(yyval.str) = template("%s %s = ctor_%s", (yyvsp[0].str), (yyvsp[-2].str), (yyvsp[0].str));
 							}else{
 							(yyval.str) = template("%s %s", (yyvsp[0].str), (yyvsp[-2].str));}
 							comp_var_name = (yyvsp[-2].str);	//maybe not a comp var, but i need it if it is
 							 }
-#line 2655 "myparser.tab.c"
+#line 2664 "myparser.tab.c"
     break;
 
   case 133:
-#line 455 "myparser.y"
+#line 464 "myparser.y"
                                                      {	(yyval.str) = template("%s %s[%s]", (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-3].str));	comp_var_name = (yyvsp[-5].str);}
-#line 2661 "myparser.tab.c"
+#line 2670 "myparser.tab.c"
     break;
 
   case 134:
-#line 456 "myparser.y"
+#line 465 "myparser.y"
                                          {(yyval.str) = template("%s* %s", (yyvsp[0].str), (yyvsp[-4].str)); comp_var_name = (yyvsp[-4].str);}
-#line 2667 "myparser.tab.c"
+#line 2676 "myparser.tab.c"
     break;
 
   case 135:
-#line 460 "myparser.y"
+#line 469 "myparser.y"
                     {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2673 "myparser.tab.c"
+#line 2682 "myparser.tab.c"
     break;
 
   case 136:
-#line 461 "myparser.y"
+#line 470 "myparser.y"
                       {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2679 "myparser.tab.c"
+#line 2688 "myparser.tab.c"
     break;
 
   case 137:
-#line 462 "myparser.y"
+#line 471 "myparser.y"
                       {(yyval.str) = template("%s", (yyvsp[0].str));}
-#line 2685 "myparser.tab.c"
+#line 2694 "myparser.tab.c"
     break;
 
   case 138:
-#line 466 "myparser.y"
+#line 475 "myparser.y"
                                                             {if(isStr == 1){
 											(yyval.str) = template("%s* %s, **%s", (yyvsp[0].str), (yyvsp[-8].str), (yyvsp[-4].str));
 										}
 										else{
 											(yyval.str) = template("%s* %s, *%s", (yyvsp[0].str), (yyvsp[-8].str), (yyvsp[-4].str));
 										}}
-#line 2696 "myparser.tab.c"
+#line 2705 "myparser.tab.c"
     break;
 
   case 139:
-#line 472 "myparser.y"
+#line 481 "myparser.y"
                                             {if(isStr == 1){
 											(yyval.str) = template("%s, **%s", (yyvsp[0].str), (yyvsp[-4].str));
 										}
 										else{
 											(yyval.str) = template("%s, *%s", (yyvsp[0].str), (yyvsp[-4].str));
 										}}
-#line 2707 "myparser.tab.c"
+#line 2716 "myparser.tab.c"
     break;
 
   case 140:
-#line 481 "myparser.y"
+#line 490 "myparser.y"
                                                                                     {if(isStr == 1){
 											(yyval.str) = template("%s %s[%s], *%s[%s]", (yyvsp[0].str), (yyvsp[-10].str), (yyvsp[-8].str), (yyvsp[-5].str), (yyvsp[-3].str));
 										}
 										else{
 											(yyval.str) = template("%s %s[%s], %s[%s]", (yyvsp[0].str), (yyvsp[-10].str), (yyvsp[-8].str), (yyvsp[-5].str), (yyvsp[-3].str));
 										}}
-#line 2718 "myparser.tab.c"
+#line 2727 "myparser.tab.c"
     break;
 
   case 141:
-#line 487 "myparser.y"
+#line 496 "myparser.y"
                                                                 {if(isStr == 1){
 									(yyval.str) = template("%s, *%s[%s]", (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-3].str));
 								}
 								else{
 									(yyval.str) = template("%s, %s[%s]", (yyvsp[0].str), (yyvsp[-5].str), (yyvsp[-3].str));
 								}}
-#line 2729 "myparser.tab.c"
+#line 2738 "myparser.tab.c"
     break;
 
   case 142:
-#line 496 "myparser.y"
+#line 505 "myparser.y"
                                             {if (isStr == 1){
 											(yyval.str) = template("%s %s, *%s", (yyvsp[0].str), (yyvsp[-4].str), (yyvsp[-2].str));
 										}
@@ -2739,11 +2748,11 @@ yyreduce:
 											}else
 											(yyval.str) = template("%s %s, %s", (yyvsp[0].str), (yyvsp[-4].str), (yyvsp[-2].str));
 										}}
-#line 2743 "myparser.tab.c"
+#line 2752 "myparser.tab.c"
     break;
 
   case 143:
-#line 505 "myparser.y"
+#line 514 "myparser.y"
                                         {if(isStr == 1){
 									(yyval.str) = template("%s, *%s", (yyvsp[0].str), (yyvsp[-2].str));
 								}
@@ -2753,35 +2762,35 @@ yyreduce:
 									}else
 									(yyval.str) = template("%s, %s", (yyvsp[0].str), (yyvsp[-2].str));
 								}}
-#line 2757 "myparser.tab.c"
+#line 2766 "myparser.tab.c"
     break;
 
   case 144:
-#line 517 "myparser.y"
+#line 526 "myparser.y"
                    {(yyval.str) = template("int"); isComp = 0; isStr = 0;}
-#line 2763 "myparser.tab.c"
+#line 2772 "myparser.tab.c"
     break;
 
   case 145:
-#line 518 "myparser.y"
+#line 527 "myparser.y"
                     {(yyval.str) = template("double"); isComp = 0; isStr = 0;}
-#line 2769 "myparser.tab.c"
+#line 2778 "myparser.tab.c"
     break;
 
   case 146:
-#line 519 "myparser.y"
+#line 528 "myparser.y"
                  {(yyval.str) = template("char*"); isComp = 0; isStr = 1;}
-#line 2775 "myparser.tab.c"
+#line 2784 "myparser.tab.c"
     break;
 
   case 147:
-#line 520 "myparser.y"
+#line 529 "myparser.y"
                       {(yyval.str) = template("int"); isComp = 0; isStr = 0;}
-#line 2781 "myparser.tab.c"
+#line 2790 "myparser.tab.c"
     break;
 
   case 148:
-#line 521 "myparser.y"
+#line 530 "myparser.y"
                    { isStr = 0;
 					if(find_comp((yyvsp[0].str), "comps") == 1){		//allow Comp data_type only if it is already declared 
 					isComp = 1;
@@ -2791,11 +2800,11 @@ yyreduce:
 					}
 
 				}
-#line 2795 "myparser.tab.c"
+#line 2804 "myparser.tab.c"
     break;
 
 
-#line 2799 "myparser.tab.c"
+#line 2808 "myparser.tab.c"
 
       default: break;
     }
@@ -3027,7 +3036,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 533 "myparser.y"
+#line 542 "myparser.y"
 
 void replaceWord(char* str, char* oldWord, char* newWord)
 {

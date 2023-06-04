@@ -5,19 +5,24 @@ comp City:
     #adyubd, #z, #x: str;
     #bla: scalar;
     #a : integer;
+
+    def bla(n: integer):
+        #a = 3;
+        #a  += #a * n;
+    enddef;
 endcomp;
 
-comp Adress:
-    #adyubd: boolean;
-    #bla[3], #x[4], #x[4]: str;
-    #a[], #b[], #x[] : str;
-endcomp;
+--comp Adress:
+--    #adyubd: boolean;
+--    #bla[3], #x[4], #x[4]: str;
+--    #a[], #b[], #x[] : str;
+--endcomp;
 
 const x = 3: integer;
 
 orderId: integer;
 def foo():
-
+;
 enddef;
 def main():
 

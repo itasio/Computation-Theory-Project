@@ -9,7 +9,7 @@
 	#define MAX_CHARS_FOR_FUNCTIONS 3000	//number of characters permitted for .c functions being translated from .ka language 
 
 	char expression[100], toBeReplaced[100], replacer[100];		//for list comprehension
-	char comp_func_to_C[MAX_CHARS_FOR_FUNCTIONS];
+	char comp_func_to_C[MAX_CHARS_FOR_FUNCTIONS];			//used for struct functions
 	char* comps[MAX_COMPS];	//name of comp types will be stored here
 	char* comp_vars[MAX_COMP_VARS];	//name of comp variables will be stored here for each comp, during comp declaration. After that elements will be erased. 
 	char* temp;		//used to temporarily store name of a Comp(multiple var decl per line)
@@ -84,7 +84,7 @@
 %type <str> statements listofexpr listofinstructions  main_block function_blocks function_return_type var_declarations const_declarations comp_declarations
 %type <str> statement if_statement while_statement for_statement expr data_type const_declaration var_declaration function_block one_var comp_declaration
 %type <str> multi_var multi_var_1 multi_var_2 multi_var_3 func_param_call function_param_decl function_call_no_assgn listof_comp_instructions comp_multi_var
-%type <str> fict_token listCompr_with_int_values listCompr_with_array comp_var_declarations comp_var_declaration comp_function_blocks comp_function_block
+%type <str> fict_token listCompr_with_int_values listCompr_with_array comp_var_declarations comp_var_declaration
 %type <str> comp_multi_var_1 comp_multi_var_2 comp_multi_var_3
 
 %right '=' TK_PLUEQ TK_MINEQ TK_MULEQ TK_DIVEQ TK_MODEQ TK_COLEQ
@@ -135,9 +135,14 @@ function_blocks:
 function_block:
 	KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_ENDDEF {
 		if (insideCompDecl == 1){
-			if(strcmp($4, "") == 1)$$ = template("void (*%s)(SELF,%s)", $2, $4);
-			else $$ = template("void (*%s)(SELF)", $2);
-			//strcat hgffuuyfgyuk
+			if(strcmp($4, "") == 1)$$ = template("void (*%s)(SELF,%s);", $2, $4); //empty parameters
+			else $$ = template("void (*%s)(SELF);", $2);
+			strcpy(comp_func_to_C, "void ");
+			strcat(comp_func_to_C, $2); 
+			strcat(comp_func_to_C, "(SELF");
+			if(strcmp($4, "") == 1) strcat(comp_func_to_C, ", ");	//empty parameters
+			strcat(comp_func_to_C, $4); strcat(comp_func_to_C, "){\n");
+			strcat(comp_func_to_C, $7);   strcat(comp_func_to_C, "\n}");
 		}else{
 			$$ = template("void %s(%s){\n%s\n}", $2, $4, $7);
 		}
@@ -314,7 +319,7 @@ comp_declarations:
 
 comp_declaration:
 	KW_COMP TK_IDENT ':' listof_comp_instructions KW_ENDCOMP 
-	{$$ = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s",$2, $2, $4, $2); comps[numOfComps] = $2; numOfComps++; insideCompDecl = 0;//todo reset comp_vars}
+	{$$ = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s",$2, $2, $4, $2); comps[numOfComps] = $2; numOfComps++; insideCompDecl = 0;}//todo reset comp_vars
 	;
 
 listof_comp_instructions:

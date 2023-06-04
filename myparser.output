@@ -1,9 +1,3 @@
-Nonterminals useless in grammar
-
-    comp_function_blocks
-    comp_function_block
-
-
 State 119 conflicts: 1 shift/reduce
 State 173 conflicts: 1 shift/reduce
 State 207 conflicts: 1 shift/reduce
