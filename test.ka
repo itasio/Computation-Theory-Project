@@ -20,11 +20,15 @@ comp City:
     enddef;
 endcomp;
 
---comp Adress:
---    #adyubd: boolean;
---    #bla[3], #x[4], #x[4]: str;
---    #a[], #b[], #x[] : str;
---endcomp;
+comp Adress:
+    #adyubd: boolean;
+    #bla[3], #x[4], #x[4]: str;
+    #a[], #b[], #x[] : str;
+
+    def lolo(i: str):
+       #adyubd = True;
+    enddef; 
+endcomp;
 
 const x = 3: integer;
 

@@ -141,12 +141,12 @@ function_block:
 		if (insideCompDecl == 1){
 			comp_funcs[numOfCompFuncs] = $2;
 			numOfCompFuncs ++;
-			if(strcmp($4, "") == 1)$$ = template("void (*%s)(SELF,%s);", $2, $4); 
-			else $$ = template("void (*%s)(SELF);", $2);		//empty parameters
+			if(strcmp($4, "") == 0) $$ = template("void (*%s)(SELF);", $2); //empty parameters 
+			else $$ = template("void (*%s)(SELF, %s);", $2, $4); 
 			strcat(comp_func_to_C, "void ");
 			strcat(comp_func_to_C, $2); 
-			strcat(comp_func_to_C, "(SELF ");
-			if(strcmp($4, "") == 1) strcat(comp_func_to_C, ", ");
+			strcat(comp_func_to_C, "(SELF");
+			if(strcmp($4, "") != 0) strcat(comp_func_to_C, ", ");	//if not empty parameters
 			strcat(comp_func_to_C, $4); strcat(comp_func_to_C, "){\n");
 			strcat(comp_func_to_C, $7);   strcat(comp_func_to_C, "\n}\n");
 		}else{
@@ -332,12 +332,21 @@ comp_declaration:
 			strcat(helper_comp_func, "=");
 			strcat(helper_comp_func, comp_funcs[i]);
 		}
-		$$ = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s;\n\n%s\n\nconst %s ctor_%s = {%s};\n#undef SELF",$2, $2, $4, $2, comp_func_to_C, $2, $2, helper_comp_func);
+		$$ = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s;\n\n%s\n\nconst %s ctor_%s = {%s};\n#undef SELF\n",$2, $2, $4, $2, comp_func_to_C, $2, $2, helper_comp_func);
 		comps[numOfComps] = $2;
 		numOfComps++;
 		insideCompDecl = 0;
+		for(int i=numOfCompVars; i>=0; i--){
+			comp_vars[i] = '\0';
+		}
+		numOfCompVars = 0;
+		for(int i=numOfCompFuncs; i>=0; i--){
+			comp_funcs[i] = '\0';
+		}
 		numOfCompFuncs = 0;
-	}//todo reset comp_vars, comp_func_to_C, helper_comp_func  κλπ
+		strcpy(comp_func_to_C, "\0");
+		strcpy(helper_comp_func, "\0");
+	}//todo reset char* comp_vars, char[] comp_func_to_C, char [] helper_comp_func  κλπ
 	;
 
 listof_comp_instructions:
