@@ -10,6 +10,7 @@ comp City:
         #a = 3;
         #a  += #a * n;
         #y = 3**2;
+        return;
     enddef;
 
     def koko():
@@ -17,6 +18,7 @@ comp City:
         yy = 3;
         #a  += #a * n;
         #y = #y**yy;
+        return;
     enddef;
 endcomp;
 
