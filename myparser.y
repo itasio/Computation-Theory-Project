@@ -4,19 +4,22 @@
 	#include <string.h>
 	#include <math.h>
   	#include "cgen.h"
-	#define MAX_COMPS 100 	//number of comp types permitted in ka language
+	#define MAX_COMPS 100 	//number of comp types / functions permitted in ka language
 	#define MAX_COMP_VARS 100 //number of variables permitted per comp in ka language
 	#define MAX_CHARS_FOR_FUNCTIONS 3000	//number of characters permitted for .c functions being translated from .ka language 
 
 	char expression[100], toBeReplaced[100], replacer[100];		//for list comprehension
-	char comp_func_to_C[MAX_CHARS_FOR_FUNCTIONS];			//used for struct functions
+	char comp_func_to_C[MAX_CHARS_FOR_FUNCTIONS];			//used for printinf struct functions after their declaration
 	char* comps[MAX_COMPS];	//name of comp types will be stored here
 	char* comp_vars[MAX_COMP_VARS];	//name of comp variables will be stored here for each comp, during comp declaration. After that elements will be erased. 
+	char* comp_funcs[MAX_COMP_VARS];	//name of comp functions will be stored here for each comp, during comp declaration. After that elements will be erased. 
 	char* temp;		//used to temporarily store name of a Comp(multiple var decl per line)
 	char* comp_var_name;		//used to temporarily store name of a Comp variable
 	
 	int insideCompDecl = 0;	//used to indicate that we are inside a comp declaration. For function comp variables handling inside functions
 	int numOfCompVars = 0; //num of variables per comp. Used in conjunction with comp_vars[MAX_COMP_VARS]
+	int numOfCompFuncs = 0; //num of functions per comp. Used in conjunction with comp_funcs[MAX_COMP_VARS]
+	
 	int isStr = 0;	//used for multiple variables declaration in one line
 	int numOfComps = 0;		//number of different Comp types declared in program
 	int isComp = 0; // used for Comp type variables
@@ -135,6 +138,8 @@ function_blocks:
 function_block:
 	KW_DEF TK_IDENT '(' function_param_decl ')' ':' listofinstructions KW_ENDDEF {
 		if (insideCompDecl == 1){
+			comp_funcs[numOfCompFuncs] = $2;
+			numOfCompFuncs ++;
 			if(strcmp($4, "") == 1)$$ = template("void (*%s)(SELF,%s);", $2, $4); //empty parameters
 			else $$ = template("void (*%s)(SELF);", $2);
 			strcpy(comp_func_to_C, "void ");
@@ -313,13 +318,18 @@ listCompr_with_array:
 	;
 
 comp_declarations:
-	comp_declaration ';' {$$ = template("%s;", $1);}
-	| comp_declarations comp_declaration ';' {$$ = template("%s \n%s;", $1, $2);}
+	comp_declaration ';' {$$ = template("%s", $1);}
+	| comp_declarations comp_declaration ';' {$$ = template("%s \n%s", $1, $2);}
 	;
 
 comp_declaration:
 	KW_COMP TK_IDENT ':' listof_comp_instructions KW_ENDCOMP 
-	{$$ = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s",$2, $2, $4, $2); comps[numOfComps] = $2; numOfComps++; insideCompDecl = 0;}//todo reset comp_vars
+	{$$ = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s;\n\n%s\n\nconst ",$2, $2, $4, $2, comp_func_to_C, );
+		comps[numOfComps] = $2;
+		numOfComps++;
+		insideCompDecl = 0;
+
+	}//todo reset comp_vars, comp_func_to_C, numOfCompFuncs  κλπ
 	;
 
 listof_comp_instructions:
