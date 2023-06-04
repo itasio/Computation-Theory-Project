@@ -3,12 +3,20 @@ comp City:
     #adyubd, #z, #x: scalar;
     #adyubd, #z, #x: boolean;
     #adyubd, #z, #x: str;
-    #bla: scalar;
+    #y: scalar;
     #a : integer;
 
     def bla(n: integer):
         #a = 3;
         #a  += #a * n;
+        #y = 3**2;
+    enddef;
+
+    def koko():
+        yy : integer;
+        yy = 3;
+        #a  += #a * n;
+        #y = #y**yy;
     enddef;
 endcomp;
 

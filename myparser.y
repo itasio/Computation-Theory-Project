@@ -10,6 +10,7 @@
 
 	char expression[100], toBeReplaced[100], replacer[100];		//for list comprehension
 	char comp_func_to_C[MAX_CHARS_FOR_FUNCTIONS];			//used for printinf struct functions after their declaration
+	char helper_comp_func[500];	//used to store self functions (ctor)
 	char* comps[MAX_COMPS];	//name of comp types will be stored here
 	char* comp_vars[MAX_COMP_VARS];	//name of comp variables will be stored here for each comp, during comp declaration. After that elements will be erased. 
 	char* comp_funcs[MAX_COMP_VARS];	//name of comp functions will be stored here for each comp, during comp declaration. After that elements will be erased. 
@@ -140,14 +141,14 @@ function_block:
 		if (insideCompDecl == 1){
 			comp_funcs[numOfCompFuncs] = $2;
 			numOfCompFuncs ++;
-			if(strcmp($4, "") == 1)$$ = template("void (*%s)(SELF,%s);", $2, $4); //empty parameters
-			else $$ = template("void (*%s)(SELF);", $2);
-			strcpy(comp_func_to_C, "void ");
+			if(strcmp($4, "") == 1)$$ = template("void (*%s)(SELF,%s);", $2, $4); 
+			else $$ = template("void (*%s)(SELF);", $2);		//empty parameters
+			strcat(comp_func_to_C, "void ");
 			strcat(comp_func_to_C, $2); 
-			strcat(comp_func_to_C, "(SELF");
-			if(strcmp($4, "") == 1) strcat(comp_func_to_C, ", ");	//empty parameters
+			strcat(comp_func_to_C, "(SELF ");
+			if(strcmp($4, "") == 1) strcat(comp_func_to_C, ", ");
 			strcat(comp_func_to_C, $4); strcat(comp_func_to_C, "){\n");
-			strcat(comp_func_to_C, $7);   strcat(comp_func_to_C, "\n}");
+			strcat(comp_func_to_C, $7);   strcat(comp_func_to_C, "\n}\n");
 		}else{
 			$$ = template("void %s(%s){\n%s\n}", $2, $4, $7);
 		}
@@ -324,12 +325,19 @@ comp_declarations:
 
 comp_declaration:
 	KW_COMP TK_IDENT ':' listof_comp_instructions KW_ENDCOMP 
-	{$$ = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s;\n\n%s\n\nconst ",$2, $2, $4, $2, comp_func_to_C, );
+	{	for(int i=0; i< numOfCompFuncs; i++){
+			if(i>0) strcat(helper_comp_func, ", ");
+			strcat(helper_comp_func, ".");
+			strcat(helper_comp_func, comp_funcs[i]);
+			strcat(helper_comp_func, "=");
+			strcat(helper_comp_func, comp_funcs[i]);
+		}
+		$$ = template("#define SELF struct %s *self\ntypedef struct %s{\n%s\n}%s;\n\n%s\n\nconst %s ctor_%s = {%s};\n#undef SELF",$2, $2, $4, $2, comp_func_to_C, $2, $2, helper_comp_func);
 		comps[numOfComps] = $2;
 		numOfComps++;
 		insideCompDecl = 0;
-
-	}//todo reset comp_vars, comp_func_to_C, numOfCompFuncs  κλπ
+		numOfCompFuncs = 0;
+	}//todo reset comp_vars, comp_func_to_C, helper_comp_func  κλπ
 	;
 
 listof_comp_instructions:
