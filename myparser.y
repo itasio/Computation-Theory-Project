@@ -276,7 +276,18 @@ expr:
 	| '-' expr %prec UMINUS {$$ = template("- %s", $2);}
 	| '+' expr %prec UPLUS {$$ = template("%s", $2);}
 	| '(' expr ')' {$$ = template("(%s)", $2);}
-	| TK_IDENT '[' expr ']' {$$ = template("%s[%s]", $1, $3);}
+	| TK_IDENT '[' expr ']' { 
+			if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+				yyerror("Comp variables are preceded by # ");
+			}else {$$ = template("%s[%s]", $1, $3);}
+		
+		}
+	| '#' TK_IDENT '[' expr ']' { 
+			if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+				$$ = template("self->%s[%s]", $2, $4);
+			}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+		
+		}
 	| expr '.' expr {$$ = template("%s.%s", $1, $3);}
 	| function_call_no_assgn {$$ = template("%s", $1);}
 	;
@@ -337,9 +348,17 @@ fict_token:
 										yyerror("Comp variables are preceded by # ");
 									}else {$$ = template("%s[%s]",$1, $3);}
 		}
-	| '#' TK_IDENT '[' TK_IDENT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
-											$$ = template("self->%s[%s]",$2, $4);
+	| '#' TK_IDENT '[' '#' TK_IDENT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) && (find_comp($5, "comp_vars"))){ //if inside comp declaration and tokens are member of comp then correct
+											$$ = template("self->%s[self->%s]",$2, $5);
 									}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+		}
+	| '#' TK_IDENT '[' TK_IDENT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) && (!find_comp($4, "comp_vars")) ){ //if inside comp declaration, 1st token is member of comp and 2nd isn't then correct
+											$$ = template("self->%s[%s]",$2, $4);
+									}else {yyerror("Comp variables inside comp declarations are preceded by # ");}
+		}
+	| TK_IDENT '[' '#' TK_IDENT ']' {if( (insideCompDecl == 1) && (!find_comp($1, "comp_vars")) && (find_comp($4, "comp_vars")) ){ //if inside comp declaration, 1st token not member of comp and 2nd is then correct
+											$$ = template("%s[self->%s]",$1, $4);
+									}else {yyerror("Comp variables inside comp declarations are preceded by # ");}
 		}
 	;
 
