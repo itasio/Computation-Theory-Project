@@ -167,12 +167,57 @@ function_block:
 			strcat(comp_func_to_C, $7);   strcat(comp_func_to_C, "\nreturn;\n}\n");
 		}else{
 			$$ = template("void %s(%s){\n%s\nreturn;\n}", $2, $4, $7);
-		}
-		
+		}	
 	}
-	| KW_DEF TK_IDENT '(' function_param_decl ')' ':'  KW_RETURN ';' KW_ENDDEF {$$ = template("void %s(%s){\nreturn;\n}", $2, $4);}
-	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);}
-	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':'  KW_RETURN  expr ';' KW_ENDDEF {$$ = template("%s %s(%s){\nreturn %s;\n}", $6, $2, $4, $9);}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' ':'  KW_RETURN ';' KW_ENDDEF {
+		if (insideCompDecl == 1){
+			comp_funcs[numOfCompFuncs] = $2;
+			numOfCompFuncs ++;
+			if(strcmp($4, "") == 0) $$ = template("void (*%s)(SELF);", $2); //empty parameters 
+			else $$ = template("void (*%s)(SELF, %s);", $2, $4); 
+			strcat(comp_func_to_C, "void ");
+			strcat(comp_func_to_C, $2); 
+			strcat(comp_func_to_C, "(SELF");
+			if(strcmp($4, "") != 0) strcat(comp_func_to_C, ", ");	//if not empty parameters
+			strcat(comp_func_to_C, $4); strcat(comp_func_to_C, "){\n");
+			strcat(comp_func_to_C, "return;\n}\n");
+		}else{
+			$$ = template("void %s(%s){\nreturn;\n}", $2, $4);
+		}
+	}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':' listofinstructions KW_RETURN  expr ';' KW_ENDDEF {
+		if (insideCompDecl == 1){
+			comp_funcs[numOfCompFuncs] = $2;
+			numOfCompFuncs ++;
+			if(strcmp($4, "") == 0) $$ = template("%s (*%s)(SELF);", $6, $2); //empty parameters 
+			else $$ = template("%s (*%s)(SELF, %s);", $6, $2, $4); 
+			strcat(comp_func_to_C, $6); strcat(comp_func_to_C, " ");
+			strcat(comp_func_to_C, $2); 
+			strcat(comp_func_to_C, "(SELF");
+			if(strcmp($4, "") != 0) strcat(comp_func_to_C, ", ");	//if not empty parameters
+			strcat(comp_func_to_C, $4); strcat(comp_func_to_C, "){\n");
+			strcat(comp_func_to_C, $8);
+			strcat(comp_func_to_C, "\nreturn "); strcat(comp_func_to_C, $10); strcat(comp_func_to_C, ";\n}");
+		}else{
+			$$ = template("%s %s(%s){\n%s\nreturn %s;\n}", $6, $2, $4, $8, $10);
+		}
+	}
+	| KW_DEF TK_IDENT '(' function_param_decl ')' function_return_type ':'  KW_RETURN  expr ';' KW_ENDDEF {
+		if (insideCompDecl == 1){
+			comp_funcs[numOfCompFuncs] = $2;
+			numOfCompFuncs ++;
+			if(strcmp($4, "") == 0) $$ = template("%s (*%s)(SELF);", $6, $2); //empty parameters 
+			else $$ = template("%s (*%s)(SELF, %s);", $6, $2, $4); 
+			strcat(comp_func_to_C, $6); strcat(comp_func_to_C, " ");
+			strcat(comp_func_to_C, $2); 
+			strcat(comp_func_to_C, "(SELF");
+			if(strcmp($4, "") != 0) strcat(comp_func_to_C, ", ");	//if not empty parameters
+			strcat(comp_func_to_C, $4); strcat(comp_func_to_C, "){\n");
+			strcat(comp_func_to_C, "return "); strcat(comp_func_to_C, $9); strcat(comp_func_to_C, ";\n}");
+		}else{
+			$$ = template("%s %s(%s){\nreturn %s;\n}", $6, $2, $4, $9);
+		}
+	}
 	;
 
 

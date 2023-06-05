@@ -6,7 +6,7 @@ comp City:
     #y: scalar;
     #a : integer;
 
-    def bla(n: integer):
+    def bla(t : scalar, j: integer, directions[]: str):
         #a = 3;
         #a  += #a * n;
         #y = 3**2;
@@ -20,6 +20,10 @@ comp City:
         #y = #y**yy;
         return;
     enddef;
+    def lili(t : scalar, j: integer, directions[]: str)->scalar:
+        return #x + (#z**#x);
+    enddef;
+
 endcomp;
 
 comp Adress:
