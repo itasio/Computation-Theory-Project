@@ -107,8 +107,14 @@
 program:
 	main_block 																			{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n", $1);}}
 	| function_blocks main_block  														{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
+	| var_declarations main_block  														{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
+	| const_declarations main_block  													{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
+	| comp_declarations main_block  													{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s", $1, $2);}}
+	| const_declarations function_blocks main_block 									{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s", $1, $2, $3);}}
+	| comp_declarations function_blocks main_block 										{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s", $1, $2, $3);}}
 	| var_declarations function_blocks main_block 										{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s", $1, $2, $3);}}
 	| const_declarations var_declarations function_blocks main_block					{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s", $1, $2, $3, $4);}}
+	| comp_declarations var_declarations function_blocks main_block						{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s", $1, $2, $3, $4);}}
 	| comp_declarations const_declarations var_declarations function_blocks main_block	{if (yyerror_count == 0) {puts(c_prologue); printf("%s\n%s\n%s\n%s\n%s", $1, $2, $3, $4, $5);}}
 	;
 
@@ -124,11 +130,11 @@ function_param_decl:
 	;
 
 function_return_type:
-	TK_FUNC_RET KW_INTEGER {$$ = template("int");}
-	| TK_FUNC_RET KW_SCALAR {$$ = template("double");}
-	| TK_FUNC_RET KW_STR {$$ = template("char*");}
-	| TK_FUNC_RET KW_BOOLEAN  {$$ = template("int");}
-	//| "->" KW_COMP ????????????todo
+	TK_FUNC_RET data_type {$$ = template("%s", $2);}
+	//| TK_FUNC_RET KW_SCALAR {$$ = template("double");}
+	//| TK_FUNC_RET KW_STR {$$ = template("char*");}
+	//| TK_FUNC_RET KW_BOOLEAN  {$$ = template("int");}
+	//| TK_FUNC_RET TK_IDENT 
 	;
 
 function_blocks:
@@ -298,12 +304,13 @@ statement:
 	| fict_token TK_MODEQ expr ';' {$$ = template("%s %= %s;",$1, $3);}
 	| fict_token TK_DIVEQ expr ';' {$$ = template("%s /= %s;",$1, $3);}
 	| fict_token TK_COLEQ expr ';' {$$ = template("%s := %s;",$1, $3);}
+	| fict_token '.' function_call_no_assgn ';' {$$ = template("%s.%s;",$1, $3);}
+	| function_call_no_assgn ';' {$$ = template("%s;",$1);}
 	| if_statement ';' {$$ = template("%s",$1);}
 	| for_statement ';' {$$ = template("%s",$1);}
 	| while_statement ';' {$$ = template("%s",$1);}
 	| KW_BREAK ';' {$$ = template("break;");}
 	| KW_CONTINUE ';' {$$ = template("continue;");}
-	| function_call_no_assgn ';' {$$ = template("%s;",$1);}
 	| listCompr_with_int_values ';'{$$ = template("%s;",$1);}
 	| listCompr_with_array ';' {$$ = template("%s;",$1);}
 	| ';' {$$ = template("");}
@@ -407,7 +414,7 @@ comp_declaration:
 		numOfCompFuncs = 0;
 		strcpy(comp_func_to_C, "\0");
 		strcpy(helper_comp_func, "\0");
-	}//todo reset char* comp_vars, char[] comp_func_to_C, char [] helper_comp_func  κλπ
+	}
 	;
 
 listof_comp_instructions:

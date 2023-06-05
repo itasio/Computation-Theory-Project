@@ -39,11 +39,20 @@ endcomp;
 const x = 3: integer;
 
 orderId: integer;
+
+def createAddress(s: str, n: integer, c: str)-> Adress:
+  a, a2: Adress;
+    x = 3;
+  setAddress(s, n, c); 
+  hgfl = setAddress(s, n, c);    
+  a.setAddress(s, n, c); 
+  hgfl = a.setAddress(s, n, c).b(); 
+  return a;
+enddef;
+
 def foo():
 ;
 enddef;
 def main():
 
 enddef;
-
-
