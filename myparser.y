@@ -266,12 +266,13 @@ expr:
 	| '#' TK_IDENT 	{
 					if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
 							$$ = template("self->%s", $2);
-					}else if ((insideCompDecl == 1) && (find_comp($2, "all_comp_vars"))){
+					}else if (/*(insideCompDecl == 1) &&*/ (find_comp($2, "all_comp_vars"))){
 						//first if stmt will catch variables that belong to current
 						//comp declaration
 						//this if stmt will catch vars that belong to other comps
 						$$ = template("%s", $2);
 					}
+
 					else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 					}
 	| TK_CONSTSTR
@@ -341,6 +342,7 @@ statement:
 	| fict_token TK_DIVEQ expr ';' {$$ = template("%s /= %s;",$1, $3);}
 	| fict_token TK_COLEQ expr ';' {$$ = template("%s := %s;",$1, $3);}
 	| fict_token '.' function_call_no_assgn ';' {$$ = template("%s.%s;",$1, $3);}
+	| fict_token '.' expr '=' listofexpr ';' {$$ = template("%s.%s = %s;",$1, $3, $5);}
 	| function_call_no_assgn ';' {$$ = template("%s;",$1);}
 	| if_statement ';' {$$ = template("%s",$1);}
 	| for_statement ';' {$$ = template("%s",$1);}
@@ -359,8 +361,13 @@ fict_token:
 			 }
 	| '#' TK_IDENT { if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
 			   			$$ = template("self->%s", $2);
-						
-			   		}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+			   		}//else if(find_comp($2, "all_comp_vars")){	
+					//	//first if stmt will catch variables that belong to current
+					//	//comp declaration
+					//	//this if stmt will catch vars that belong to other comps 
+					//	$$ = template("%s", $2);
+					//}
+					else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		 }
 	| TK_IDENT '[' TK_CONSTINT ']' 	{ if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
 										yyerror("Comp variables are preceded by # ");
@@ -386,6 +393,13 @@ fict_token:
 											$$ = template("%s[self->%s]",$1, $4);
 									}else {yyerror("Comp variables inside comp declarations are preceded by # ");}
 		}
+	//| TK_IDENT '.' fict_token {
+	//		$$ = template("%s.%s",$1, $3);
+	//	}
+	//| TK_IDENT '.' '#' TK_IDENT{if((insideCompDecl == 0) && (find_comp($4, "all_comp_vars"))){
+	//							$$ = template("%s.%s",$1, $4);
+	//							}else{yyerror("Comp variables that are not members of comp are not preceded by # ");}
+	//	}
 	;
 
 if_statement:

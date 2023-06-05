@@ -152,18 +152,19 @@ def createBookstore(n: str)->Bookstore:
 enddef;
 
 def main():
+  ord : Order;
+  a, a1: Address;
+  author: Person;
+  b: Book;
+  bs: Bookstore;
   orderId = 0;
 
-  a, a1: Address;
   a = createAddress("Stadiou", 10, "Stadiou");  
 
-  author: Person;
   author = createPerson("Christos","Papadimitriou","cpap@gmail.com", 12345, a);   
 
-  b: Book;
   b = createBook("Computation Theory", author, 34.3, 100);
   
-  bs: Bookstore;
   bs = createBookstore("Papasotiriou");
   
   bs.addBook(b);
@@ -175,7 +176,6 @@ def main():
 
   bs.printBookStoreBooks();
 
-  ord : Order;
   ord = createOrder(orderId, b, 2, a, False );  
   orderId +=  1;
   
