@@ -18,6 +18,7 @@
 	char* all_comp_funcs[MAX_COMP_VARS];	//name of all comp functions declared in .ka program
 	char* temp;		//used to temporarily store name of a Comp(multiple var decl per line)
 	char* comp_var_name;		//used to temporarily store name of a Comp variable
+	char comp_func_name[500];		//used to temporarily store name of a Comp function (for function call(&..., ))
 	
 	int insideCompDecl = 0;	//used to indicate that we are inside a comp declaration. For function comp variables handling inside functions
 	int numOfCompVars = 0; //num of variables per comp. Used in conjunction with comp_vars[MAX_COMP_VARS]
@@ -30,7 +31,7 @@
 	
 	void replaceWord(char* str, char* oldWord, char* newWord);
 	extern int yylex(void);
-	int find_comp(char* compToSearch, char* whereToSearch);
+	int find_in_comps(char* whatToSearch, char* whereToSearch);
 
 
 %}
@@ -134,10 +135,6 @@ function_param_decl:
 
 function_return_type:
 	TK_FUNC_RET data_type {$$ = template("%s", $2);}
-	//| TK_FUNC_RET KW_SCALAR {$$ = template("double");}
-	//| TK_FUNC_RET KW_STR {$$ = template("char*");}
-	//| TK_FUNC_RET KW_BOOLEAN  {$$ = template("int");}
-	//| TK_FUNC_RET TK_IDENT 
 	;
 
 function_blocks:
@@ -241,8 +238,22 @@ function_block:
 
 
 function_call_no_assgn:
-	TK_IDENT '(' func_param_call ')' {$$ = template("%s(%s)", $1, $3);}
-	| TK_IDENT '(' ')' {$$ = template("%s()", $1);}
+	TK_IDENT '(' func_param_call ')' {
+		if(find_in_comps($1, "all_comp_funcs")){	// function member of comp 
+			$$ = template("%s(&%s, %s)", $1, comp_func_name, $3);
+		}else{
+			$$ = template("%s(%s)", $1, $3);
+		}
+	}
+	| TK_IDENT '(' ')' {
+		if(find_in_comps($1, "all_comp_funcs")){	// function member of comp
+			$$ = template("%s(&%s)", $1, comp_func_name);
+		}
+		else{
+			$$ = template("%s()", $1);
+		}
+	
+	}
 	;
 
 func_param_call:
@@ -259,14 +270,14 @@ expr:
 	TK_CONSTINT
 	| TK_CONSTFLOAT
 	| TK_IDENT	{
-				if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+				if( (insideCompDecl == 1) && (find_in_comps($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
 							yyerror("Comp variables are preceded by # ");
 				}else {$$ = template("%s", $1);}
 				}
 	| '#' TK_IDENT 	{
-					if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+					if( (insideCompDecl == 1) && (find_in_comps($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
 							$$ = template("self->%s", $2);
-					}else if (/*(insideCompDecl == 1) &&*/ (find_comp($2, "all_comp_vars"))){
+					}else if (/*(insideCompDecl == 1) &&*/ (find_in_comps($2, "all_comp_vars"))){
 						//first if stmt will catch variables that belong to current
 						//comp declaration
 						//this if stmt will catch vars that belong to other comps
@@ -297,15 +308,15 @@ expr:
 	| '+' expr %prec UPLUS {$$ = template("%s", $2);}
 	| '(' expr ')' {$$ = template("(%s)", $2);}
 	| TK_IDENT '[' expr ']' { 
-			if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+			if( (insideCompDecl == 1) && (find_in_comps($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
 				yyerror("Comp variables are preceded by # ");
 			}else {$$ = template("%s[%s]", $1, $3);}
 		
 		}
 	| '#' TK_IDENT '[' expr ']' { 
-			if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+			if( (insideCompDecl == 1) && (find_in_comps($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
 				$$ = template("self->%s[%s]", $2, $4);
-			}else if ((insideCompDecl == 1) && (find_comp($2, "all_comp_vars"))){
+			}else if ((insideCompDecl == 1) && (find_in_comps($2, "all_comp_vars"))){
 				//first if stmt will catch variables that belong to current
 				//comp declaration
 				//this if stmt will catch vars that belong to other comps
@@ -355,13 +366,20 @@ statement:
 	;
 
 fict_token:
-	TK_IDENT { if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+	TK_IDENT { if( (insideCompDecl == 1) && (find_in_comps($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
 			   		yyerror("Comp variables are preceded by # ");
-			   }else {$$ = template("%s", $1);}
+			   }else {
+					$$ = template("%s", $1);
+					strcpy(comp_func_name, "\0");	
+			   		strcat(comp_func_name, $1);		//store it in case of x.foo(&x)
+				}	
 			 }
-	| '#' TK_IDENT { if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+	| '#' TK_IDENT { if( (insideCompDecl == 1) && (find_in_comps($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
 			   			$$ = template("self->%s", $2);
-			   		}//else if(find_comp($2, "all_comp_vars")){	
+						strcpy(comp_func_name, "\0");
+						strcat(comp_func_name, "self->");	//store it in case of x.foo(&x)
+						strcat(comp_func_name, $2);	
+			   		}//else if(find_in_comps($2, "all_comp_vars")){	
 					//	//first if stmt will catch variables that belong to current
 					//	//comp declaration
 					//	//this if stmt will catch vars that belong to other comps 
@@ -369,37 +387,49 @@ fict_token:
 					//}
 					else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		 }
-	| TK_IDENT '[' TK_CONSTINT ']' 	{ if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+	| TK_IDENT '[' TK_CONSTINT ']' 	{ if( (insideCompDecl == 1) && (find_in_comps($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
 										yyerror("Comp variables are preceded by # ");
 									}else {$$ = template("%s[%s]",$1, $3);}
 									}
-	| '#' TK_IDENT '[' TK_CONSTINT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
+	| '#' TK_IDENT '[' TK_CONSTINT ']' {if( (insideCompDecl == 1) && (find_in_comps($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
 											$$ = template("self->%s[%s]",$2, $4);
+											strcpy(comp_func_name, "\0");
+											strcat(comp_func_name, "self->");	//store it in case of #listOfBooks[3].foo()
+											strcat(comp_func_name, $2);
+											strcat(comp_func_name, "[");
+											strcat(comp_func_name, $4);
+											strcat(comp_func_name, "]");
 										}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		}
-	| TK_IDENT '[' TK_IDENT ']' { if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
+	| TK_IDENT '[' TK_IDENT ']' { if( (insideCompDecl == 1) && (find_in_comps($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
 										yyerror("Comp variables are preceded by # ");
 									}else {$$ = template("%s[%s]",$1, $3);}
 		}
-	| '#' TK_IDENT '[' '#' TK_IDENT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) && (find_comp($5, "comp_vars"))){ //if inside comp declaration and tokens are member of comp then correct
+	| '#' TK_IDENT '[' '#' TK_IDENT ']' {if( (insideCompDecl == 1) && (find_in_comps($2, "comp_vars")) && (find_in_comps($5, "comp_vars"))){ //if inside comp declaration and tokens are member of comp then correct
 											$$ = template("self->%s[self->%s]",$2, $5);
+											strcpy(comp_func_name, "\0");
+											strcat(comp_func_name, "self->");	//store it in case of #listOfBooks[i].foo()
+											strcat(comp_func_name, $2);
+											strcat(comp_func_name, "[");
+											strcat(comp_func_name, "self->");
+											strcat(comp_func_name, $5);
+											strcat(comp_func_name, "]");
 									}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		}
-	| '#' TK_IDENT '[' TK_IDENT ']' {if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) && (!find_comp($4, "comp_vars")) ){ //if inside comp declaration, 1st token is member of comp and 2nd isn't then correct
+	| '#' TK_IDENT '[' TK_IDENT ']' {if( (insideCompDecl == 1) && (find_in_comps($2, "comp_vars")) && (!find_in_comps($4, "comp_vars")) ){ //if inside comp declaration, 1st token is member of comp and 2nd isn't then correct
 											$$ = template("self->%s[%s]",$2, $4);
+											strcpy(comp_func_name, "\0");
+											strcat(comp_func_name, "self->");	//store it in case of #listOfBooks[i].foo()
+											strcat(comp_func_name, $2);
+											strcat(comp_func_name, "[");
+											strcat(comp_func_name, $4);
+											strcat(comp_func_name, "]");
 									}else {yyerror("Comp variables inside comp declarations are preceded by # ");}
 		}
-	| TK_IDENT '[' '#' TK_IDENT ']' {if( (insideCompDecl == 1) && (!find_comp($1, "comp_vars")) && (find_comp($4, "comp_vars")) ){ //if inside comp declaration, 1st token not member of comp and 2nd is then correct
+	| TK_IDENT '[' '#' TK_IDENT ']' {if( (insideCompDecl == 1) && (!find_in_comps($1, "comp_vars")) && (find_in_comps($4, "comp_vars")) ){ //if inside comp declaration, 1st token not member of comp and 2nd is then correct
 											$$ = template("%s[self->%s]",$1, $4);
 									}else {yyerror("Comp variables inside comp declarations are preceded by # ");}
 		}
-	//| TK_IDENT '.' fict_token {
-	//		$$ = template("%s.%s",$1, $3);
-	//	}
-	//| TK_IDENT '.' '#' TK_IDENT{if((insideCompDecl == 0) && (find_comp($4, "all_comp_vars"))){
-	//							$$ = template("%s.%s",$1, $4);
-	//							}else{yyerror("Comp variables that are not members of comp are not preceded by # ");}
-	//	}
 	;
 
 if_statement:
@@ -694,7 +724,7 @@ data_type:
 	| KW_STR {$$ = template("char*"); isComp = 0; isStr = 1;}
 	| KW_BOOLEAN  {$$ = template("int"); isComp = 0; isStr = 0;}
 	| TK_IDENT { isStr = 0;
-					if(find_comp($1, "comps") == 1){		//allow Comp data_type only if it is already declared 
+					if(find_in_comps($1, "comps") == 1){		//allow Comp data_type only if it is already declared 
 					isComp = 1;
 					$$ = template("%s", $1);
 					}else{
@@ -735,31 +765,39 @@ void replaceWord(char* str, char* oldWord, char* newWord)
 	}
 }
 
-int find_comp(char* compToSearch, char* whereToSearch){
-	if(strcmp(whereToSearch, "comps") == 0){	//search in list of comps declared
+int find_in_comps(char* whatToSearch, char* whereToSearch){
+	if(strcmp(whereToSearch, "comps") == 0){	//search in list of all comps declared
 		for(int i = 0; i< numOfComps; i++){
-			if(strcmp(compToSearch, comps[i]) == 0){
-				temp = compToSearch;
+			if(strcmp(whatToSearch, comps[i]) == 0){
+				temp = whatToSearch;
 				return 1;	//comp exists
 			}
 		}
 		return 0; //comp does not exist
 	}
-	else if(strcmp(whereToSearch, "comp_vars") == 0){
+	else if(strcmp(whereToSearch, "comp_vars") == 0){	//search in list of all vars in comp now being declared
 		for(int i = 0; i< numOfCompVars; i++){
-			if(strcmp(compToSearch, comp_vars[i]) == 0){
+			if(strcmp(whatToSearch, comp_vars[i]) == 0){
 				return 1;	//comp var exists
 			}
 		}
 		return 0; //comp var does not exist
 	}
-	else if(strcmp(whereToSearch, "all_comp_vars") == 0){
+	else if(strcmp(whereToSearch, "all_comp_vars") == 0){	//search in list of all vars of all comps declared
 		for(int i = 0; i< numOfAllCompVars; i++){
-			if(strcmp(compToSearch, all_comp_vars[i]) == 0){
+			if(strcmp(whatToSearch, all_comp_vars[i]) == 0){
 				return 1;	//comp var exists
 			}
 		}
 		return 0; //comp var does not exist
+	}
+	else if(strcmp(whereToSearch, "all_comp_funcs") == 0){	//search in list of all funcs of all comps declared
+		for(int i = 0; i< numOfAllCompFuncs; i++){
+			if(strcmp(whatToSearch, all_comp_funcs[i]) == 0){
+				return 1;	//comp func exists
+			}
+		}
+		return 0; //comp func does not exist
 	}
 	else{
 		yyerror("Unknown Comp / Comp variable");

@@ -12,6 +12,8 @@
   ?? Στο bookstore.ka έχει στο Comp Person #address: Address;
   εμένα βγάζει Address address = ctor_Address
   ενω στο bookstore.c βγάζει Address address
+
+  ?? Πρέπει οι παράμετροι της comp func στη δήλωση της να μην έχουν ίδιο όνομα με αυτό της μεταβλητής μέλους
  
  !! Το αρχείο prime.ka έχει: 
  for num in [3: limit+1] (line 44) 
