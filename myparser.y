@@ -14,13 +14,16 @@
 	char* comps[MAX_COMPS];	//name of comp types will be stored here
 	char* comp_vars[MAX_COMP_VARS];	//name of comp variables will be stored here for each comp, during comp declaration. After that elements will be erased. 
 	char* comp_funcs[MAX_COMP_VARS];	//name of comp functions will be stored here for each comp, during comp declaration. After that elements will be erased. 
+	char* all_comp_vars[MAX_COMP_VARS];	//name of all comp variables declared in .ka program
+	char* all_comp_funcs[MAX_COMP_VARS];	//name of all comp functions declared in .ka program
 	char* temp;		//used to temporarily store name of a Comp(multiple var decl per line)
 	char* comp_var_name;		//used to temporarily store name of a Comp variable
 	
 	int insideCompDecl = 0;	//used to indicate that we are inside a comp declaration. For function comp variables handling inside functions
 	int numOfCompVars = 0; //num of variables per comp. Used in conjunction with comp_vars[MAX_COMP_VARS]
 	int numOfCompFuncs = 0; //num of functions per comp. Used in conjunction with comp_funcs[MAX_COMP_VARS]
-	
+	int numOfAllCompVars = 0;	//num of all variables declared in .ka program
+	int numOfAllCompFuncs = 0;	//num of all functions declared in .ka program
 	int isStr = 0;	//used for multiple variables declaration in one line
 	int numOfComps = 0;		//number of different Comp types declared in program
 	int isComp = 0; // used for Comp type variables
@@ -147,6 +150,8 @@ function_block:
 		if (insideCompDecl == 1){
 			comp_funcs[numOfCompFuncs] = $2;
 			numOfCompFuncs ++;
+			all_comp_funcs[numOfAllCompFuncs] = $2;
+			numOfAllCompFuncs ++;
 			if(strcmp($4, "") == 0) $$ = template("void (*%s)(SELF);", $2); //empty parameters 
 			else $$ = template("void (*%s)(SELF, %s);", $2, $4); 
 			strcat(comp_func_to_C, "void ");
@@ -163,6 +168,8 @@ function_block:
 		if (insideCompDecl == 1){
 			comp_funcs[numOfCompFuncs] = $2;
 			numOfCompFuncs ++;
+			all_comp_funcs[numOfAllCompFuncs] = $2;
+			numOfAllCompFuncs ++;
 			if(strcmp($4, "") == 0) $$ = template("void (*%s)(SELF);", $2); //empty parameters 
 			else $$ = template("void (*%s)(SELF, %s);", $2, $4); 
 			strcat(comp_func_to_C, "void ");
@@ -179,6 +186,8 @@ function_block:
 		if (insideCompDecl == 1){
 			comp_funcs[numOfCompFuncs] = $2;
 			numOfCompFuncs ++;
+			all_comp_funcs[numOfAllCompFuncs] = $2;
+			numOfAllCompFuncs ++;
 			if(strcmp($4, "") == 0) $$ = template("void (*%s)(SELF);", $2); //empty parameters 
 			else $$ = template("void (*%s)(SELF, %s);", $2, $4); 
 			strcat(comp_func_to_C, "void ");
@@ -195,6 +204,8 @@ function_block:
 		if (insideCompDecl == 1){
 			comp_funcs[numOfCompFuncs] = $2;
 			numOfCompFuncs ++;
+			all_comp_funcs[numOfAllCompFuncs] = $2;
+			numOfAllCompFuncs ++;
 			if(strcmp($4, "") == 0) $$ = template("%s (*%s)(SELF);", $6, $2); //empty parameters 
 			else $$ = template("%s (*%s)(SELF, %s);", $6, $2, $4); 
 			strcat(comp_func_to_C, $6); strcat(comp_func_to_C, " ");
@@ -212,6 +223,8 @@ function_block:
 		if (insideCompDecl == 1){
 			comp_funcs[numOfCompFuncs] = $2;
 			numOfCompFuncs ++;
+			all_comp_funcs[numOfAllCompFuncs] = $2;
+			numOfAllCompFuncs ++;
 			if(strcmp($4, "") == 0) $$ = template("%s (*%s)(SELF);", $6, $2); //empty parameters 
 			else $$ = template("%s (*%s)(SELF, %s);", $6, $2, $4); 
 			strcat(comp_func_to_C, $6); strcat(comp_func_to_C, " ");
@@ -253,7 +266,13 @@ expr:
 	| '#' TK_IDENT 	{
 					if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
 							$$ = template("self->%s", $2);
-					}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+					}else if ((insideCompDecl == 1) && (find_comp($2, "all_comp_vars"))){
+						//first if stmt will catch variables that belong to current
+						//comp declaration
+						//this if stmt will catch vars that belong to other comps
+						$$ = template("%s", $2);
+					}
+					else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 					}
 	| TK_CONSTSTR
 	| KW_FALSE	{$$ = template("0");}
@@ -285,7 +304,13 @@ expr:
 	| '#' TK_IDENT '[' expr ']' { 
 			if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
 				$$ = template("self->%s[%s]", $2, $4);
-			}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
+			}else if ((insideCompDecl == 1) && (find_comp($2, "all_comp_vars"))){
+				//first if stmt will catch variables that belong to current
+				//comp declaration
+				//this if stmt will catch vars that belong to other comps
+				$$ = template("%s[%s]", $2, $4);
+			}
+			else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		
 		}
 	| expr '.' expr {$$ = template("%s.%s", $1, $3);}
@@ -334,6 +359,7 @@ fict_token:
 			 }
 	| '#' TK_IDENT { if( (insideCompDecl == 1) && (find_comp($2, "comp_vars")) ){ //if inside comp declaration and token is member of comp then correct
 			   			$$ = template("self->%s", $2);
+						
 			   		}else {yyerror("Only comp variables inside comp declarations are preceded by # ");}
 		 }
 	| TK_IDENT '[' TK_CONSTINT ']' 	{ if( (insideCompDecl == 1) && (find_comp($1, "comp_vars")) ){ //if inside comp declaration and token is member of comp then error(should have '#')
@@ -449,7 +475,10 @@ comp_var_declarations:
 
 
 comp_var_declaration:
-	'#' one_var {$$ = template("%s", $2); comp_vars[numOfCompVars] = comp_var_name; numOfCompVars++;}
+	'#' one_var {
+				$$ = template("%s", $2); comp_vars[numOfCompVars] = comp_var_name; numOfCompVars++;
+				all_comp_vars[numOfAllCompVars] = comp_var_name; numOfAllCompVars++;
+				}
 	| comp_multi_var {$$ = template("%s", $1);}
 	;
 
@@ -468,6 +497,8 @@ comp_multi_var_3:
 																	}
 										comp_vars[numOfCompVars] = $2; numOfCompVars++;
 										comp_vars[numOfCompVars] = $7; numOfCompVars++;
+										all_comp_vars[numOfAllCompVars] = $2; numOfAllCompVars++;
+										all_comp_vars[numOfAllCompVars] = $7; numOfAllCompVars++;
 										}
 	| '#' TK_IDENT '[' ']' ',' comp_multi_var_3  {	if(isStr == 1){
 														$$ = template("%s, **%s", $6, $2);
@@ -476,6 +507,7 @@ comp_multi_var_3:
 														$$ = template("%s, *%s", $6, $2);
 													}
 										comp_vars[numOfCompVars] = $2; numOfCompVars++;
+										all_comp_vars[numOfAllCompVars] = $2; numOfAllCompVars++;
 										}
 	; 
 
@@ -488,6 +520,8 @@ comp_multi_var_2:
 										}
 										comp_vars[numOfCompVars] = $2; numOfCompVars++;
 										comp_vars[numOfCompVars] = $8; numOfCompVars++;
+										all_comp_vars[numOfAllCompVars] = $2; numOfAllCompVars++;
+										all_comp_vars[numOfAllCompVars] = $8; numOfAllCompVars++;
 										}
 	| '#' TK_IDENT '[' TK_CONSTINT ']' ',' comp_multi_var_2 {	if(isStr == 1){
 																	$$ = template("%s, *%s[%s]", $7, $2, $4);
@@ -496,6 +530,7 @@ comp_multi_var_2:
 																	$$ = template("%s, %s[%s]", $7, $2, $4);
 																}
 								comp_vars[numOfCompVars] = $2; numOfCompVars++;
+								all_comp_vars[numOfAllCompVars] = $2; numOfAllCompVars++;
 								}
 	; 
 
@@ -511,6 +546,8 @@ comp_multi_var_1:
 										}
 										comp_vars[numOfCompVars] = $2; numOfCompVars++;
 										comp_vars[numOfCompVars] = $5; numOfCompVars++;
+										all_comp_vars[numOfAllCompVars] = $2; numOfAllCompVars++;
+										all_comp_vars[numOfAllCompVars] = $5; numOfAllCompVars++;
 										}
 	| '#' TK_IDENT ',' comp_multi_var_1 {	if(isStr == 1){
 												$$ = template("%s, *%s", $4, $2);
@@ -522,6 +559,7 @@ comp_multi_var_1:
 												$$ = template("%s, %s", $4, $2);
 											}
 								comp_vars[numOfCompVars] = $2; numOfCompVars++;
+								all_comp_vars[numOfAllCompVars] = $2; numOfAllCompVars++;
 								}
 	;
 /*
@@ -699,7 +737,15 @@ int find_comp(char* compToSearch, char* whereToSearch){
 				return 1;	//comp var exists
 			}
 		}
-		return 0; //comp does not exist
+		return 0; //comp var does not exist
+	}
+	else if(strcmp(whereToSearch, "all_comp_vars") == 0){
+		for(int i = 0; i< numOfAllCompVars; i++){
+			if(strcmp(compToSearch, all_comp_vars[i]) == 0){
+				return 1;	//comp var exists
+			}
+		}
+		return 0; //comp var does not exist
 	}
 	else{
 		yyerror("Unknown Comp / Comp variable");

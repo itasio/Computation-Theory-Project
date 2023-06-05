@@ -41,11 +41,11 @@ comp Book:
   #numOfCopies: integer;
   #price: scalar;
 
-  def setBook(t: str, a: Person, numOfCop: integer, pr: scalar):
+  def setBook(t: str, a: Person, numOfCop: integer, pric: scalar):
     #title = t;
     #author = a;
     #numOfCopies = numOfCop;
-    #price = pr;
+    #price = pric;
   enddef;
 
   def printBook():
