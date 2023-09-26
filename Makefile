@@ -4,3 +4,4 @@ lex_file : parser_files
 	flex lexer-pr.l
 parser_files :
 	bison -d -v -r all myparser.y
+
