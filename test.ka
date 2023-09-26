@@ -1,0 +1,62 @@
+comp City:
+    #adyubd, #z, #x: scalar;
+    #adyubd, #z, #x: scalar;
+    #adyubd, #z, #x: boolean;
+    #adyubd, #z, #x: str;
+    #y: scalar;
+    #a : integer;
+
+    def bla(t : scalar, j: integer, directions[]: str):
+        #a = 3;
+        #a  += #a * n;
+        #y = 3**2;
+        return;
+    enddef;
+
+    def koko():
+        yy : integer;
+        yy = 3;
+        #a  += #a * n;
+        #y = #y**yy;
+        return;
+    enddef;
+    def lili(t : scalar, j: integer, directions[]: str)->scalar:
+        return #x + (#z**#x);
+    enddef;
+
+endcomp;
+
+comp Adress:
+    #adyubd: boolean;
+    #k : integer;
+    #bla[3], #x[4], #x[4]: str;
+    #a[], #b[], #x[] : str;
+
+    def lolo(i: str):
+        poni[4]: str;
+       #adyubd = True;
+       #k = 1;
+       poni[#k] = 1;
+    enddef; 
+endcomp;
+
+const x = 3: integer;
+
+orderId: integer;
+
+def createAddress(s: str, n: integer, c: str)-> Adress:
+  a, a2: Adress;
+    x = 3;
+  setAddress(s, n, c); 
+  hgfl = setAddress(s, n, c);    
+  a.setAddress(s, n, c); 
+  hgfl = a.setAddress(s, n, c).b(); 
+  return a;
+enddef;
+
+def foo():
+;
+enddef;
+def main():
+
+enddef;

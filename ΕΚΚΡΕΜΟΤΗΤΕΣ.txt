@@ -1,0 +1,28 @@
+ΕΚΚΡΕΜΟΤΗΤΕΣ
+
+
+?? func().x(); δεν το παιρνει
+
+
+
+?? Τι παίζει με αυτό στo prime.ka  
+  isPrime = n % i != 0;  .ka
+  isPrime = ((int) n) % ((int) i) != 0; .c
+
+  ?? Στο bookstore.ka έχει στο Comp Person #address: Address;
+  εμένα βγάζει Address address = ctor_Address
+  ενω στο bookstore.c βγάζει Address address
+
+  ?? Πρέπει οι παράμετροι της comp func στη δήλωση της να μην έχουν ίδιο όνομα με αυτό της μεταβλητής μέλους
+ 
+ !! Το αρχείο prime.ka έχει: 
+ for num in [3: limit+1] (line 44) 
+ αλλά σε αυτό που μας δωσανε σαν μετατροπή σε C έχει 
+ for (int num =3; num<limit + 1; num+=2) σε αντιθεση με τις οδηγίες της εκφώνησης για βήμα +1 όταν παραλείπεται 
+
+!! Το αρχείο qsort.ka και qsort_comprehension.ka έχει την def quickSort(a[]:integer, low:integer, high:integer) -> void: (line 29)
+ενώ στην εκφώνηση λέει ότι μπαίνουν -> τύπος μόνο όταν υπάρχει συνάρτηση επιστρέφει κάποια τιμή
+
+!! Το bookstore.ka έχει μία συνάρτηση χωρίς εντολή. Ούτε καν την κενή. Η κενή εντολή σύμφωνα με την εκφώνηση είναι σκέτο ';'
+
+

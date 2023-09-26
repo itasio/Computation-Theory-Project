@@ -1,23 +1,11 @@
 %{
-	//-1 is for EOF
-	#define TK_ERROR -3
-	#define TK_NEWLINE -2
-	#define TK_IDENT 258
-	#define TK_ASSIGN 259
-	#define TK_ARITHMETIC 260
-	#define TK_KEYWORD 261
-	#define TK_CONSTINT 262
-	#define TK_CONSTFLOAT 263
-	#define TK_CONSTSTR 264
-	#define TK_CONSTBOOL 265
-	#define TK_LOGICAL 266
-	#define TK_RELATIONAL 267
-	#define TK_DELIMITER 268
 
+	#include "myparser.tab.h"
+	#include "cgen.h"	
 	#include <math.h>
 	#include <stdio.h>
 	#include <string.h>
-	int lineNum = 1;
+	int line_num = 1;
 	int j;
 	int MAX_STR_CONST = 500;
 %}
@@ -42,54 +30,81 @@ CONST_FLOAT		{CONST_INT}"."({DIGIT}+)(([eE][+-]?{CONST_INT})?)
 													string_buf[j]='"';
 													j++;
 													string_buf[j]='\0';
-													printf("token CONST_STRING: %s\n", string_buf);
+													//printf("token CONST_STRING: %s\n", string_buf);
+													yylval.str = strdup(string_buf);
 													for(;j>=0;j--){
 														string_buf[j] = '\0';
 													}
-													return TK_CONSTSTR;}
+													return TK_CONSTSTR;
+													}
 													
-"and"|"or"|"not"							{printf("token LOGICAL_OP: "); return TK_LOGICAL;}																		
-"integer"|"for"|"break"|"def"|"endcomp"|"scalar"|"const"|"in"|"continue"|"enddef"|"of"|"str"|"if"|"endfor"|"main"|"boolean"|"else"|"while"|return"|"endif"|"endwhile"|comp"			{ printf("token KEYWORD: "); return TK_KEYWORD;}
-"True"										{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
-"False"										{printf("token CONST_BOOL: "); return TK_CONSTBOOL;}
-{CONST_INT}									{printf("token CONST_INT: "); return TK_CONSTINT;}
-{CONST_FLOAT}								{printf("token CONST_FLOAT: "); return TK_CONSTFLOAT;}
-{IDENTIFIER}								{printf("token IDENTIFIER: "); return TK_IDENT;}
-"+"|"-"|"*"|"/"|"%"|"**"					{printf("token ARITHMETIC_OP: "); return TK_ARITHMETIC;}
-"="|"+="|"-="|"*="|"/="|"%="				{printf("token ASSIGN_OP: "); return TK_ASSIGN;}
-"=="|"!="|"<"|"<="|">"|">="					{printf("token RELATIONAL_OP: "); return TK_RELATIONAL;}
-";"|"("|")"|","|"["|"]"|":"|"."				{printf("token DELIMITER: "); return TK_DELIMITER;}
+"and"		return KW_AND;
+"or"		return KW_OR;
+"not"		return KW_NOT;														
+"integer"	return KW_INTEGER;
+"for"		return KW_FOR;
+"break"		return KW_BREAK;
+"def"		return KW_DEF;
+"endcomp"	return KW_ENDCOMP;
+"scalar"	return KW_SCALAR;
+"const"		return KW_CONST;
+"in"		return KW_IN;
+"continue"	return KW_CONTINUE;
+"enddef"	return KW_ENDDEF;
+"of"		return KW_OF;
+"str"		return KW_STR;
+"if"		return KW_IF;
+"endfor"	return KW_ENDFOR;
+"main"		return KW_MAIN;
+"boolean"	return KW_BOOLEAN;
+"else"		return KW_ELSE;
+"while"		return KW_WHILE;
+"return"	return KW_RETURN;
+"endif"		return KW_ENDIF;
+"endwhile"	return KW_ENDWHILE;
+"comp"		return KW_COMP;
+"True"		return KW_TRUE;
+"False"		return KW_FALSE;
+{CONST_INT}								{yylval.str = strdup(yytext); return TK_CONSTINT;}
+{CONST_FLOAT}							{yylval.str = strdup(yytext); return TK_CONSTFLOAT;}
+{IDENTIFIER}							{yylval.str = strdup(yytext); return TK_IDENT;}
+
+"+"			return '+';
+"-"			return '-';
+"*"			return '*';
+"/"			return '/';
+"%"			return '%';
+"="			return '=';
+"#"			return '#';	
+"**"									return TK_POW;
+"+="									return TK_PLUEQ;
+"-="									return TK_MINEQ;
+"*="									return TK_MULEQ;
+"/="									return TK_DIVEQ;
+"%="									return TK_MODEQ;
+":="									return TK_COLEQ;
+"=="									return TK_EQEQ;
+"!="									return TK_NOTEQ;
+">="									return TK_GREEQ;
+"<="									return TK_LESEQ;
+"->"									return TK_FUNC_RET;
+"<"			return '<';
+">"			return '>';
+";"			return ';';
+"("			return '(';
+")"			return ')';
+","			return ',';
+"["			return '[';
+"]"			return ']';
+":"			return ':';
+"."			return '.';
 
 [ \r\t]+		/* eat whitespace */
 "--"[^\n]*  	/* eat line comments */
-\n 				{++lineNum; return TK_NEWLINE;}
+\n 				++line_num;
 
 <<EOF>> 	return EOF;
-.           { printf("Unrecognized token %s in line: %d ", yytext, lineNum); return TK_ERROR;}
+.           { yyerror("lexical error: unrecognized literal '%s'\n", yytext);}
 
 
 %%
-int main ()
-{
-   int token, i;
-   int counter = 0;
-   char str[MAX_STR_CONST];						//keep here the input to show whole text of line where an error has occured
-   str[0]='\0';
-	while ( (token = yylex()) != EOF ){
-		if(token == TK_NEWLINE){		
-			for(i=strlen(str);i>=0;i--){	//<<erasing>> the former line, to be ready for the next one
-				str[i] = '\0';
-			}
-		}else{
-			strcat(str, yytext);
-		}
-		if(token != TK_ERROR){
-			if(token != TK_NEWLINE && token != TK_CONSTSTR)		//do not print new line or string literal(has already been printed)
-				printf("%s\n", yytext);
-		}
-		else{
-			printf("%s\n", str);
-			return -1;
-		}
-	}
-}
